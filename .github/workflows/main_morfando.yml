@@ -3,20 +3,15 @@
 
 name: Build and deploy Node.js app to Azure Web App - Morfando
 
-env:
-  AZURE_WEBAPP_PACKAGE_PATH: './backend'      # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '16.x'                # set this to the node version to use
-
-
 on:
   push:
     branches:
       - main
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./backend
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: 'backend' # set this to the path to your web app project, defaults to the repository root
+
 
 jobs:
   build:
@@ -31,6 +26,7 @@ jobs:
           node-version: '16.x'
 
       - name: npm install, build, and test
+        working-directory: backend
         run: |
           npm install
           npm run build --if-present
@@ -62,4 +58,4 @@ jobs:
           app-name: 'Morfando'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3D378816AA7B43C28DD4A002481ED779 }}
-          package: .
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/build
