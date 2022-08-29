@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: 'backend' # set this to the path to your web app project, defaults to the repository root
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -54,4 +58,4 @@ jobs:
           app-name: 'Morfando'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3D378816AA7B43C28DD4A002481ED779 }}
-          package: .
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/build
