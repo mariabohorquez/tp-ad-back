@@ -12,7 +12,7 @@ exports.create = (req, res) => {
   // Create a Restaurant
   const restaurant = new Restaurant({
     name: req.body.name,
-    type: req.body.type
+    kind: req.body.kind
   });
 
   // Save Restaurant in the database
