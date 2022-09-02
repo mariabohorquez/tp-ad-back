@@ -1,5 +1,5 @@
 module.exports = mongoose => {
-  var schema = mongoose.Schema(
+  const schema = mongoose.Schema(
     {
       name: String,
       type: String
