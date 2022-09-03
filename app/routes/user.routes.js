@@ -21,11 +21,9 @@ module.exports = app => {
     // Retrieve all user favorite restaurants
     router.get("/:id/favoriteRestaurants", users.findAllFavoriteRestaurants);
 
-    // Retrieve a single favorite restaurant from user with id
-    router.get("/:id/favoriteRestaurants/:restaurantId", users.findOneFavoriteRestaurant);
+    // Add a favorite restaurant to the user
+    router.post("/:id/favoriteRestaurants/:restaurantId", users.addFavoriteRestaurant);
 
-    // Add an favorite restaurant to the user
-    app.post("/api/users/favoriteRestaurants", router);
-
+    app.use("/api/users", router);
   };
   

@@ -37,5 +37,11 @@ module.exports = app => {
   router.put("/:restaurantId/dishes/:dishId", restaurants.updateDish);
   router.delete("/:restaurantId/dishes/:dishId", restaurants.deleteDish);
 
+  // Dishes categories
+  router.post("/:restaurantId/dishes/categories", restaurants.createCategory);
+  router.get("/:restaurantId/dishes/categories", restaurants.getAllCategories);
+  router.delete("/:restaurantId/dishes/categories/:categoryId", restaurants.deleteCategory);
+  router.put("/:restaurantId/dishes/categories/:categoryId", restaurants.updateCategory);
+
   app.use("/api/restaurants", router);
 };

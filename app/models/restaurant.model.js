@@ -26,7 +26,13 @@ module.exports = mongoose => {
         state: String,
         country: String,
       },
-      categories:[
+      restaurantTypes:[
+        {
+          type:String,
+          required: true,
+        }
+      ],
+      menuCategories:[
         {
           type:String,
           required: true,
@@ -34,7 +40,7 @@ module.exports = mongoose => {
       ],
       menu:[{
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'menu'
+        ref: 'dish'
       }]  
     },
     { timestamps: true }

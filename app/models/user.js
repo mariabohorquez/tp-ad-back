@@ -41,6 +41,6 @@ module.exports = mongoose => {
     return object;
   });
   
-  const Owner = mongoose.model("owner", schema);
-  return Owner;
+  const User = mongoose.model("user", schema);
+  return User;
 };
