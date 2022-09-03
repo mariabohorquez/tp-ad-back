@@ -22,7 +22,7 @@ module.exports = mongoose => {
     },
     profilePicture: {
       type: Buffer,
-      required: false;
+      required: false,
       unique: false,
     },    
     favoriteRestaurants:[

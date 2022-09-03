@@ -24,6 +24,12 @@ module.exports = app => {
   // Delete a Restaurants with id
   router.delete("/:id", restaurants.delete);
 
+  // Set restaurant status to active
+  router.put("/:id/activate", restaurants.activate);
+
+  // Set restaurant status to inactive
+  router.put("/:id/deactivate", restaurants.deactivate);
+
   // Dishes CRUD
   router.post("/:restaurantId/dishes", restaurants.createDish);
   router.get("/:restaurantId/dishes", restaurants.findAllDishes);
