@@ -1,3 +1,2 @@
 const db = require("../models");
-const Owner = db.owner;
-
+const User = db.user;
