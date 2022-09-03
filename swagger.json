@@ -33,6 +33,7 @@
           "Restaurants"
         ],
         "summary": "Get all restaurants in system",
+        "description":"API for restaurants in the system",
         "responses": {
           "200": {
             "description": "OK",
