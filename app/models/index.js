@@ -7,5 +7,7 @@ const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
 db.restaurants = require("./restaurant.model.js")(mongoose);
+db.dishes = require("./dish.model.js")(mongoose);
+db.reviews = require("./review.model.js")(mongoose);
 
 module.exports = db;

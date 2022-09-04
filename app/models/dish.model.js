@@ -11,7 +11,7 @@ module.exports = mongoose => {
       unique: false,
     },
     price: {
-      type: Decimal128,
+      type: mongoose.Schema.Types.Decimal128,
       required: true,
       unique: false,
     },

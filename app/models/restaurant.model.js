@@ -6,13 +6,18 @@ module.exports = mongoose => {
         required: true,
         unique: true
       },
-      openingTime:{
-        type: Date,
-        required: true,
+      openingTime: {
+        hours: Number,
+        minutes: Number,
       },
       closingTime:{
-        type: Date,
-        required: true,
+        hours: Number,
+        minutes: Number,
+      },
+      isClosedOverwrite:{
+        type: Boolean,
+        required: false,
+        default: false,
       },
       priceRange:{
         type: String,
@@ -20,7 +25,7 @@ module.exports = mongoose => {
       },
       address:{
         streetName: String,
-        streetNumber: Integer,
+        streetNumber: Number,
         neighborhood: String,
         city: String,
         state: String,
@@ -41,17 +46,21 @@ module.exports = mongoose => {
       menu:[{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'dish'
-      }]  
-    },
-    { timestamps: true }
-    );
-    
-    schema.method("toJSON", function() {
-      const { __v, _id, ...object } = this.toObject();
-      object.id = _id;
-      return object;
-    });
-    
-    const Restaurant = mongoose.model("restaurant", schema);
-    return Restaurant;
+      }],
+      reviews:[{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'review'
+    }]
+  },
+  { timestamps: true }
+  );
+
+  schema.method("toJSON", function() {
+    const { __v, _id, ...object } = this.toObject();
+    object.id = _id;
+    return object;
+  });
+  
+  const Restaurant = mongoose.model("restaurant", schema);
+  return Restaurant;
   };
