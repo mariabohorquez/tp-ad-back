@@ -13,13 +13,13 @@ module.exports = app => {
   router.get("/:name", restaurants.findAll);
 
   // Retrieve a single Restaurants with id
-  router.get("/:id", restaurants.findOne);
+  router.get("/id/:id", restaurants.findOne);
 
   // Update a Restaurants with id
   router.put("/:id", restaurants.update);
 
   // Post a review to a restaurant
-  router.post("/:id", restaurants.createReview);
+  router.post("/:id/review", restaurants.createReview);
 
   // Delete a Restaurants with id
   router.delete("/:id", restaurants.delete);
@@ -31,8 +31,8 @@ module.exports = app => {
   router.put("/:id/activate", restaurants.activate);
 
   // Dishes CRUD
-  // router.post("/:restaurantId/dishes", restaurants.createDish);
-  // router.get("/:restaurantId/dishes", restaurants.findAllDishes);
+  router.post("/:restaurantId/dishes", restaurants.createDish);
+  router.get("/:restaurantId/dishes", restaurants.findAllDishes);
   // router.get("/:restaurantId/dishes/:dishId", restaurants.findOneDish);
   // router.put("/:restaurantId/dishes/:dishId", restaurants.updateDish);
   // router.delete("/:restaurantId/dishes/:dishId", restaurants.deleteDish);

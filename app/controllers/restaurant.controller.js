@@ -1,6 +1,7 @@
 const db = require("../models");
 const Restaurant = db.restaurants;
 const Review = db.reviews;
+const Dish = db.dishes;
 
 // Create and Save a new Restaurant
 exports.create = (req, res) => {
@@ -39,9 +40,10 @@ exports.create = (req, res) => {
 // Retrieve all Restaurants from the database.
 // Can be filtered by name.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
+  const name = req.params.name;
   var condition = name ? { name: { $regex: new RegExp(name), $options: "i" } } : {};
-  
+  console.log(condition);
+
   Restaurant.find(condition)
   .then(data => {
     res.status(200).send(data);
@@ -110,6 +112,17 @@ exports.createReview = (req, res) => {
     name: req.body.name,
     rating: req.body.rating,
     comment: req.body.comment
+  });
+
+  console.log(review);
+
+  review
+  .save(review)
+  .catch(err => {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while creating the review."
+    });
   });
   
   // Add review to array
@@ -189,6 +202,74 @@ exports.activate = (req, res) => {
   .catch(err => {
     res.status(500).send({
       message: "Error updating Restaurant with id=" + id + " with error: " + err
+    });
+  });
+}
+
+
+// Post a review to a restaurant
+exports.createDish = (req, res) => {
+  const id = req.params.restaurantId;
+  
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update cannot be empty!"
+    });
+  }
+  
+  const dish = new Dish({
+    name: req.body.name,
+    category: req.body.category,
+    price: req.body.price,
+    picture: req.body.picture,
+    ingredients: req.body.ingredients,
+    isVegan: req.body.isVegan,
+    isGlutenFree: req.body.isGlutenFree,
+  });
+
+  console.log(dish);
+
+  dish
+  .save(dish)
+  .catch(err => {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while creating dish: " + dish
+    });
+  });
+  
+  // Add dish to array
+  Restaurant.findOneAndUpdate(
+    { _id: id }, 
+    { $push: { menu: dish } },
+    { upsert: true, new: true })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
+        });
+      } else res.status(200).send({ message: "Restaurant was updated successfully." });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Restaurant with id=" + id
+      });
+    });
+  };
+
+// Get all dishes from a restaurant
+// Reference: https://www.bezkoder.com/mongoose-one-to-many-relationship/
+exports.findAllDishes = (req, res) => {
+  const id = req.params.restaurantId;
+  
+  Restaurant.findById(id).populate("menu", "-_id -__v")
+  .then(data => {
+    res.status(200).send(data.menu);
+  })
+  .catch(err => {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while retrieving the menu for restaurant" + id
     });
   });
 }
