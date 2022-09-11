@@ -33,18 +33,18 @@ module.exports = app => {
   // Dishes CRUD
   router.post("/:restaurantId/dishes", restaurants.createDish);
   router.get("/:restaurantId/dishes", restaurants.findAllDishes);
-  // router.get("/:restaurantId/dishes/:dishId", restaurants.findOneDish);
-  // router.put("/:restaurantId/dishes/:dishId", restaurants.updateDish);
-  // router.delete("/:restaurantId/dishes/:dishId", restaurants.deleteDish);
+  router.get("/:restaurantId/dishes/:dishId", restaurants.findOneDish);
+  router.put("/:restaurantId/dishes/:dishId", restaurants.updateDish);
+  router.delete("/:restaurantId/dishes/:dishId", restaurants.deleteDish);
 
   // Dishes categories
-  // router.post("/:restaurantId/dishes/categories", restaurants.createCategory);
-  // router.get("/:restaurantId/dishes/categories", restaurants.getAllCategories);
-  // router.delete("/:restaurantId/dishes/categories/:categoryId", restaurants.deleteCategory);
-  // router.put("/:restaurantId/dishes/categories/:categoryId", restaurants.updateCategory);
+  router.post("/:restaurantId/dishes/categories", restaurants.createCategory);
+  router.get("/:restaurantId/dishes/categories", restaurants.findAllCategories);
+  router.delete("/:restaurantId/dishes/categories/:categoryId", restaurants.deleteCategory);
+  router.put("/:restaurantId/dishes/categories/:categoryId", restaurants.updateCategory);
 
   // Helper routes
-  // router.get("/:restaurantId/reviews", restaurants.findAllReviews);
+  router.get("/:restaurantId/reviews", restaurants.findAllReviews);
 
   app.use("/api/restaurants", router);
 };
