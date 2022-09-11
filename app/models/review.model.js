@@ -6,7 +6,7 @@ module.exports = mongoose => {
     },
     rating: {
       type: Number, // 1-5
-      required: true,
+      required: true
     },
     comment: {
       type: String, // can be empty
@@ -15,14 +15,14 @@ module.exports = mongoose => {
     }
   }, {
     timestamp: true
-  });
-  
-  schema.method("toJSON", function() {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-  });
-  
-  const Review = mongoose.model("review", schema);
-  return Review;
-};
+  })
+
+  schema.method('toJSON', function () {
+    const { __v, _id, ...object } = this.toObject()
+    object.id = _id
+    return object
+  })
+
+  const Review = mongoose.model('review', schema)
+  return Review
+}

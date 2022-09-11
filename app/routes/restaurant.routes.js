@@ -1,50 +1,50 @@
 module.exports = app => {
-  const restaurants = require("../controllers/restaurant.controller.js");
+  const restaurants = require('../controllers/restaurant.controller.js')
 
-  var router = require("express").Router();
+  const router = require('express').Router()
 
   // Create a new Restaurant
-  router.post("/", restaurants.create);
+  router.post('/', restaurants.create)
 
   // Retrieve all restaurants
-  router.get("/", restaurants.findAll);
+  router.get('/', restaurants.findAll)
 
   // Retrieve all restaurants matching a regex
-  router.get("/:name", restaurants.findAll);
+  router.get('/:name', restaurants.findAll)
 
   // Retrieve a single Restaurants with id
-  router.get("/id/:id", restaurants.findOne);
+  router.get('/id/:id', restaurants.findOne)
 
   // Update a Restaurants with id
-  router.put("/:id", restaurants.update);
+  router.put('/:id', restaurants.update)
 
   // Post a review to a restaurant
-  router.post("/:id/review", restaurants.createReview);
+  router.post('/:id/review', restaurants.createReview)
 
   // Delete a Restaurants with id
-  router.delete("/:id", restaurants.delete);
+  router.delete('/:id', restaurants.delete)
 
   // Set restaurant status to closed by force
-  router.put("/:id/deactivate", restaurants.deactivate);
+  router.put('/:id/deactivate', restaurants.deactivate)
 
   // Remove closed by force flag
-  router.put("/:id/activate", restaurants.activate);
+  router.put('/:id/activate', restaurants.activate)
 
   // Dishes CRUD
-  router.post("/:restaurantId/dishes", restaurants.createDish);
-  router.get("/:restaurantId/dishes", restaurants.findAllDishes);
-  router.get("/:restaurantId/dishes/:dishId", restaurants.findOneDish);
-  router.put("/:restaurantId/dishes/:dishId", restaurants.updateDish);
-  router.delete("/:restaurantId/dishes/:dishId", restaurants.deleteDish);
+  router.post('/:restaurantId/dishes', restaurants.createDish)
+  router.get('/:restaurantId/dishes', restaurants.findAllDishes)
+  router.get('/:restaurantId/dishes/:dishId', restaurants.findOneDish)
+  router.put('/:restaurantId/dishes/:dishId', restaurants.updateDish)
+  router.delete('/:restaurantId/dishes/:dishId', restaurants.deleteDish)
 
   // Dishes categories
-  router.post("/:restaurantId/dishes/categories", restaurants.createCategory);
-  router.get("/:restaurantId/dishes/categories", restaurants.findAllCategories);
-  router.delete("/:restaurantId/dishes/categories/:categoryId", restaurants.deleteCategory);
-  router.put("/:restaurantId/dishes/categories/:categoryId", restaurants.updateCategory);
+  router.post('/:restaurantId/dishes/categories', restaurants.createCategory)
+  router.get('/:restaurantId/dishes/categories', restaurants.findAllCategories)
+  router.delete('/:restaurantId/dishes/categories/:categoryId', restaurants.deleteCategory)
+  router.put('/:restaurantId/dishes/categories/:categoryId', restaurants.updateCategory)
 
   // Helper routes
-  router.get("/:restaurantId/reviews", restaurants.findAllReviews);
+  router.get('/:restaurantId/reviews', restaurants.findAllReviews)
 
-  app.use("/api/restaurants", router);
-};
+  app.use('/api/restaurants', router)
+}

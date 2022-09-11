@@ -8,61 +8,61 @@ module.exports = mongoose => {
       },
       openingTime: {
         hours: Number,
-        minutes: Number,
+        minutes: Number
       },
-      closingTime:{
+      closingTime: {
         hours: Number,
-        minutes: Number,
+        minutes: Number
       },
-      isClosedOverwrite:{
+      isClosedOverwrite: {
         type: Boolean,
         required: false,
-        default: false,
+        default: false
       },
       // $, $$, $$$, $$$$
-      priceRange:{ 
+      priceRange: {
         type: String,
         required: true
       },
-      address:{
+      address: {
         streetName: String,
         streetNumber: Number,
         neighborhood: String,
         city: String,
         state: String,
-        country: String,
+        country: String
       },
       // Force this to be some pre-approved types
-      restaurantTypes:[
+      restaurantTypes: [
         {
-          type:String,
-          required: true,
+          type: String,
+          required: true
         }
       ],
-      menuCategories:[
+      menuCategories: [
         {
-          type:String,
-          required: true,
+          type: String,
+          required: true
         }
       ],
-      menu:[{
-        type: mongoose.Schema.Types.ObjectId, 
+      menu: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'dish'
       }],
-      reviews:[{
-        type: mongoose.Schema.Types.ObjectId, 
+      reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'review'
-    }]
-  },
-  { timestamps: true }
-  );
+      }]
+    },
+    { timestamps: true }
+  )
 
-  schema.method("toJSON", function() {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-  });
-  
-  const Restaurant = mongoose.model("restaurant", schema);
-  return Restaurant;
-  };
+  schema.method('toJSON', function () {
+    const { __v, _id, ...object } = this.toObject()
+    object.id = _id
+    return object
+  })
+
+  const Restaurant = mongoose.model('restaurant', schema)
+  return Restaurant
+}
