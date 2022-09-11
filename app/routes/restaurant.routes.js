@@ -24,7 +24,7 @@ module.exports = app => {
   // Delete a Restaurants with id
   router.delete("/:id", restaurants.delete);
 
-  // Set restaurant status to inactivate by force
+  // Set restaurant status to closed by force
   router.put("/:id/deactivate", restaurants.deactivate);
 
   // Remove closed by force flag
@@ -42,6 +42,9 @@ module.exports = app => {
   // router.get("/:restaurantId/dishes/categories", restaurants.getAllCategories);
   // router.delete("/:restaurantId/dishes/categories/:categoryId", restaurants.deleteCategory);
   // router.put("/:restaurantId/dishes/categories/:categoryId", restaurants.updateCategory);
+
+  // Helper routes
+  // router.get("/:restaurantId/reviews", restaurants.findAllReviews);
 
   app.use("/api/restaurants", router);
 };

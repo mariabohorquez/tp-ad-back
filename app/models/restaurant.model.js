@@ -19,7 +19,8 @@ module.exports = mongoose => {
         required: false,
         default: false,
       },
-      priceRange:{
+      // $, $$, $$$, $$$$
+      priceRange:{ 
         type: String,
         required: true
       },
@@ -31,6 +32,7 @@ module.exports = mongoose => {
         state: String,
         country: String,
       },
+      // Force this to be some pre-approved types
       restaurantTypes:[
         {
           type:String,

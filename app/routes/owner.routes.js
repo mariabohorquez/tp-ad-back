@@ -15,6 +15,9 @@ module.exports = app => {
   // Update an owners with id
   router.put("/:id", owners.update);
 
+  // Associate a restaurant to an owner
+  router.put("/:id/restaurant/:restaurantId", owners.addRestaurant);
+
   // Recover owner password
   router.post("/:id/recoverPassword", owners.recoverPassword);
   

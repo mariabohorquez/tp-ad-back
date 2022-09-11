@@ -21,7 +21,7 @@ module.exports = mongoose => {
       unique: false,
     },
     ingredients: {
-      type: String,
+      type: String, // fresa, leche, azucar
       required: true,
       unique: false,
     },

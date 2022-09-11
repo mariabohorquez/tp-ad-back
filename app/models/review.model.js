@@ -5,11 +5,11 @@ module.exports = mongoose => {
       required: true
     },
     rating: {
-      type: Number,
+      type: Number, // 1-5
       required: true,
     },
     comment: {
-      type: String,
+      type: String, // can be empty
       required: false,
       default: null
     }
