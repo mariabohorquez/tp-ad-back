@@ -10,14 +10,9 @@ module.exports = mongoose => {
       required: true,
       unique: false
     },
-    fistName: {
+    name: {
       type: String,
-      required: true,
-      unique: false
-    },
-    lastName: {
-      type: String,
-      required: true,
+      required: false,
       unique: false
     },
     profilePicture: {

@@ -32,17 +32,17 @@ module.exports = mongoose => {
         state: String,
         country: String
       },
-      // Force this to be some pre-approved types
+      // TODO: Force this to be some pre-approved types
       restaurantTypes: [
         {
           type: String,
-          required: true
+          required: false
         }
       ],
       menuCategories: [
         {
           type: String,
-          required: true
+          required: false
         }
       ],
       menu: [{

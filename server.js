@@ -3,11 +3,13 @@ const cors = require("cors");
 
 const app = express();
 
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
+// Swagger documentation
+// https://levelup.gitconnected.com/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger_autogen.json')
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -32,21 +34,13 @@ db.mongoose
 
 // Base route
 app.get("/", (req, res) => {
-  res.json({ message: "Healthy." });
+  res.json({ message: "Server is running." });
 });
 
-// Swagger documentation
-// https://levelup.gitconnected.com/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce
-const swaggerUi = require("swagger-ui-express"),
-swaggerDocument = require("./swagger.json");
-
-app.use(
-  '/docs',
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument)
-);
-
 require("./app/routes/restaurant.routes")(app);
+// require("./app/routes/owner.routes")(app);
+// require("./app/routes/user.routes")(app);
+require("./app/routes/helpers.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

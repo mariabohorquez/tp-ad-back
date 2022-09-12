@@ -5,6 +5,27 @@ const Dish = db.dishes
 
 // Create and Save a new Restaurant
 exports.create = (req, res) => {
+  /* #swagger.tags = ['Restaurant']
+     #swagger.summary = 'Create a restaurant.'
+     #swagger.description = `Endpoint to create a restaurant.
+                             Prices must be either $, $$, $$$ or $$$$.
+                             The menu will be empty at creation time.`
+                             `
+     #swagger.parameters['obj'] = {
+      in: 'body',
+      description: 'Restaurant object',
+      required: true,
+      type: 'object',
+      schema: { $ref: "#/definitions/Restaurant" }
+   }
+  /* #swagger.responses[200] = {
+    description: 'Restaurant created successfully',
+    schema: { $ref: "#/definitions/Restaurant" }
+  }
+   #swagger.responses[500] = {
+    description: 'Error creating restaurant',
+  } */
+
   // Validate request
   if (!req.body.name) {
     res.status(400).send({ message: 'Content can not be empty!' })
@@ -37,15 +58,47 @@ exports.create = (req, res) => {
     })
 }
 
+exports.findAll = (req, res) => {
+  /* #swagger.tags = ['Restaurant']
+     #swagger.summary = 'Get all restaurants.'
+     #swagger.description = 'Endpoint to get all restaurants.'
+     #swagger.responses[200] = {
+      description: 'Restaurants retrieved successfully',
+      schema: { $ref: "#/definitions/Restaurant" }
+     }
+     #swagger.responses[500] = {
+      description: 'Error retrieving restaurants',
+     }
+  */
+  this.findAllWithFilter(req, res)
+}
+
 // Retrieve all Restaurants from the database.
 // Can be filtered by name.
-exports.findAll = (req, res) => {
-  const name = req.params.name
+exports.findAllWithFilter = (req, res) => {
+  /* #swagger.tags = ['Restaurant']
+     #swagger.summary = 'Retrieve all restaurants with regex.'
+     #swagger.description = `Retrieve all restaurants from the database.
+                             If a name is provided, it will be used to filter the results.`
+     #swagger.parameters['name'] =
+      { description: 'Text to filter by',
+      required: 'false',
+      type: 'string' }
+
+     #swagger.responses[200] = {
+     schema: { $ref: "#/definitions/Restaurants" }
+  }
+     #swagger.responses[500] = {
+     description: 'Error retrieving restaurants',
+  } */
+
+  const name = req.params.name === 'undefined' ? '' : req.params.name
   const condition = name ? { name: { $regex: new RegExp(name), $options: 'i' } } : {}
   console.log(condition)
 
   Restaurant.find(condition)
     .then(data => {
+      console.log(data)
       res.status(200).send(data)
     })
     .catch(err => {
@@ -58,6 +111,22 @@ exports.findAll = (req, res) => {
 
 // Find a single Restaurant with an id
 exports.findOne = (req, res) => {
+  /*  #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Get a restaurant by id.'
+      #swagger.description = 'Endpoint to get a restaurant by id.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Restaurant retrieved successfully',
+        schema: { $ref: "#/definitions/Restaurant" }
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error retrieving restaurant',
+      }
+  */
+
   const id = req.params.id
 
   Restaurant.findById(id)
@@ -73,6 +142,29 @@ exports.findOne = (req, res) => {
 
 // Update a Restaurant by the id in the request
 exports.update = (req, res) => {
+  /* #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Update a restaurant.'
+      #swagger.description = 'Endpoint to update a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'Restaurant object',
+        required: true,
+        type: 'object',
+        schema: { $ref: "#/definitions/Restaurant" }
+      }
+      #swagger.responses[200] = {
+        description: 'Restaurant updated successfully',
+        schema: { $ref: "#/definitions/Restaurant" }
+      }
+      #swagger.responses[400] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error updating restaurant',
+      }
+  */
+
   if (!req.body) {
     return res.status(400).send({
       message: 'Data to update cannot be empty!'
@@ -98,6 +190,27 @@ exports.update = (req, res) => {
 
 // Post a review to a restaurant
 exports.createReview = (req, res) => {
+  /*  #swagger.tags = ['Review']
+      #swagger.summary = 'Post a review to a restaurant.'
+      #swagger.description = 'Endpoint to post a review to a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'Review object',
+        required: true,
+        type: 'object',
+        schema: { $ref: "#/definitions/Review" }
+      }
+      #swagger.responses[200] = {
+        description: 'Review posted successfully',
+      }
+      #swagger.responses[400] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error posting review',
+      }
+  */
   const id = req.params.id
 
   if (!req.body) {
@@ -133,7 +246,7 @@ exports.createReview = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was updated successfully.' })
+      } else res.status(200).send({ message: 'Review posted successfully.' })
     })
     .catch(err => {
       res.status(500).send({
@@ -144,6 +257,20 @@ exports.createReview = (req, res) => {
 
 // Delete a Restaurant with the specified id in the request
 exports.delete = (req, res) => {
+  /*  #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Delete a restaurant.'
+      #swagger.description = 'Endpoint to delete a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Restaurant deleted successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error deleting restaurant',
+      }
+  */
   const id = req.params.id
 
   Restaurant.findByIdAndRemove(id, { useFindAndModify: false })
@@ -167,6 +294,21 @@ exports.delete = (req, res) => {
 
 // Set restaurant to closed with overwrite
 exports.deactivate = (req, res) => {
+  /*  #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Force restaurant to close.'
+      #swagger.description = 'Endpoint to close a restaurant by force.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Restaurant set to closed successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error deactivating restaurant',
+      }
+  */
+
   const id = req.params.id
 
   Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: true }, { useFindAndModify: false })
@@ -186,6 +328,21 @@ exports.deactivate = (req, res) => {
 
 // Remove restaurant overwrite for restaurant closed
 exports.activate = (req, res) => {
+  /*  #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Remove restaurant closed overwrite.'
+      #swagger.description = `Endpoint to remove restaurant closed overwrite,
+                              will set restaurant to open if it's open time.`
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Restaurant set to open successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error activating restaurant',
+      }
+  */
   const id = req.params.id
 
   Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: false }, { useFindAndModify: false })
@@ -205,6 +362,28 @@ exports.activate = (req, res) => {
 
 // Post a review to a restaurant
 exports.createDish = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Create a dish.'
+      #swagger.description = 'Endpoint to create a dish.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['dish'] = {
+        in: 'body',
+        description: 'Dish object',
+        required: 'true',
+        type: 'object',
+        schema: { $ref: '#/definitions/Dish' }
+      }
+      #swagger.responses[200] = {
+        description: 'Dish created successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error creating dish',
+      }
+  */
+
   const id = req.params.restaurantId
 
   if (!req.body) {
@@ -256,6 +435,22 @@ exports.createDish = (req, res) => {
 // Get all dishes from a restaurant
 // Reference: https://www.bezkoder.com/mongoose-one-to-many-relationship/
 exports.findAllDishes = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Get all dishes from a restaurant.'
+      #swagger.description = 'Endpoint to get all dishes from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Dishes retrieved successfully',
+        schema: { $ref: '#/definitions/Menu' }
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error retrieving dishes',
+      }
+  */
+
   const id = req.params.restaurantId
 
   Restaurant.findById(id).populate('menu', '-_id -__v')
@@ -272,6 +467,23 @@ exports.findAllDishes = (req, res) => {
 
 // Get a dish from a restaurant
 exports.findOneDish = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Get a dish from a restaurant.'
+      #swagger.description = 'Endpoint to get a dish from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Dish retrieved successfully',
+        schema: { $ref: '#/definitions/Dish' }
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant or dish not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error retrieving dish',
+      }
+  */
+
   const id = req.params.restaurantId
   const dishId = req.params.dishId
 
@@ -289,6 +501,29 @@ exports.findOneDish = (req, res) => {
 
 // Update a dish from a restaurant
 exports.updateDish = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Update a dish from a restaurant.'
+      #swagger.description = 'Endpoint to update a dish from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
+      #swagger.parameters['dish'] = {
+        in: 'body',
+        description: 'Dish object',
+        required: 'true',
+        type: 'object',
+        schema: { $ref: '#/definitions/Dish' }
+      }
+      #swagger.responses[200] = {
+        description: 'Dish updated successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant or dish not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error updating dish',
+      }
+  */
+
   const id = req.params.restaurantId
   const dishId = req.params.dishId
 
@@ -318,7 +553,24 @@ exports.updateDish = (req, res) => {
 
 // Delete a dish from a restaurant
 // TODO: test that deleting a dish also deletes the dish from the menu array of the restaurant
+// Comment: it should delete the file after the model is fetched again.
 exports.deleteDish = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Delete a dish from a restaurant.'
+      #swagger.description = 'Endpoint to delete a dish from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Dish deleted successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant or dish not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error deleting dish',
+      }
+  */
+
   const dishId = req.params.dishId
 
   Restaurant.findByIdAndRemove(dishId, { useFindAndModify: false })
@@ -342,6 +594,22 @@ exports.deleteDish = (req, res) => {
 
 // Get all reviews from a restaurant
 exports.findAllReviews = (req, res) => {
+  /*  #swagger.tags = ['Review']
+      #swagger.summary = 'Get all reviews from a restaurant.'
+      #swagger.description = 'Endpoint to get all reviews from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Reviews retrieved successfully',
+        schema: { $ref: '#/definitions/Review' }
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error retrieving reviews',
+      }
+  */
+
   const id = req.params.restaurantId
 
   Restaurant.findById(id).populate('reviews', '-_id -__v')
@@ -358,6 +626,28 @@ exports.findAllReviews = (req, res) => {
 
 // Create a category for a restaurant
 exports.createCategory = (req, res) => {
+  /*  #swagger.tags = ['Category']
+      #swagger.summary = 'Create a category for a restaurant.'
+      #swagger.description = 'Endpoint to create a category for a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['category'] = {
+        in: 'body',
+        description: 'Category String',
+        required: 'true',
+        type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Category created successfully',
+      }
+      #swagger.responses[400] = {
+        description: 'Body for category cannot be empty!',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error updating restaurant with category',
+      }
+  */
   const id = req.params.restaurantId
   const category = req.body.category
 
@@ -390,6 +680,25 @@ exports.createCategory = (req, res) => {
 
 // Get all categories from a restaurant
 exports.findAllCategories = (req, res) => {
+  /*  #swagger.tags = ['Category']
+      #swagger.summary = 'Get all categories from a restaurant.'
+      #swagger.description = 'Endpoint to get all categories from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Categories retrieved successfully',
+        type: 'array',
+      }
+      #swagger.responses[200] = {
+        description: 'Categories retrieved successfully',
+        type: 'array',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error retrieving categories',
+      }
+  */
   const id = req.params.restaurantId
 
   Restaurant.findById(id).populate('menuCategories', '-_id -__v')
@@ -406,6 +715,25 @@ exports.findAllCategories = (req, res) => {
 
 // Delete a category from a restaurant
 exports.deleteCategory = (req, res) => {
+  /*  #swagger.tags = ['Category']
+      #swagger.summary = 'Delete a category from a restaurant.'
+      #swagger.description = 'Endpoint to delete a category from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['category'] = {
+        in: 'body',
+        description: 'Category String',
+        required: 'true',
+        type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Category deleted successfully',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error updating restaurant with category',
+      }
+  */
   const id = req.params.restaurantId
   const category = req.params.category
 
@@ -429,6 +757,28 @@ exports.deleteCategory = (req, res) => {
 
 // Update a category from a restaurant
 exports.updateCategory = (req, res) => {
+  /*  #swagger.tags = ['Category']
+      #swagger.summary = 'Update a category from a restaurant.'
+      #swagger.description = 'Endpoint to update a category from a restaurant.'
+      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['category'] = {
+        in: 'body',
+        description: 'Category String',
+        required: 'true',
+        type: 'string' }
+      #swagger.responses[200] = {
+        description: 'Category updated successfully',
+      }
+      #swagger.responses[400] = {
+        description: 'Body for category cannot be empty!',
+      }
+      #swagger.responses[404] = {
+        description: 'Restaurant not found',
+      }
+      #swagger.responses[500] = {
+        description: 'Error updating restaurant with category',
+      }
+  */
   const id = req.params.restaurantId
   const category = req.params.category
   const newCategory = req.body.category

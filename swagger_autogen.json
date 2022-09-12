@@ -1,0 +1,1035 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Morfando API",
+    "description": "Documentacion de la API de Morfando",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/api",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/restaurant": {
+      "post": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Create a restaurant.",
+        "description": "Endpoint to create a restaurant.    Prices must be either $, $$, $$$ or $$$$.    The menu will be empty at creation time.",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Review object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Review"
+            }
+          },
+          {
+            "name": "name",
+            "description": "Text to filter by",
+            "required": false,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "dish",
+            "in": "body",
+            "description": "Dish object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          },
+          {
+            "name": "dishId",
+            "description": "Dish id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "category",
+            "in": "body",
+            "description": "Category String",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category updated successfully",
+            "schema": {
+              "$ref": "#/definitions/Review"
+            },
+            "type": "array"
+          },
+          "400": {
+            "description": "Body for category cannot be empty!"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error updating restaurant with category"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Get all restaurants.",
+        "description": "Endpoint to get all restaurants.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Restaurants retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/Restaurant"
+            }
+          },
+          "500": {
+            "description": "Error retrieving restaurants"
+          }
+        }
+      }
+    },
+    "/restaurant/{name}": {
+      "get": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Retrieve all restaurants with regex.",
+        "description": "Retrieve all restaurants from the database.    If a name is provided, it will be used to filter the results.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": false,
+            "type": "string",
+            "description": "Text to filter by"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Restaurants"
+            }
+          },
+          "500": {
+            "description": "Error retrieving restaurants"
+          }
+        }
+      }
+    },
+    "/restaurant/id/{id}": {
+      "get": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Get a restaurant by id.",
+        "description": "Endpoint to get a restaurant by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/Restaurant"
+            }
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error retrieving restaurant"
+          }
+        }
+      }
+    },
+    "/restaurant/{id}": {
+      "put": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Update a restaurant.",
+        "description": "Endpoint to update a restaurant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Restaurant object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Restaurant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant updated successfully",
+            "schema": {
+              "$ref": "#/definitions/Restaurant"
+            }
+          },
+          "400": {
+            "description": "Restaurant not found"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Error updating restaurant"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Delete a restaurant.",
+        "description": "Endpoint to delete a restaurant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant deleted successfully"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error deleting restaurant"
+          }
+        }
+      }
+    },
+    "/restaurant/{id}/review": {
+      "post": {
+        "tags": [
+          "Review"
+        ],
+        "summary": "Post a review to a restaurant.",
+        "description": "Endpoint to post a review to a restaurant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Review object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review posted successfully"
+          },
+          "400": {
+            "description": "Restaurant not found"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Error posting review"
+          }
+        }
+      }
+    },
+    "/restaurant/{id}/deactivate": {
+      "put": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Force restaurant to close.",
+        "description": "Endpoint to close a restaurant by force.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant set to closed successfully"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error deactivating restaurant"
+          }
+        }
+      }
+    },
+    "/restaurant/{id}/activate": {
+      "put": {
+        "tags": [
+          "Restaurant"
+        ],
+        "summary": "Remove restaurant closed overwrite.",
+        "description": "Endpoint to remove restaurant closed overwrite,    will set restaurant to open if it's open time.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Restaurant id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant set to open successfully"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error activating restaurant"
+          }
+        }
+      }
+    },
+    "/restaurant/{restaurantId}/dishes": {
+      "post": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Create a dish.",
+        "description": "Endpoint to create a dish.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "dish",
+            "in": "body",
+            "description": "Dish object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish created successfully"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error creating dish"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Get all dishes from a restaurant.",
+        "description": "Endpoint to get all dishes from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dishes retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/Menu"
+            }
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error retrieving dishes"
+          }
+        }
+      }
+    },
+    "/restaurant/{restaurantId}/dishes/{dishId}": {
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Get a dish from a restaurant.",
+        "description": "Endpoint to get a dish from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dishId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Dish id"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          },
+          "404": {
+            "description": "Restaurant or dish not found"
+          },
+          "500": {
+            "description": "Error retrieving dish"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Update a dish from a restaurant.",
+        "description": "Endpoint to update a dish from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dishId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Dish id"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "dish",
+            "in": "body",
+            "description": "Dish object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish updated successfully"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Restaurant or dish not found"
+          },
+          "500": {
+            "description": "Error updating dish"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Delete a dish from a restaurant.",
+        "description": "Endpoint to delete a dish from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dishId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Dish id"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish deleted successfully"
+          },
+          "404": {
+            "description": "Restaurant or dish not found"
+          },
+          "500": {
+            "description": "Error deleting dish"
+          }
+        }
+      }
+    },
+    "/restaurant/{restaurantId}/dishes/categories": {
+      "post": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Create a category for a restaurant.",
+        "description": "Endpoint to create a category for a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "category",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "example": "any"
+                }
+              }
+            },
+            "description": "Category String",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category created successfully"
+          },
+          "400": {
+            "description": "Body for category cannot be empty!"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error updating restaurant with category"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get all categories from a restaurant.",
+        "description": "Endpoint to get all categories from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "type": "array"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error retrieving categories"
+          }
+        }
+      }
+    },
+    "/restaurant/{restaurantId}/dishes/categories/{categoryId}": {
+      "delete": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Delete a category from a restaurant.",
+        "description": "Endpoint to delete a category from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "category",
+            "in": "body",
+            "description": "Category String",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted successfully"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error updating restaurant with category"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Update a category from a restaurant.",
+        "description": "Endpoint to update a category from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "category",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "example": "any"
+                }
+              }
+            },
+            "description": "Category String",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category updated successfully"
+          },
+          "400": {
+            "description": "Body for category cannot be empty!"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error updating restaurant with category"
+          }
+        }
+      }
+    },
+    "/restaurant/{restaurantId}/reviews": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "summary": "Get all reviews from a restaurant.",
+        "description": "Endpoint to get all reviews from a restaurant.",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Restaurant id",
+            "required": true,
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reviews retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/Review"
+            }
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Error retrieving reviews"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "description": "Health check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Restaurant": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "La Pizzeria"
+        },
+        "openingTime": {
+          "type": "object",
+          "properties": {
+            "hours": {
+              "type": "number",
+              "example": 12
+            },
+            "minutes": {
+              "type": "number",
+              "example": 30
+            }
+          }
+        },
+        "closingTime": {
+          "type": "object",
+          "properties": {
+            "hours": {
+              "type": "number",
+              "example": 22
+            },
+            "minutes": {
+              "type": "number",
+              "example": 0
+            }
+          }
+        },
+        "priceRange": {
+          "type": "string",
+          "example": "$$"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "streetName": {
+              "type": "string",
+              "example": "Calle 1"
+            },
+            "streetNumber": {
+              "type": "number",
+              "example": 123
+            },
+            "neighborhood": {
+              "type": "string",
+              "example": "Palermo"
+            },
+            "city": {
+              "type": "string",
+              "example": "Buenos Aires"
+            },
+            "state": {
+              "type": "string",
+              "example": "Buenos Aires"
+            },
+            "country": {
+              "type": "string",
+              "example": "Argentina"
+            }
+          }
+        },
+        "restaurantTypes": {
+          "type": "array",
+          "example": [
+            "Italian",
+            "Pizza"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "menuCategories": {
+          "type": "array",
+          "example": [
+            "Pizza",
+            "Pasta"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "menu": {
+          "$ref": "#/definitions/Menu"
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Review"
+          }
+        },
+        "isClosedOverwrite": {
+          "type": "boolean",
+          "example": false
+        }
+      },
+      "required": [
+        "name",
+        "openingTime",
+        "closingTime",
+        "priceRange",
+        "restaurantTypes"
+      ]
+    },
+    "Restaurants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Restaurant"
+      }
+    },
+    "Owner": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Jhon Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "the-coolest@anydomain.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
+        },
+        "restaurants": {
+          "$ref": "#/definitions/Restaurant"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "Dish": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Pizza Margarita"
+        },
+        "price": {
+          "type": "number",
+          "example": 1000
+        },
+        "description": {
+          "type": "string",
+          "example": "Pizza con tomate, queso y albahaca"
+        },
+        "category": {
+          "type": "string",
+          "example": "Pizzas"
+        },
+        "ingredients": {
+          "type": "array",
+          "example": [
+            "tomate",
+            "queso",
+            "albahaca"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "isVegan": {
+          "type": "boolean",
+          "example": false
+        },
+        "isGlutenFree": {
+          "type": "boolean",
+          "example": false
+        },
+        "restaurant": {
+          "$ref": "#/definitions/Restaurant"
+        }
+      },
+      "required": [
+        "name",
+        "price",
+        "category",
+        "ingredients",
+        "restaurant"
+      ]
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "number",
+          "example": 5
+        },
+        "comment": {
+          "type": "string",
+          "example": "Muy buena pizza"
+        },
+        "restaurant": {
+          "$ref": "#/definitions/Restaurant"
+        }
+      },
+      "required": [
+        "rating",
+        "restaurant"
+      ]
+    },
+    "Menu": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Dish"
+      }
+    }
+  }
+}
