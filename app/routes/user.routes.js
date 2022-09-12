@@ -4,25 +4,25 @@ module.exports = app => {
   const router = require('express').Router()
 
   // Create a new user
-  router.post('/owners/', users.create)
+  router.post('/users/', users.create)
 
   // Retrieve all users
-  router.get('/owners/', users.findAll)
+  router.get('/users/', users.findAll)
 
   // Retrieve a single user with id
-  router.get('/owners/:id', users.findOne)
+  router.get('/users/:id', users.findOne)
 
   // Update an users with id
-  router.put('/owners/:id', users.update)
+  router.put('/users/:id', users.update)
 
   // Delete an user with id
-  router.delete('/owners/:id', users.delete)
+  router.delete('/users/:id', users.delete)
 
   // Retrieve all user favorite restaurants
-  router.get('/owners/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)
+  router.get('/users/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)
 
   // Add a favorite restaurant to the user
-  router.post('/owners/:id/favoriteRestaurants/:restaurantId', users.addFavoriteRestaurant)
+  router.post('/users/:id/favoriteRestaurants/:restaurantId', users.addFavoriteRestaurant)
 
-  app.use('/api/users', router)
+  app.use('/api', router)
 }
