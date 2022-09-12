@@ -15,7 +15,6 @@ const doc = {
     }
   },
   "basePath": "/api",
-  "host": "localhost:8080",
   "schemes": [
     "http", "https"
   ],
