@@ -15,9 +15,6 @@ const doc = {
     }
   },
   "basePath": "/api",
-  "schemes": [
-    "http", "https"
-  ],
   "consumes": [
     "application/json"
   ],
