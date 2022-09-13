@@ -29,3 +29,22 @@ exports.create = (req, res) => {
       })
     })
 }
+
+// Retrieve all Owners from the database.
+exports.findAll = (req, res) => {
+  // #swagger.tags = ['Owner']
+  // #swagger.description = 'Retrieve all Owners from the database.'
+  const name = req.query.name
+  var condition = name ? { name: { $regex: new RegExp(name), $options: 'i' } } : {}
+
+  Owner.find(condition)
+    .then(data => {
+      res.send(data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving owners.'
+      })
+    })
+}

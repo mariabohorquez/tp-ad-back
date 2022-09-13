@@ -7,12 +7,12 @@ module.exports = mongoose => {
         unique: true
       },
       openingTime: {
-        hours: Number,
-        minutes: Number
+        hours: { type: Number, min: 0, max: 24 , required: true},
+        minutes: { type: Number, min: 0, max: 60, required: true},
       },
       closingTime: {
-        hours: Number,
-        minutes: Number
+        hours: { type: Number, min: 0, max: 24, required: true},
+        minutes: { type: Number, min: 0, max: 60, required: true},
       },
       isClosedOverwrite: {
         type: Boolean,
@@ -30,9 +30,10 @@ module.exports = mongoose => {
         neighborhood: String,
         city: String,
         state: String,
-        country: String
+        country: String,
+        longitude: mongoose.Schema.Types.Decimal128,
+        latitude: mongoose.Schema.Types.Decimal128,
       },
-      // TODO: Force this to be some pre-approved types
       restaurantTypes: [
         {
           type: String,

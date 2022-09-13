@@ -18,9 +18,12 @@ exports.create = (req, res) => {
       type: 'object',
       schema: { $ref: "#/definitions/Restaurant" }
    }
-  /* #swagger.responses[200] = {
+    #swagger.responses[200] = {
     description: 'Restaurant created successfully',
     schema: { $ref: "#/definitions/Restaurant" }
+  }
+    #swagger.responses[400] = {
+    description: 'Body cannot be empty.',
   }
    #swagger.responses[500] = {
     description: 'Error creating restaurant',
@@ -179,7 +182,7 @@ exports.update = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.send({ message: 'Restaurant was updated successfully.' })
+      } else res.status(200).send(data);
     })
     .catch(err => {
       res.status(500).send({

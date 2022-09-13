@@ -1,19 +1,15 @@
 module.exports = mongoose => {
   const schema = mongoose.Schema({
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    password: {
-      type: String,
-      required: true,
-      unique: false
-    },
-    name: {
-      type: String,
-      required: false,
-      unique: false
+    google: {
+      id: {
+        type: String,
+      },
+      name: {
+        type: Stri0ng,
+      },
+      email: {
+        type: String,
+      },
     },
     profilePicture: {
       type: Buffer,

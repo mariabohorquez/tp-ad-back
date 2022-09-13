@@ -39,8 +39,6 @@ const doc = {
       },
       $restaurantTypes: ['Italian', 'Pizza'],
       menuCategories: ['Pizza', 'Pasta'],
-      menu: {$ref: '#/definitions/Menu'},
-      reviews: [{$ref: '#/definitions/Review'}],
       isClosedOverwrite: false
     },
     Restaurants: [

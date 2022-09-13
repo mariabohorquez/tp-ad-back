@@ -5,14 +5,9 @@ module.exports = mongoose => {
       required: true,
       unique: true
     },
-    description: {
-      type: String,
-      required: false
-    },
     category: {
       type: String,
-      required: true,
-      unique: false
+      required: true
     },
     price: {
       type: mongoose.Schema.Types.Decimal128,

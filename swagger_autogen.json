@@ -898,15 +898,6 @@
             "type": "string"
           }
         },
-        "menu": {
-          "$ref": "#/definitions/Menu"
-        },
-        "reviews": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Review"
-          }
-        },
         "isClosedOverwrite": {
           "type": "boolean",
           "example": false
