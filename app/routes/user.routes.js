@@ -13,7 +13,7 @@ module.exports = app => {
   router.get('/users/:id', users.findOne)
 
   // Update an users with id
-  router.put('/users/:id', users.update)
+  router.patch('/users/:id', users.update)
 
   // Delete an user with id
   router.delete('/users/:id', users.delete)
@@ -24,5 +24,5 @@ module.exports = app => {
   // Add a favorite restaurant to the user
   router.post('/users/:id/favoriteRestaurants/:restaurantId', users.addFavoriteRestaurant)
 
-  app.use('/api', router)
+  app.use('/api/v1', router)
 }

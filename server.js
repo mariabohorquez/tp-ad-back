@@ -3,11 +3,9 @@ const cors = require("cors");
 
 const app = express();
 
-// Swagger documentation
-// https://levelup.gitconnected.com/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce
-const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger_autogen.json')
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+const swaggerUi = require('swagger-ui-express')
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile, { swaggerOptions: { defaultModelsExpandDepth: 0 }}))
 
 app.use(cors());
 
@@ -40,7 +38,7 @@ app.get("/", (req, res) => {
 require("./app/routes/restaurant.routes")(app);
 // require("./app/routes/owner.routes")(app);
 // require("./app/routes/user.routes")(app);
-require("./app/routes/helpers.routes")(app);
+require("./app/routes/utils.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

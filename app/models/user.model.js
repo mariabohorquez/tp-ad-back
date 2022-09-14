@@ -5,7 +5,7 @@ module.exports = mongoose => {
         type: String,
       },
       name: {
-        type: Stri0ng,
+        type: String,
       },
       email: {
         type: String,

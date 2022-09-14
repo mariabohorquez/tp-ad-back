@@ -13,10 +13,10 @@ module.exports = app => {
   router.get('/owners/:id', owners.findOne)
 
   // Update an owners with id
-  router.put('/owners/:id', owners.update)
+  router.patch('/owners/:id', owners.update)
 
   // Associate a restaurant to an owner
-  router.put('/owners/:id/restaurant/:restaurantId', owners.addRestaurant)
+  router.patch('/owners/:id/restaurants/:restaurantId', owners.addRestaurant)
 
   // Recover owner password
   router.post('/owners/:id/recoverPassword', owners.recoverPassword)
@@ -27,5 +27,13 @@ module.exports = app => {
   // Retrieve all owner restaurants
   router.get('/owners/:id/restaurants', owners.findAllRestaurants)
 
-  app.use('/api', router)
+  // Upload image
+  router.post('/owners/:id/upload', owners.uploadImage)
+
+  // Auth methods
+  router.post('/owners/login', owners.login)
+  router.post('/owners/logout', owners.logout)
+  router.post('/owners/signUp', owners.signUp)
+
+  app.use('/api/v1', router)
 }
