@@ -5,7 +5,7 @@ module.exports = app => {
 
   // Health check
   router.get("/health", (req, res) => {
-    // #swagger.tags = ['Health']
+    // #swagger.tags = ['Health Check']
     // #swagger.description = 'Health check'
     res.send("OK").status(200);
   });

@@ -47,6 +47,23 @@ const doc = {
       menuCategories: ['Pizza', 'Pasta'],
       isClosedOverwrite: false
     },
+    createRestaurant: {
+      $name: 'La Pizzeria',
+      $openingTime: {'hours': 12, 'minutes': 30},
+      $closingTime: {'hours': 22, 'minutes': 0},
+      $priceRange: '$$',
+      address: {
+        streetName: 'Calle 1',
+        streetNumber: 123,
+        neighborhood: 'Palermo',
+        city: 'Buenos Aires',
+        state: 'Buenos Aires',
+        country: 'Argentina',
+        longitude: -100.0,
+        latitude: 50.0,
+      },
+      $restaurantTypes: ['Italian', 'Pizza'],
+    },
     Restaurants: [
       {$ref: '#/definitions/Restaurant'}
     ],
@@ -98,23 +115,6 @@ const doc = {
     createMenuCategory: {
       $name: 'Pizzas',
     },
-  },
-  createRestaurant: {
-    $name: 'La Pizzeria',
-    $openingTime: {'hours': 12, 'minutes': 30},
-    $closingTime: {'hours': 22, 'minutes': 0},
-    $priceRange: '$$',
-    address: {
-      streetName: 'Calle 1',
-      streetNumber: 123,
-      neighborhood: 'Palermo',
-      city: 'Buenos Aires',
-      state: 'Buenos Aires',
-      country: 'Argentina',
-      longitude: -100.0,
-      latitude: 50.0,
-    },
-    $restaurantTypes: ['Italian', 'Pizza'],
   },
 }
 

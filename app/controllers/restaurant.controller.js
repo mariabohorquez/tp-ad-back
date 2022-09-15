@@ -335,66 +335,38 @@ exports.delete = (req, res) => {
     })
 }
 
-// Set restaurant to closed with overwrite
-exports.deactivate = (req, res) => {
+// Set restaurant status to boolean by force
+exports.close = (req, res) => {
   /*  #swagger.tags = ['Restaurant']
-      #swagger.summary = 'Force restaurant to close.'
-      #swagger.description = 'Endpoint to close a restaurant by force.'
+      #swagger.summary = 'Set restaurant closed overwrite.'
+      #swagger.description = `Endpoint to set restaurant closed overwrite,
+                              if set to true restaurant will close regardless of time,
+                              if set to false restaurant will open/close taking into account normal opening hours.`
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['status'] = { description: 'true/false closed overwrite', required: 'true', type: 'boolean' }
       #swagger.responses[200] = {
-        description: 'Restaurant set to closed successfully',
+        description: 'Restaurant set to {status} successfully',
       }
       #swagger.responses[404] = {
         description: 'Restaurant not found',
       }
       #swagger.responses[500] = {
-        description: 'Error deactivating restaurant',
+        description: 'Error {status} restaurant',
       }
   */
-
   const id = req.params.id
+  const boolean = (req.params.status.toLowerCase() === 'true');
 
-  Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: true }, { useFindAndModify: false })
+  Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: boolean }, { useFindAndModify: false })
     .then(data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was set to closed.' })
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
-      })
-    })
-}
-
-// Remove restaurant overwrite for restaurant closed
-exports.activate = (req, res) => {
-  /*  #swagger.tags = ['Restaurant']
-      #swagger.summary = 'Remove restaurant closed overwrite.'
-      #swagger.description = `Endpoint to remove restaurant closed overwrite,
-                              will set restaurant to open if it's open time.`
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
-      #swagger.responses[200] = {
-        description: 'Restaurant set to open successfully',
+      } else {
+        const status = boolean ? 'closed' : 'opened'
+        res.status(200).send({ message: 'Restaurant was set to ' + status + '.' })
       }
-      #swagger.responses[404] = {
-        description: 'Restaurant not found',
-      }
-      #swagger.responses[500] = {
-        description: 'Error activating restaurant',
-      }
-  */
-  const id = req.params.id
-
-  Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: false }, { useFindAndModify: false })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
-        })
-      } else res.status(200).send({ message: 'Restaurant was set to closed.' })
     })
     .catch(err => {
       res.status(500).send({
@@ -637,7 +609,7 @@ exports.deleteDish = (req, res) => {
 
 // Create a category for a restaurant
 exports.createCategory = (req, res) => {
-  /*  #swagger.tags = ['Category']
+  /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Create a category for a restaurant.'
       #swagger.description = 'Endpoint to create a category for a restaurant.'
       #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
@@ -692,7 +664,7 @@ exports.createCategory = (req, res) => {
 
 // Get all categories from a restaurant
 exports.findAllCategories = (req, res) => {
-  /*  #swagger.tags = ['Category']
+  /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Get all categories from a restaurant.'
       #swagger.description = 'Endpoint to get all categories from a restaurant.'
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
@@ -727,7 +699,7 @@ exports.findAllCategories = (req, res) => {
 
 // Delete a category from a restaurant
 exports.deleteCategory = (req, res) => {
-  /*  #swagger.tags = ['Category']
+  /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Delete a category from a restaurant.'
       #swagger.description = 'Endpoint to delete a category from a restaurant.'
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
@@ -769,7 +741,7 @@ exports.deleteCategory = (req, res) => {
 
 // Update a category from a restaurant
 exports.updateCategory = (req, res) => {
-  /*  #swagger.tags = ['Category']
+  /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Update a category from a restaurant.'
       #swagger.description = 'Endpoint to update a category from a restaurant.'
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }

@@ -46,25 +46,6 @@
             "description": "Error creating restaurant"
           }
         }
-      },
-      "get": {
-        "tags": [
-          "Restaurant"
-        ],
-        "summary": "Get all restaurants.",
-        "description": "Endpoint to get all restaurants.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Restaurants retrieved successfully",
-            "schema": {
-              "$ref": "#/definitions/Restaurants"
-            }
-          },
-          "500": {
-            "description": "Error retrieving restaurants"
-          }
-        }
       }
     },
     "/restaurants/{name}": {
@@ -96,7 +77,7 @@
         }
       }
     },
-    "/restaurants/id/{id}": {
+    "/restaurants/{id}": {
       "get": {
         "tags": [
           "Restaurant"
@@ -126,9 +107,7 @@
             "description": "Error retrieving restaurant"
           }
         }
-      }
-    },
-    "/restaurants/{id}": {
+      },
       "patch": {
         "tags": [
           "Restaurant"
@@ -199,13 +178,13 @@
         }
       }
     },
-    "/restaurants/{id}/deactivate": {
+    "/restaurants/{id}/close/{status}": {
       "patch": {
         "tags": [
           "Restaurant"
         ],
-        "summary": "Force restaurant to close.",
-        "description": "Endpoint to close a restaurant by force.",
+        "summary": "Set restaurant   overwrite.",
+        "description": "Endpoint to set restaurant   overwrite,    if set to true restaurant will close regardless of time,    if set to false restaurant will open/close taking into account normal opening hours.",
         "parameters": [
           {
             "name": "id",
@@ -213,46 +192,24 @@
             "required": true,
             "type": "string",
             "description": "Restaurant id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Restaurant set to closed successfully"
           },
-          "404": {
-            "description": "Restaurant not found"
-          },
-          "500": {
-            "description": "Error deactivating restaurant"
-          }
-        }
-      }
-    },
-    "/restaurants/{id}/activate": {
-      "patch": {
-        "tags": [
-          "Restaurant"
-        ],
-        "summary": "Remove restaurant closed overwrite.",
-        "description": "Endpoint to remove restaurant closed overwrite,    will set restaurant to open if it's open time.",
-        "parameters": [
           {
-            "name": "id",
+            "name": "status",
             "in": "path",
             "required": true,
-            "type": "string",
-            "description": "Restaurant id"
+            "type": "boolean",
+            "description": "true/false closed overwrite"
           }
         ],
         "responses": {
           "200": {
-            "description": "Restaurant set to open successfully"
+            "description": "Restaurant set to {status} successfully"
           },
           "404": {
             "description": "Restaurant not found"
           },
           "500": {
-            "description": "Error activating restaurant"
+            "description": "Error {status} restaurant"
           }
         }
       }
@@ -557,7 +514,7 @@
     "/restaurants/{restaurantId}/categories": {
       "post": {
         "tags": [
-          "Category"
+          "Menu categories"
         ],
         "summary": "Create a category for a restaurant.",
         "description": "Endpoint to create a category for a restaurant.",
@@ -595,7 +552,7 @@
       },
       "get": {
         "tags": [
-          "Category"
+          "Menu categories"
         ],
         "summary": "Get all categories from a restaurant.",
         "description": "Endpoint to get all categories from a restaurant.",
@@ -631,7 +588,7 @@
     "/restaurants/{restaurantId}/categories/{categoryId}": {
       "delete": {
         "tags": [
-          "Category"
+          "Menu categories"
         ],
         "summary": "Delete a category from a restaurant.",
         "description": "Endpoint to delete a category from a restaurant.",
@@ -677,64 +634,12 @@
             "description": "Error updating restaurant with category"
           }
         }
-      },
-      "patch": {
-        "tags": [
-          "Category"
-        ],
-        "summary": "Update a category from a restaurant.",
-        "description": "Endpoint to update a category from a restaurant.",
-        "parameters": [
-          {
-            "name": "restaurantId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "categoryId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "Restaurant id",
-            "required": true,
-            "type": "string",
-            "in": "query"
-          },
-          {
-            "name": "category",
-            "in": "body",
-            "description": "Category String",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Category updated successfully"
-          },
-          "400": {
-            "description": "Body for category cannot be empty!"
-          },
-          "404": {
-            "description": "Restaurant not found"
-          },
-          "500": {
-            "description": "Error updating restaurant with category"
-          }
-        }
       }
     },
     "/health": {
       "get": {
         "tags": [
-          "Health"
+          "Health Check"
         ],
         "description": "Health check",
         "parameters": [],
@@ -839,6 +744,99 @@
         }
       },
       "required": [
+        "restaurantTypes"
+      ]
+    },
+    "createRestaurant": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "La Pizzeria"
+        },
+        "openingTime": {
+          "type": "object",
+          "properties": {
+            "hours": {
+              "type": "number",
+              "example": 12
+            },
+            "minutes": {
+              "type": "number",
+              "example": 30
+            }
+          }
+        },
+        "closingTime": {
+          "type": "object",
+          "properties": {
+            "hours": {
+              "type": "number",
+              "example": 22
+            },
+            "minutes": {
+              "type": "number",
+              "example": 0
+            }
+          }
+        },
+        "priceRange": {
+          "type": "string",
+          "example": "$$"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "streetName": {
+              "type": "string",
+              "example": "Calle 1"
+            },
+            "streetNumber": {
+              "type": "number",
+              "example": 123
+            },
+            "neighborhood": {
+              "type": "string",
+              "example": "Palermo"
+            },
+            "city": {
+              "type": "string",
+              "example": "Buenos Aires"
+            },
+            "state": {
+              "type": "string",
+              "example": "Buenos Aires"
+            },
+            "country": {
+              "type": "string",
+              "example": "Argentina"
+            },
+            "longitude": {
+              "type": "number",
+              "example": -100
+            },
+            "latitude": {
+              "type": "number",
+              "example": 50
+            }
+          }
+        },
+        "restaurantTypes": {
+          "type": "array",
+          "example": [
+            "Italian",
+            "Pizza"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "openingTime",
+        "closingTime",
+        "priceRange",
         "restaurantTypes"
       ]
     },
@@ -1007,31 +1005,5 @@
         "name"
       ]
     }
-  },
-  "createRestaurant": {
-    "$name": "La Pizzeria",
-    "$openingTime": {
-      "hours": 12,
-      "minutes": 30
-    },
-    "$closingTime": {
-      "hours": 22,
-      "minutes": 0
-    },
-    "$priceRange": "$$",
-    "address": {
-      "streetName": "Calle 1",
-      "streetNumber": 123,
-      "neighborhood": "Palermo",
-      "city": "Buenos Aires",
-      "state": "Buenos Aires",
-      "country": "Argentina",
-      "longitude": -100,
-      "latitude": 50
-    },
-    "$restaurantTypes": [
-      "Italian",
-      "Pizza"
-    ]
   }
 }

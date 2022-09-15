@@ -21,8 +21,12 @@ module.exports = app => {
   // Retrieve all user favorite restaurants
   router.get('/users/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)
 
-  // Add a favorite restaurant to the user
-  router.post('/users/:id/favoriteRestaurants/:restaurantId', users.addFavoriteRestaurant)
+  router.patch('/users/:id/favorite/:restaurantId', users.changeRestaurantFavoriteStatus)
+
+  // Auth routes
+  router.post('/users/login', users.login)
+  router.post('/users/register', users.register)
+  router.post('/users/logout', users.logout)
 
   app.use('/api/v1', router)
 }
