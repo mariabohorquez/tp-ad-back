@@ -5,7 +5,7 @@ const app = express();
 
 const swaggerFile = require('./swagger_autogen.json')
 const swaggerUi = require('swagger-ui-express')
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile, { swaggerOptions: { defaultModelsExpandDepth: 0 }}))
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile, { swaggerOptions: { defaultModelsExpandDepth: -1 }}))
 
 app.use(cors());
 

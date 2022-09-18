@@ -1214,6 +1214,10 @@
           "type": "number",
           "example": 1000
         },
+        "discount": {
+          "type": "number",
+          "example": 0
+        },
         "description": {
           "type": "string",
           "example": "Pizza con tomate, queso y albahaca"

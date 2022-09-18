@@ -14,6 +14,11 @@ module.exports = mongoose => {
       required: true,
       unique: false
     },
+    discounts: {
+      type: mongoose.Schema.Types.Decimal128,
+      required: true,
+      unique: false
+    },
     picture: {
       type: Buffer,
       required: false,
