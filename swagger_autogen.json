@@ -17,6 +17,20 @@
     "application/json"
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health Check"
+        ],
+        "description": "Health check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/restaurants": {
       "post": {
         "tags": [
@@ -636,16 +650,306 @@
         }
       }
     },
-    "/health": {
+    "/users/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login a user",
+        "description": "Handles login of a user, must specify if it is a user or an owner to know strategy.",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/users/logout": {
       "get": {
         "tags": [
-          "Health Check"
+          "Auth"
         ],
-        "description": "Health check",
+        "summary": "Logout a user",
+        "description": "Handles logout of a user, must specify if it is a user or an owner to know strategy.",
         "parameters": [],
         "responses": {
           "200": {
+            "description": "Successfully logged out"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a user",
+        "description": "Handles creation of a new user, must specify if it is a user or an owner.",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.    If it is a user, it must specify the google fields.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/createUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/users/recoverPassword": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Recover password of a user",
+        "description": "Handles password recovery of a user, can only be done for owner. Sends email to recover password",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out"
+          },
+          "400": {
+            "description": "Content cannot be empty"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get a user with id",
+        "description": "Gets a user via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully retrieved"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update a user with id",
+        "description": "Updates a user via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully  "
+          },
+          "400": {
+            "description": "Content cannot be empty"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete a user with id",
+        "description": "Deletes a user via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully  "
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/{id}/favoriteRestaurants": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get all favorite restaurants of a user",
+        "description": "Gets all favorite restaurants of a user via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorites successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/Restaurants"
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/{id}/favorites": {
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Change restaurant favorite status",
+        "description": "Change the current favorite status of a restaurant for a user.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant successfully added to favorites"
+          },
+          "400": {
+            "description": "Content cannot be empty"
+          },
+          "404": {
+            "description": "Restaurant not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/{id}/restaurant/{restaurantId}": {
+      "patch": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Add a restaurant to owner",
+        "description": "Adds a restaurant to owner via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurant successfully added to owner"
+          },
+          "400": {
+            "description": "Content cannot be empty"
+          },
+          "404": {
+            "description": "Owner not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
+          }
+        }
+      }
+    },
+    "/users/{id}/restaurants": {
+      "get": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Get all restaurants of an owner",
+        "description": "Gets all restaurants of an owner via its id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restaurants successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/Restaurants"
+            }
+          },
+          "404": {
+            "description": "Owner not found"
+          },
+          "500": {
+            "description": "Internal server error, returns specific error message"
           }
         }
       }
@@ -1003,6 +1307,58 @@
       },
       "required": [
         "name"
+      ]
+    },
+    "createUser": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "array",
+          "example": [
+            "user",
+            "owner"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "google": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Jane Doe"
+            },
+            "id": {
+              "type": "string",
+              "example": "1234567890"
+            },
+            "email": {
+              "type": "string",
+              "example": "user@morfando.com"
+            }
+          }
+        },
+        "custom": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Jane Doe"
+            },
+            "email": {
+              "type": "string",
+              "example": "owner@morfando.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "123456"
+            }
+          }
+        }
+      },
+      "required": [
+        "role"
       ]
     }
   }

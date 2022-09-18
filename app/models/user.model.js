@@ -3,13 +3,17 @@ module.exports = mongoose => {
     google: {
       id: {
         type: String,
+        required: true,
+        unique: true
       },
       name: {
         type: String,
+        required: true
       },
       email: {
         type: String,
-      },
+        required: true
+      }
     },
     profilePicture: {
       type: Buffer,

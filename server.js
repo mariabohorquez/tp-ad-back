@@ -32,12 +32,11 @@ db.mongoose
 
 // Base route
 app.get("/", (req, res) => {
-  res.json({ message: "Server is running." });
+  res.status(200).send("Server is running.");
 });
 
 require("./app/routes/restaurant.routes")(app);
-// require("./app/routes/owner.routes")(app);
-// require("./app/routes/user.routes")(app);
+require("./app/routes/user.routes")(app);
 require("./app/routes/utils.routes")(app);
 
 // set port, listen for requests

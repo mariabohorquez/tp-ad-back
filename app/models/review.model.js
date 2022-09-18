@@ -1,8 +1,8 @@
 module.exports = mongoose => {
   const schema = mongoose.Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user'
     },
     rating: {
       type: Number, // 1-5

@@ -7,8 +7,7 @@ const options = {
 const swaggerAutogen = require('swagger-autogen')(options)
 
 const outputFile = './swagger_autogen.json'
-// TODO: Add the other routes when they are complete
-const endpointsFiles = ['app/routes/restaurant.routes.js', 'app/routes/utils.routes.js'] 
+const endpointsFiles = ['app/routes/utils.routes.js', 'app/routes/restaurant.routes.js', 'app/routes/user.routes.js']
 
 const doc = { 
   "info": {
@@ -114,6 +113,19 @@ const doc = {
     ],
     createMenuCategory: {
       $name: 'Pizzas',
+    },
+    createUser: {
+      $role: ['user', 'owner'],
+      google: {
+        name: 'Jane Doe',
+        id: '1234567890',
+        email: 'user@morfando.com'
+      },
+      custom: {
+        name: 'Jane Doe',
+        email: 'owner@morfando.com',
+        password: '123456'
+      },
     },
   },
 }
