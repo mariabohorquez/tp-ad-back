@@ -6,7 +6,7 @@ const User = db.users
 
 // Create and Save a new Restaurant
 exports.create = (req, res) => {
-  // #swagger.auto = false 
+  // #swagger.auto = false
   // #swagger.tags = ['Restaurant']
   // #swagger.summary = 'Create a restaurant.'
   // #swagger.description = `Endpoint to create a restaurant. PriceRange must be $, $$, $$$ or $$$$.`
@@ -25,7 +25,6 @@ exports.create = (req, res) => {
     description: 'Error creating restaurant',
   } */
 
-
   // Validate request
   if (!req.body.name) {
     res.status(400).send({ message: 'Content cannot be empty!' })
@@ -39,7 +38,7 @@ exports.create = (req, res) => {
     closingTime: req.body.closingTime,
     priceRange: req.body.priceRange,
     address: req.body.address || {},
-    restaurantTypes: req.body.restaurantTypes,
+    restaurantTypes: req.body.restaurantTypes
   })
 
   // Save Restaurant in the database
@@ -171,13 +170,13 @@ exports.update = (req, res) => {
 
   const id = req.params.id
 
-  Restaurant.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument:'after' })
+  Restaurant.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
     .then(data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send(data);
+      } else res.status(200).send(data)
     })
     .catch(err => {
       res.status(500).send({
@@ -222,7 +221,7 @@ exports.createReview = (req, res) => {
     })
   }
 
-  const user = User.findById(userId);
+  const user = User.findById(userId)
   if (!user) {
     return res.status(404).send({
       message: 'User not found!'
@@ -297,7 +296,6 @@ exports.findAllReviews = (req, res) => {
     })
 }
 
-
 // Delete a Restaurant with the specified id in the request
 exports.delete = (req, res) => {
   /*  #swagger.tags = ['Restaurant']
@@ -355,7 +353,7 @@ exports.close = (req, res) => {
       }
   */
   const id = req.params.id
-  const boolean = (req.params.status.toLowerCase() === 'true');
+  const boolean = (req.params.status.toLowerCase() === 'true')
 
   Restaurant.findByIdAndUpdate(id, { isClosedOverwrite: boolean }, { useFindAndModify: false })
     .then(data => {
@@ -657,7 +655,7 @@ exports.createCategory = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
+        message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
       })
     })
 }

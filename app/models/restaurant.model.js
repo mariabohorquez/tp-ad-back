@@ -7,12 +7,12 @@ module.exports = mongoose => {
         unique: true
       },
       openingTime: {
-        hours: { type: Number, min: 0, max: 24 , required: true},
-        minutes: { type: Number, min: 0, max: 60, required: true},
+        hours: { type: Number, min: 0, max: 24, required: true },
+        minutes: { type: Number, min: 0, max: 60, required: true }
       },
       closingTime: {
-        hours: { type: Number, min: 0, max: 24, required: true},
-        minutes: { type: Number, min: 0, max: 60, required: true},
+        hours: { type: Number, min: 0, max: 24, required: true },
+        minutes: { type: Number, min: 0, max: 60, required: true }
       },
       isClosedOverwrite: {
         type: Boolean,
@@ -32,7 +32,7 @@ module.exports = mongoose => {
         state: String,
         country: String,
         longitude: mongoose.Schema.Types.Decimal128,
-        latitude: mongoose.Schema.Types.Decimal128,
+        latitude: mongoose.Schema.Types.Decimal128
       },
       restaurantTypes: [
         {

@@ -3,30 +3,37 @@ module.exports = app => {
 
   const router = require('express').Router()
 
-  // Create a new user
-  router.post('/users/', users.create)
-
-  // Retrieve all users
-  router.get('/users/', users.findAll)
+  // Auth routes
+  // Authenticate a user
+  router.post('/users/login', users.login)
+  // Logout a user
+  router.get('/users/logout', users.logout)
+  // Handles creation of a new user
+  router.post('/users/register', users.register)
+  // Recover password, currently only for the owner role
+  router.post('/users/recoverPassword', users.recoverPassword)
 
   // Retrieve a single user with id
   router.get('/users/:id', users.findOne)
 
-  // Update an users with id
+  // Update a user with id
   router.patch('/users/:id', users.update)
 
-  // Delete an user with id
+  // Delete a user with id
   router.delete('/users/:id', users.delete)
 
-  // Retrieve all user favorite restaurants
+  // Normal user specific routes
   router.get('/users/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)
+  router.patch('/users/:id/favorites', users.changeRestaurantFavoriteStatus)
 
-  router.patch('/users/:id/favorite/:restaurantId', users.changeRestaurantFavoriteStatus)
+  // Owner specific routes
+  // Associate restaurant to owner
+  router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
+  // Retrieve all owner restaurants
+  router.get('/users/:id/restaurants', users.findAllRestaurants)
 
-  // Auth routes
-  router.post('/users/login', users.login)
-  router.post('/users/register', users.register)
-  router.post('/users/logout', users.logout)
+  // Upload an image
+  // router.get('/users/:id/restaurants', users.uploadImage)
 
   app.use('/api/v1', router)
 }
