@@ -1,12 +1,11 @@
 const db = require('../models')
 const User = db.user
-const Owner = db.owner
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Register a user'
   // #swagger.description = 'Handles creation of a new user, must specify if it is a user or an owner.'
-  /* #swagger.parameters['obj'] = {
+  /* #swagger.parameters['user'] = {
           in: 'body',
           description: 'User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.
                         If it is a user, it must specify the google fields.',
@@ -28,7 +27,7 @@ exports.register = (req, res) => {
 
   if (req.body.role === 'owner') {
     // Create a Owner
-    const owner = new Owner({
+    const owner = new User({
       custom: {
         email: req.body.custom.email,
         password: req.body.custom.password,
@@ -40,7 +39,7 @@ exports.register = (req, res) => {
     owner
       .save(owner)
       .then(data => {
-        res.send(data).status(201)
+        res.status(201).send(data)
       })
       .catch(err => {
         res.status(500).send({
@@ -82,6 +81,16 @@ exports.login = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Login a user'
   // #swagger.description = 'Handles login of a user, must specify if it is a user or an owner to know strategy.'
+  /* #swagger.parameters['accessToken'] = {
+          in: 'header',
+          description: 'Token from google or custom login',
+          required: true,
+          type: 'string',
+  } */
+  // #swagger.responses[200] = { description: 'Successfully logged in' }
+  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[404] = { description: 'User not found' }
+  // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   // Validate request
   if (!req.body) {
@@ -162,6 +171,21 @@ exports.delete = (req, res) => {
   const id = req.params.id
 }
 
+// Upload a user image
+exports.uploadUserImage = (req, res) => {
+  /*  #swagger.tags = ['User']
+      #swagger.summary = 'Upload a user image.'
+      #swagger.description = 'Endpoint to upload a user image.'
+      #swagger.parameters['userId'] = { description: 'user id', required: 'true', type: 'string' }
+      #swagger.parameters['image'] = { description: 'user image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
+      #swagger.responses[200] = { description: 'User image uploaded successfully.' }
+      #swagger.responses[400] = { description: 'Error with given parameters.' }
+      #swagger.responses[404] = { description: 'User not found.' }
+      #swagger.responses[500] = { description: 'Error uploading user image.' }
+  */
+}
+
+
 // Find all favorite restaurants of a user
 exports.findAllFavoriteRestaurants = (req, res) => {
   // #swagger.tags = ['User']
@@ -192,7 +216,7 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
 
 // Add a restaurant to owner's restaurants
 exports.addRestaurant = (req, res) => {
-  // #swagger.tags = ['Owner']
+  // #swagger.tags = ['User']
   // #swagger.summary = 'Add a restaurant to owner'
   // #swagger.description = 'Adds a restaurant to owner via its id.'
 
@@ -207,7 +231,7 @@ exports.addRestaurant = (req, res) => {
 
 // Return all restaurants of an owner
 exports.findAllRestaurants = (req, res) => {
-  // #swagger.tags = ['Owner']
+  // #swagger.tags = ['User']
   // #swagger.summary = 'Get all restaurants of an owner'
   // #swagger.description = 'Gets all restaurants of an owner via its id.'
 

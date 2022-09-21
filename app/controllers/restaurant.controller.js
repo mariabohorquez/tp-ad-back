@@ -74,7 +74,7 @@ exports.findAll = (req, res) => {
 // Can be filtered by name.
 exports.findAllWithFilter = (req, res) => {
   /* #swagger.tags = ['Restaurant']
-     #swagger.summary = 'Retrieve all restaurants with regex.'
+     #swagger.summary = 'Retrieve all restaurants matching full or partial name.'
      #swagger.description = `Retrieve all restaurants from the database.
                              If a name is provided, it will be used to filter the results.`
      #swagger.parameters['name'] =
@@ -90,7 +90,10 @@ exports.findAllWithFilter = (req, res) => {
   } */
 
   const name = req.params.name === 'undefined' ? '' : req.params.name
-  const condition = name ? { name: { $regex: new RegExp(name), $options: 'i' } } : {}
+  const condition = name ? { $in: [ 
+                           {name: { $regex: new RegExp(name), $options: 'i' }}, 
+                           { _id: { $regex: new RegExp(name), $options: 'i' }}
+                          ]} : {}
   console.log(condition)
 
   Restaurant.find(condition)
@@ -109,7 +112,7 @@ exports.findAllWithFilter = (req, res) => {
 // Find a single Restaurant with an id
 exports.findOne = (req, res) => {
   /*  #swagger.tags = ['Restaurant']
-      #swagger.summary = 'Get a restaurant by id.'
+      #swagger.summary = 'Get a single restaurant by id.'
       #swagger.description = 'Endpoint to get a restaurant by id.'
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.responses[200] = {
@@ -294,6 +297,20 @@ exports.findAllReviews = (req, res) => {
       `${err.message} ocurred while retrieving the reviews for restaurant ` + id
       })
     })
+}
+
+// Upload a restaurant image
+exports.uploadRestaurantImage = (req, res) => {
+  /*  #swagger.tags = ['Restaurant']
+      #swagger.summary = 'Upload a restaurant image.'
+      #swagger.description = 'Endpoint to upload a restaurant image.'
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['image'] = { description: 'Restaurant image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
+      #swagger.responses[200] = { description: 'Restaurant image uploaded successfully.' }
+      #swagger.responses[400] = { description: 'Error with given parameters.' }
+      #swagger.responses[404] = { description: 'Restaurant not found.' }
+      #swagger.responses[500] = { description: 'Error uploading restaurant image.' }
+  */
 }
 
 // Delete a Restaurant with the specified id in the request
@@ -605,6 +622,21 @@ exports.deleteDish = (req, res) => {
     })
 }
 
+// Upload a dish image
+exports.uploadDishImage = (req, res) => {
+  /*  #swagger.tags = ['Dish']
+      #swagger.summary = 'Upload a dish image.'
+      #swagger.description = 'Endpoint to upload a dish image.'
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
+      #swagger.parameters['image'] = { description: 'Dish image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
+      #swagger.responses[200] = { description: 'Dish image uploaded successfully' }
+      #swagger.responses[400] = { description: 'Error with given parameters' }
+      #swagger.responses[404] = { description: 'Restaurant or dish not found' }
+      #swagger.responses[500] = { description: 'Error uploading dish image' }
+  */
+}
+
 // Create a category for a restaurant
 exports.createCategory = (req, res) => {
   /*  #swagger.tags = ['Menu categories']
@@ -665,7 +697,7 @@ exports.findAllCategories = (req, res) => {
   /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Get all categories from a restaurant.'
       #swagger.description = 'Endpoint to get all categories from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.responses[200] = {
         description: 'Categories retrieved successfully',
         type: 'array',
@@ -700,7 +732,7 @@ exports.deleteCategory = (req, res) => {
   /*  #swagger.tags = ['Menu categories']
       #swagger.summary = 'Delete a category from a restaurant.'
       #swagger.description = 'Endpoint to delete a category from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['category'] = {
         in: 'body',
         description: 'Category String',
@@ -717,7 +749,7 @@ exports.deleteCategory = (req, res) => {
       }
   */
   const id = req.params.restaurantId
-  const category = req.params.category
+  const category = req.body.category
 
   Restaurant.findOneAndUpdate(
     { _id: id },

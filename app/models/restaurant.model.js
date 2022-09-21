@@ -22,6 +22,7 @@ module.exports = mongoose => {
       // $, $$, $$$, $$$$
       priceRange: {
         type: String,
+        enum : ['$','$$', '$$$', '$$$$'],
         required: true
       },
       address: {
