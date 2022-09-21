@@ -2,7 +2,7 @@ module.exports = mongoose => {
   const schema = mongoose.Schema({
     role: {
       type: String,
-      enum : ['user','owner'],
+      enum: ['user', 'owner'],
       default: 'user'
     },
     google: {

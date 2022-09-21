@@ -185,7 +185,6 @@ exports.uploadUserImage = (req, res) => {
   */
 }
 
-
 // Find all favorite restaurants of a user
 exports.findAllFavoriteRestaurants = (req, res) => {
   // #swagger.tags = ['User']

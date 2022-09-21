@@ -116,7 +116,7 @@ const doc = {
       $name: 'Pizzas',
     },
     createUser: {
-      $role: ['user', 'owner'],
+      role: "user or owner",   
       google: {
         name: 'Jane Doe',
         id: '1234567890',

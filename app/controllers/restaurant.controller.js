@@ -90,10 +90,14 @@ exports.findAllWithFilter = (req, res) => {
   } */
 
   const name = req.params.name === 'undefined' ? '' : req.params.name
-  const condition = name ? { $in: [ 
-                           {name: { $regex: new RegExp(name), $options: 'i' }}, 
-                           { _id: { $regex: new RegExp(name), $options: 'i' }}
-                          ]} : {}
+  const condition = name
+    ? {
+        $in: [
+          { name: { $regex: new RegExp(name), $options: 'i' } },
+          { _id: { $regex: new RegExp(name), $options: 'i' } }
+        ]
+      }
+    : {}
   console.log(condition)
 
   Restaurant.find(condition)

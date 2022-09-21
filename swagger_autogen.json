@@ -1461,14 +1461,8 @@
       "type": "object",
       "properties": {
         "role": {
-          "type": "array",
-          "example": [
-            "user",
-            "owner"
-          ],
-          "items": {
-            "type": "string"
-          }
+          "type": "string",
+          "example": "user or owner"
         },
         "google": {
           "type": "object",
@@ -1504,10 +1498,7 @@
             }
           }
         }
-      },
-      "required": [
-        "role"
-      ]
+      }
     }
   }
 }
