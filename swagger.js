@@ -7,7 +7,7 @@ const options = {
 const swaggerAutogen = require('swagger-autogen')(options)
 
 const outputFile = './swagger_autogen.json'
-const endpointsFiles = ['app/routes/utils.routes.js', 'app/routes/restaurant.routes.js', 'app/routes/user.routes.js']
+const endpointsFiles = ['app/routes/utils.routes.js', 'app/routes/user.routes.js', 'app/routes/restaurant.routes.js']
 
 const doc = { 
   "info": {
@@ -70,7 +70,7 @@ const doc = {
       name: 'Jhon Doe',
       $email: 'the-coolest@anydomain.com',
       $password: '123456',
-      restaurants: {
+      ownedRestaurants: {
         $ref: '#/definitions/Restaurant'
       },
     },

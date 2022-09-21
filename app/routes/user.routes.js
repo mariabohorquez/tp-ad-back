@@ -4,12 +4,12 @@ module.exports = app => {
   const router = require('express').Router()
 
   // Auth routes
+  // Handles creation of a new user
+  router.post('/users/register', users.register)
   // Authenticate a user
   router.post('/users/login', users.login)
   // Logout a user
-  router.get('/users/logout', users.logout)
-  // Handles creation of a new user
-  router.post('/users/register', users.register)
+  router.post('/users/logout', users.logout)
   // Recover password, currently only for the owner role
   router.post('/users/recoverPassword', users.recoverPassword)
 
@@ -21,6 +21,9 @@ module.exports = app => {
 
   // Delete a user with id
   router.delete('/users/:id', users.delete)
+
+  // Upload a user image
+  router.post('/users/:id/image', users.uploadUserImage)
 
   // Normal user specific routes
   router.get('/users/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)

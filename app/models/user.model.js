@@ -1,5 +1,10 @@
 module.exports = mongoose => {
   const schema = mongoose.Schema({
+    role: {
+      type: String,
+      enum : ['user','owner'],
+      default: 'user'
+    },
     google: {
       id: {
         type: String,
@@ -15,12 +20,35 @@ module.exports = mongoose => {
         required: true
       }
     },
+    custom: {
+      email: {
+        type: String,
+        required: true,
+        unique: true
+      },
+      password: {
+        type: String,
+        required: true,
+        unique: false
+      },
+      name: {
+        type: String,
+        required: true,
+        unique: false
+      }
+    },
     profilePicture: {
       type: Buffer,
       required: false,
       unique: false
     },
     favoriteRestaurants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'restaurant'
+      }
+    ],
+    ownedRestaurants: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'restaurant'
