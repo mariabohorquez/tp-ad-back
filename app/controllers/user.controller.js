@@ -13,9 +13,9 @@ exports.register = (req, res) => {
           type: 'object',
           schema: { $ref: "#/definitions/createUser" }
   } */
-  // swagger.responses[201] = { description: 'User successfully created' }
-  // swagger.responses[400] = { description: 'Content cannot be empty' }
-  // swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
+  // #swagger.responses[201] = { description: 'User successfully created' }
+  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   // Validate request
   if (!req.body) {
@@ -78,15 +78,24 @@ exports.register = (req, res) => {
 }
 
 exports.login = (req, res) => {
+  // https://www.bezkoder.com/node-js-express-login-mongodb/#Controller_for_Registration_Login_Logout
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Login a user'
-  // #swagger.description = 'Handles login of a user, must specify if it is a user or an owner to know strategy.'
+  // #swagger.description = 'Handles login of a user, must specify either accessToken (google) or credentials (custom login).'
   /* #swagger.parameters['accessToken'] = {
           in: 'header',
           description: 'Token from google or custom login',
-          required: true,
+          required: false,
           type: 'string',
   } */
+  /* #swagger.parameters['credentials'] = {
+          in: 'body',
+          description: 'Credentials for custom login',
+          required: false,
+          type: 'object',
+          schema: { $ref: "#/definitions/credentials" }
+  }
+  */
   // #swagger.responses[200] = { description: 'Successfully logged in' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
@@ -106,7 +115,15 @@ exports.logout = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Logout a user'
   // #swagger.description = 'Handles logout of a user, must specify if it is a user or an owner to know strategy.'
+  /* #swagger.parameters['userId'] = {
+          in: 'header',
+          description: 'Id of user',
+          required: false,
+          type: 'string',
+  }
+  */
   // #swagger.responses[200] = { description: 'Successfully logged out' }
+  // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   // TODO: Needs to remove session from mongodb and stuff.
@@ -116,7 +133,14 @@ exports.recoverPassword = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Recover password of a user'
   // #swagger.description = 'Handles password recovery of a user, can only be done for owner. Sends email to recover password'
-  // #swagger.responses[200] = { description: 'Successfully logged out' }
+  /* #swagger.parameters['email'] = {
+          in: 'header',
+          description: 'User email',
+          required: true,
+          type: 'string',
+  }
+  */
+  // #swagger.responses[200] = { description: 'Email sent' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -136,8 +160,12 @@ exports.findOne = (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Get a user with id'
   // #swagger.description = 'Gets a user via its id.'
-
-  // #swagger.responses[200] = { description: 'User successfully retrieved' }
+  /* #swagger.responses[200] = {
+    description: 'User retrieved successfully',
+    schema: { $ref: "#/definitions/User" }
+  }
+  */
+  // #swagger.responses[400] = { description: 'Needs to specify userId' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
@@ -149,6 +177,15 @@ exports.update = (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Update a user with id'
   // #swagger.description = 'Updates a user via its id.'
+
+  /* #swagger.parameters['credentials'] = {
+          in: 'body',
+          description: 'Credentials for custom login',
+          required: false,
+          type: 'object',
+          schema: { $ref: "#/definitions/credentials" }
+  }
+  */
 
   // #swagger.responses[200] = { description: 'User successfully updated' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }

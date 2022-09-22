@@ -51,13 +51,13 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "User successfully created"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Content cannot be empty"
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal server error, returns specific error message"
           }
         }
       }
@@ -68,14 +68,23 @@
           "Auth"
         ],
         "summary": "Login a user",
-        "description": "Handles login of a user, must specify if it is a user or an owner to know strategy.",
+        "description": "Handles login of a user, must specify either accessToken (google) or credentials (custom login).",
         "parameters": [
           {
             "name": "accessToken",
             "in": "header",
             "description": "Token from google or custom login",
-            "required": true,
+            "required": false,
             "type": "string"
+          },
+          {
+            "name": "credentials",
+            "in": "body",
+            "description": "Credentials for custom login",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/credentials"
+            }
           }
         ],
         "responses": {
@@ -101,10 +110,21 @@
         ],
         "summary": "Logout a user",
         "description": "Handles logout of a user, must specify if it is a user or an owner to know strategy.",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "header",
+            "description": "Id of user",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully logged out"
+          },
+          "400": {
+            "description": "Content cannot be empty"
           },
           "500": {
             "description": "Internal server error, returns specific error message"
@@ -119,10 +139,18 @@
         ],
         "summary": "Recover password of a user",
         "description": "Handles password recovery of a user, can only be done for owner. Sends email to recover password",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "header",
+            "description": "User email",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successfully logged out"
+            "description": "Email sent"
           },
           "400": {
             "description": "Content cannot be empty"
@@ -153,7 +181,13 @@
         ],
         "responses": {
           "200": {
-            "description": "User successfully retrieved"
+            "description": "User retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Needs to specify userId"
           },
           "404": {
             "description": "User not found"
@@ -1321,6 +1355,10 @@
     "User": {
       "type": "object",
       "properties": {
+        "role": {
+          "type": "string",
+          "example": "user"
+        },
         "google": {
           "type": "object",
           "properties": {
@@ -1338,11 +1376,31 @@
             }
           }
         },
+        "custom": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Jane Doe"
+            },
+            "email": {
+              "type": "string",
+              "example": "janedoe@gmail.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "123456"
+            }
+          }
+        },
         "profilePicture": {
           "type": "string",
           "example": ""
         },
         "favoriteRestaurants": {
+          "$ref": "#/definitions/Restaurants"
+        },
+        "ownedRestaurants": {
           "$ref": "#/definitions/Restaurants"
         }
       }
@@ -1497,6 +1555,19 @@
               "example": "123456"
             }
           }
+        }
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "owner@morfando.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
         }
       }
     }

@@ -75,13 +75,22 @@ const doc = {
       },
     },
     User: {
+      role: 'user',
       google: {
         name: 'Jane Doe',
         id: '1234567890',
         email: 'jane-doe@gmail.com',
       },
+      custom: {
+        name: 'Jane Doe',
+        email: 'janedoe@gmail.com',
+        password: '123456'
+      },
       profilePicture: '',
       favoriteRestaurants: {
+        $ref: '#/definitions/Restaurants',
+      },
+      ownedRestaurants: {
         $ref: '#/definitions/Restaurants',
       },
     },
@@ -128,6 +137,10 @@ const doc = {
         password: '123456'
       },
     },
+    credentials: {
+      email: 'owner@morfando.com',
+      password: '123456'
+    }
   },
 }
 
