@@ -9,7 +9,9 @@ exports.create = (req, res) => {
   // #swagger.auto = false
   // #swagger.tags = ['Restaurant']
   // #swagger.summary = 'Create a restaurant.'
-  // #swagger.description = `Endpoint to create a restaurant. PriceRange must be $, $$, $$$ or $$$$.`
+  /* #swagger.description = `Endpoint to create a restaurant.
+                             Price range must be $, \$\$, $\$\$ or $\$\$\$ ($ is the cheapest, $\$\$\$ the most expensive).`
+  */
   /* #swagger.parameters['Restaurants'] = {
     in: 'body',
     description: 'Restaurant object',
@@ -20,6 +22,9 @@ exports.create = (req, res) => {
   /* #swagger.responses[201] = {
     description: 'Restaurant created successfully',
     schema: { $ref: "#/definitions/Restaurant" }
+  }
+  #swagger.responses[400] = {
+    description: 'Error with given parameters.'
   }
   #swagger.responses[500] = {
     description: 'Error creating restaurant',
@@ -53,6 +58,8 @@ exports.create = (req, res) => {
       err.message || 'Some error occurred while creating the Restaurant.'
       })
     })
+
+  // TODO: associate restaurant with owner
 }
 
 exports.findAll = (req, res) => {
@@ -90,10 +97,14 @@ exports.findAllWithFilter = (req, res) => {
   } */
 
   const name = req.params.name === 'undefined' ? '' : req.params.name
-  const condition = name ? { $in: [ 
-                           {name: { $regex: new RegExp(name), $options: 'i' }}, 
-                           { _id: { $regex: new RegExp(name), $options: 'i' }}
-                          ]} : {}
+  const condition = name
+    ? {
+        $in: [
+          { name: { $regex: new RegExp(name), $options: 'i' } },
+          { _id: { $regex: new RegExp(name), $options: 'i' } }
+        ]
+      }
+    : {}
   console.log(condition)
 
   Restaurant.find(condition)
@@ -158,6 +169,9 @@ exports.update = (req, res) => {
         schema: { $ref: "#/definitions/Restaurant" }
       }
       #swagger.responses[400] = {
+        description: 'Error with given body.',
+      }
+      #swagger.responses[404] = {
         description: 'Restaurant not found',
       }
       #swagger.responses[500] = {
@@ -224,12 +238,12 @@ exports.createReview = (req, res) => {
     })
   }
 
-  const user = User.findById(userId)
-  if (!user) {
-    return res.status(404).send({
-      message: 'User not found!'
-    })
-  }
+  // const user = User.findById(userId)
+  // if (!user) {
+  //   return res.status(404).send({
+  //     message: 'User not found!'
+  //   })
+  // }
 
   const review = new Review({
     user: req.body.user,
@@ -406,6 +420,9 @@ exports.createDish = (req, res) => {
       #swagger.responses[201] = {
         description: 'Dish created successfully',
       }
+      #swagger.responses[400] = {
+        description: 'Error with given parameters',
+      }
       #swagger.responses[404] = {
         description: 'Restaurant not found',
       }
@@ -453,7 +470,7 @@ exports.createDish = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was updated successfully.' })
+      } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
     })
     .catch(err => {
       res.status(500).send({
@@ -468,7 +485,7 @@ exports.findAllDishes = (req, res) => {
   /*  #swagger.tags = ['Dish']
       #swagger.summary = 'Get all dishes from a restaurant.'
       #swagger.description = 'Endpoint to get all dishes from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.responses[200] = {
         description: 'Dishes retrieved successfully',
         schema: { $ref: '#/definitions/Menu' }
@@ -481,16 +498,16 @@ exports.findAllDishes = (req, res) => {
       }
   */
 
-  const id = req.params.restaurantId
+  const restaurantId = req.params.restaurantId
 
-  Restaurant.findById(id).populate('menu', '-_id -__v')
+  Restaurant.findById(restaurantId).populate('menu', '-_id -__v')
     .then(data => {
       res.status(200).send(data.menu)
     })
     .catch(err => {
       res.status(500).send({
         message:
-      err.message || 'Some error occurred while retrieving the menu for restaurant' + id
+      err.message || 'Some error occurred while retrieving the menu for restaurant' + restaurantId
       })
     })
 }
@@ -500,7 +517,7 @@ exports.findOneDish = (req, res) => {
   /*  #swagger.tags = ['Dish']
       #swagger.summary = 'Get a dish from a restaurant.'
       #swagger.description = 'Endpoint to get a dish from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
       #swagger.responses[200] = {
         description: 'Dish retrieved successfully',
@@ -534,7 +551,7 @@ exports.updateDish = (req, res) => {
   /*  #swagger.tags = ['Dish']
       #swagger.summary = 'Update a dish from a restaurant.'
       #swagger.description = 'Endpoint to update a dish from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
       #swagger.parameters['dish'] = {
         in: 'body',
@@ -588,7 +605,7 @@ exports.deleteDish = (req, res) => {
   /*  #swagger.tags = ['Dish']
       #swagger.summary = 'Delete a dish from a restaurant.'
       #swagger.description = 'Endpoint to delete a dish from a restaurant.'
-      #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
+      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
       #swagger.responses[200] = {
         description: 'Dish deleted successfully',
@@ -649,7 +666,7 @@ exports.createCategory = (req, res) => {
         type: 'object',
         schema: { $ref: '#/definitions/createMenuCategory' }
       }
-      #swagger.responses[200] = {
+      #swagger.responses[201] = {
         description: 'Category created successfully',
       }
       #swagger.responses[400] = {
@@ -683,7 +700,7 @@ exports.createCategory = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${restaurantId}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was updated successfully.' })
+      } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
     })
     .catch(err => {
       res.status(500).send({
@@ -735,9 +752,10 @@ exports.deleteCategory = (req, res) => {
       #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['category'] = {
         in: 'body',
-        description: 'Category String',
         required: 'true',
-        type: 'string' }
+        type: 'object',
+        schema: { $ref: '#/definitions/createMenuCategory' }
+      }
       #swagger.responses[200] = {
         description: 'Category deleted successfully',
       }
@@ -777,9 +795,10 @@ exports.updateCategory = (req, res) => {
       #swagger.parameters['id'] = { description: 'Restaurant id', required: 'true', type: 'string' }
       #swagger.parameters['category'] = {
         in: 'body',
-        description: 'Category String',
         required: 'true',
-        type: 'string' }
+        type: 'object',
+        schema: { $ref: '#/definitions/createMenuCategory' }
+      }
       #swagger.responses[200] = {
         description: 'Category updated successfully',
       }

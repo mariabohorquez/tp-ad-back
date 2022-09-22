@@ -51,13 +51,13 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "User successfully created"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Content cannot be empty"
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal server error, returns specific error message"
           }
         }
       }
@@ -68,14 +68,23 @@
           "Auth"
         ],
         "summary": "Login a user",
-        "description": "Handles login of a user, must specify if it is a user or an owner to know strategy.",
+        "description": "Handles login of a user, must specify either accessToken (google) or credentials (custom login).",
         "parameters": [
           {
             "name": "accessToken",
             "in": "header",
             "description": "Token from google or custom login",
-            "required": true,
+            "required": false,
             "type": "string"
+          },
+          {
+            "name": "credentials",
+            "in": "body",
+            "description": "Credentials for custom login",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/credentials"
+            }
           }
         ],
         "responses": {
@@ -101,10 +110,21 @@
         ],
         "summary": "Logout a user",
         "description": "Handles logout of a user, must specify if it is a user or an owner to know strategy.",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "header",
+            "description": "Id of user",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successfully logged out"
+          },
+          "400": {
+            "description": "Content cannot be empty"
           },
           "500": {
             "description": "Internal server error, returns specific error message"
@@ -119,10 +139,18 @@
         ],
         "summary": "Recover password of a user",
         "description": "Handles password recovery of a user, can only be done for owner. Sends email to recover password",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "header",
+            "description": "User email",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successfully logged out"
+            "description": "Email sent"
           },
           "400": {
             "description": "Content cannot be empty"
@@ -153,7 +181,13 @@
         ],
         "responses": {
           "200": {
-            "description": "User successfully retrieved"
+            "description": "User retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Needs to specify userId"
           },
           "404": {
             "description": "User not found"
@@ -175,11 +209,23 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.    If it is a user, it must specify the google fields.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "User successfully  "
+            "description": "User successfully  ",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           },
           "400": {
             "description": "Content cannot be empty"
@@ -203,7 +249,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User id"
           }
         ],
         "responses": {
@@ -231,14 +278,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "userId",
-            "description": "user id",
-            "required": true,
             "type": "string",
-            "in": "query"
+            "description": "user id"
           },
           {
             "name": "image",
@@ -265,7 +306,7 @@
         }
       }
     },
-    "/users/{id}/favoriteRestaurants": {
+    "/users/{id}/favorites": {
       "get": {
         "tags": [
           "User"
@@ -294,9 +335,7 @@
             "description": "Internal server error, returns specific error message"
           }
         }
-      }
-    },
-    "/users/{id}/favorites": {
+      },
       "patch": {
         "tags": [
           "User"
@@ -307,6 +346,14 @@
           {
             "name": "id",
             "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "User id"
+          },
+          {
+            "name": "restaurantId",
+            "in": "header",
+            "description": "Restaurant id to change favorite status for",
             "required": true,
             "type": "string"
           }
@@ -327,43 +374,6 @@
         }
       }
     },
-    "/users/{id}/restaurant/{restaurantId}": {
-      "patch": {
-        "tags": [
-          "User"
-        ],
-        "summary": "Add a restaurant to owner",
-        "description": "Adds a restaurant to owner via its id.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "restaurantId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Restaurant successfully added to owner"
-          },
-          "400": {
-            "description": "Content cannot be empty"
-          },
-          "404": {
-            "description": "Owner not found"
-          },
-          "500": {
-            "description": "Internal server error, returns specific error message"
-          }
-        }
-      }
-    },
     "/users/{id}/restaurants": {
       "get": {
         "tags": [
@@ -376,7 +386,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User id"
           }
         ],
         "responses": {
@@ -387,7 +398,7 @@
             }
           },
           "404": {
-            "description": "Owner not found"
+            "description": "User not found"
           },
           "500": {
             "description": "Internal server error, returns specific error message"
@@ -401,7 +412,7 @@
           "Restaurant"
         ],
         "summary": "Create a restaurant.",
-        "description": "Endpoint to create a restaurant. PriceRange must be $, $$, $$$ or $$$$.",
+        "description": "Endpoint to create a restaurant.     Price range must be $, \\$\\$, $\\$\\$ or $\\$\\$\\$ ($ is the cheapest, $\\$\\$\\$ the most expensive).",
         "parameters": [
           {
             "name": "Restaurants",
@@ -419,6 +430,9 @@
             "schema": {
               "$ref": "#/definitions/Restaurant"
             }
+          },
+          "400": {
+            "description": "Error with given parameters."
           },
           "500": {
             "description": "Error creating restaurant"
@@ -537,10 +551,10 @@
             }
           },
           "400": {
-            "description": "Restaurant not found"
+            "description": "Error with given body."
           },
           "404": {
-            "description": "Not Found"
+            "description": "Restaurant not found"
           },
           "500": {
             "description": "Error updating restaurant"
@@ -757,14 +771,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "201": {
             "description": "Dish created successfully"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Error with given parameters"
           },
           "404": {
             "description": "Restaurant not found"
@@ -785,14 +796,8 @@
             "name": "restaurantId",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "Restaurant id",
-            "required": true,
             "type": "string",
-            "in": "query"
+            "description": "Restaurant id"
           }
         ],
         "responses": {
@@ -823,7 +828,8 @@
             "name": "restaurantId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Restaurant id"
           },
           {
             "name": "dishId",
@@ -831,13 +837,6 @@
             "required": true,
             "type": "string",
             "description": "Dish id"
-          },
-          {
-            "name": "id",
-            "description": "Restaurant id",
-            "required": true,
-            "type": "string",
-            "in": "query"
           }
         ],
         "responses": {
@@ -866,7 +865,8 @@
             "name": "restaurantId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Restaurant id"
           },
           {
             "name": "dishId",
@@ -874,13 +874,6 @@
             "required": true,
             "type": "string",
             "description": "Dish id"
-          },
-          {
-            "name": "id",
-            "description": "Restaurant id",
-            "required": true,
-            "type": "string",
-            "in": "query"
           },
           {
             "name": "dish",
@@ -918,7 +911,8 @@
             "name": "restaurantId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Restaurant id"
           },
           {
             "name": "dishId",
@@ -926,13 +920,6 @@
             "required": true,
             "type": "string",
             "description": "Dish id"
-          },
-          {
-            "name": "id",
-            "description": "Restaurant id",
-            "required": true,
-            "type": "string",
-            "in": "query"
           }
         ],
         "responses": {
@@ -1018,7 +1005,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Category created successfully"
           },
           "400": {
@@ -1077,11 +1064,9 @@
           {
             "name": "category",
             "in": "body",
-            "description": "Category String",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {}
+              "$ref": "#/definitions/createMenuCategory"
             }
           }
         ],
@@ -1198,6 +1183,10 @@
     "createRestaurant": {
       "type": "object",
       "properties": {
+        "ownerId": {
+          "type": "string",
+          "example": "5f9f9f9f9f9f9f9f9f9f9f9f"
+        },
         "name": {
           "type": "string",
           "example": "La Pizzeria"
@@ -1281,6 +1270,7 @@
         }
       },
       "required": [
+        "ownerId",
         "name",
         "openingTime",
         "closingTime",
@@ -1321,6 +1311,10 @@
     "User": {
       "type": "object",
       "properties": {
+        "role": {
+          "type": "string",
+          "example": "user"
+        },
         "google": {
           "type": "object",
           "properties": {
@@ -1338,11 +1332,31 @@
             }
           }
         },
+        "custom": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Jane Doe"
+            },
+            "email": {
+              "type": "string",
+              "example": "janedoe@gmail.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "123456"
+            }
+          }
+        },
         "profilePicture": {
           "type": "string",
           "example": ""
         },
         "favoriteRestaurants": {
+          "$ref": "#/definitions/Restaurants"
+        },
+        "ownedRestaurants": {
           "$ref": "#/definitions/Restaurants"
         }
       }
@@ -1423,14 +1437,10 @@
         "comment": {
           "type": "string",
           "example": "Muy buena pizza"
-        },
-        "user": {
-          "$ref": "#/definitions/User"
         }
       },
       "required": [
-        "rating",
-        "user"
+        "rating"
       ]
     },
     "Reviews": {
@@ -1461,14 +1471,8 @@
       "type": "object",
       "properties": {
         "role": {
-          "type": "array",
-          "example": [
-            "user",
-            "owner"
-          ],
-          "items": {
-            "type": "string"
-          }
+          "type": "string",
+          "example": "user or owner"
         },
         "google": {
           "type": "object",
@@ -1504,10 +1508,20 @@
             }
           }
         }
-      },
-      "required": [
-        "role"
-      ]
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "owner@morfando.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
+        }
+      }
     }
   }
 }

@@ -47,6 +47,7 @@ const doc = {
       isClosedOverwrite: false
     },
     createRestaurant: {
+      $ownerId: '5f9f9f9f9f9f9f9f9f9f9f9f',
       $name: 'La Pizzeria',
       $openingTime: {'hours': 12, 'minutes': 30},
       $closingTime: {'hours': 22, 'minutes': 0},
@@ -75,13 +76,22 @@ const doc = {
       },
     },
     User: {
+      role: 'user',
       google: {
         name: 'Jane Doe',
         id: '1234567890',
         email: 'jane-doe@gmail.com',
       },
+      custom: {
+        name: 'Jane Doe',
+        email: 'janedoe@gmail.com',
+        password: '123456',
+      },
       profilePicture: '',
       favoriteRestaurants: {
+        $ref: '#/definitions/Restaurants',
+      },
+      ownedRestaurants: {
         $ref: '#/definitions/Restaurants',
       },
     },
@@ -102,9 +112,6 @@ const doc = {
     Review: {
       $rating: 5,
       comment: 'Muy buena pizza',
-      $user: {
-        $ref: '#/definitions/User'
-      },
     },
     Reviews: [
       {$ref: '#/definitions/Review'}
@@ -116,7 +123,7 @@ const doc = {
       $name: 'Pizzas',
     },
     createUser: {
-      $role: ['user', 'owner'],
+      role: "user or owner",   
       google: {
         name: 'Jane Doe',
         id: '1234567890',
@@ -128,6 +135,10 @@ const doc = {
         password: '123456'
       },
     },
+    credentials: {
+      email: 'owner@morfando.com',
+      password: '123456'
+    }
   },
 }
 

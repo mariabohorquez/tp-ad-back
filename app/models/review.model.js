@@ -6,7 +6,9 @@ module.exports = mongoose => {
     },
     rating: {
       type: Number, // 1-5
-      required: true
+      required: true,
+      min: 1,
+      max: 5
     },
     comment: {
       type: String, // can be empty
