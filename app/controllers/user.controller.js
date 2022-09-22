@@ -178,16 +178,16 @@ exports.update = (req, res) => {
   // #swagger.summary = 'Update a user with id'
   // #swagger.description = 'Updates a user via its id.'
 
-  /* #swagger.parameters['credentials'] = {
+  /* #swagger.parameters['user'] = {
           in: 'body',
-          description: 'Credentials for custom login',
-          required: false,
+          description: 'User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.
+                        If it is a user, it must specify the google fields.',
+          required: true,
           type: 'object',
-          schema: { $ref: "#/definitions/credentials" }
-  }
-  */
+          schema: { $ref: "#/definitions/User" }
+  } */
 
-  // #swagger.responses[200] = { description: 'User successfully updated' }
+  // #swagger.responses[200] = { description: 'User successfully updated' , schema: { $ref: "#/definitions/User" }}
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -201,6 +201,8 @@ exports.delete = (req, res) => {
   // #swagger.summary = 'Delete a user with id'
   // #swagger.description = 'Deletes a user via its id.'
 
+  // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
+
   // #swagger.responses[200] = { description: 'User successfully deleted' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -213,7 +215,7 @@ exports.uploadUserImage = (req, res) => {
   /*  #swagger.tags = ['User']
       #swagger.summary = 'Upload a user image.'
       #swagger.description = 'Endpoint to upload a user image.'
-      #swagger.parameters['userId'] = { description: 'user id', required: 'true', type: 'string' }
+      #swagger.parameters['id'] = { description: 'user id', required: 'true', type: 'string' }
       #swagger.parameters['image'] = { description: 'user image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
       #swagger.responses[200] = { description: 'User image uploaded successfully.' }
       #swagger.responses[400] = { description: 'Error with given parameters.' }
@@ -241,13 +243,20 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
   // #swagger.summary = 'Change restaurant favorite status'
   // #swagger.description = 'Change the current favorite status of a restaurant for a user.'
 
+  // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
+  /* #swagger.parameters['restaurantId'] = {
+          in: 'header',
+          description: 'Restaurant id to change favorite status for',
+          required: true,
+          type: 'string',
+  } */
+
   // #swagger.responses[200] = { description: 'Restaurant successfully added to favorites' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'Restaurant not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
-  const restaurantId = req.params.restaurantId
 }
 
 // Add a restaurant to owner's restaurants
@@ -258,7 +267,7 @@ exports.addRestaurant = (req, res) => {
 
   // #swagger.responses[200] = { description: 'Restaurant successfully added to owner' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
-  // #swagger.responses[404] = { description: 'Owner not found' }
+  // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
@@ -271,8 +280,10 @@ exports.findAllRestaurants = (req, res) => {
   // #swagger.summary = 'Get all restaurants of an owner'
   // #swagger.description = 'Gets all restaurants of an owner via its id.'
 
+  // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
+
   // #swagger.responses[200] = { description: 'Restaurants successfully retrieved', schema: { $ref: "#/definitions/Restaurants" } }
-  // #swagger.responses[404] = { description: 'Owner not found' }
+  // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id

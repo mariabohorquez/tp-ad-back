@@ -26,17 +26,14 @@ module.exports = app => {
   router.post('/users/:id/image', users.uploadUserImage)
 
   // Normal user specific routes
-  router.get('/users/:id/favoriteRestaurants', users.findAllFavoriteRestaurants)
+  router.get('/users/:id/favorites', users.findAllFavoriteRestaurants)
   router.patch('/users/:id/favorites', users.changeRestaurantFavoriteStatus)
 
   // Owner specific routes
-  // Associate restaurant to owner
-  router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
   // Retrieve all owner restaurants
   router.get('/users/:id/restaurants', users.findAllRestaurants)
-
-  // Upload an image
-  // router.get('/users/:id/restaurants', users.uploadImage)
+  // Associate restaurant to owner
+  // router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
 
   app.use('/api/v1', router)
 }
