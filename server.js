@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+
+
 
 const app = express();
 
@@ -8,6 +11,13 @@ const swaggerUi = require('swagger-ui-express')
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile, { swaggerOptions: { defaultModelsExpandDepth: -1 }}))
 
 app.use(cors());
+
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+app.use(bodyParser.json());
 
 // parse requests of content-type - application/json
 app.use(express.json());
