@@ -1,5 +1,5 @@
 const db = require('../models')
-const User = db.user
+const User = db.users;
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -18,6 +18,8 @@ exports.register = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   // Validate request
+  console.log("Request: ", req.body);
+  
   if (!req.body) {
     res.status(400).send({
       message: 'Content cannot be empty!'
@@ -27,11 +29,17 @@ exports.register = (req, res) => {
 
   if (req.body.role === 'owner') {
     // Create a Owner
+    console.log("Owner Creation");
     const owner = new User({
       custom: {
         email: req.body.custom.email,
         password: req.body.custom.password,
         name: req.body.custom.name
+      },
+      google: {
+        name: 'null',
+        id: 'null',
+        email: 'null'
       }
     })
 
@@ -42,6 +50,7 @@ exports.register = (req, res) => {
         res.status(201).send(data)
       })
       .catch(err => {
+        console.log(err);
         res.status(500).send({
           message:
           err.message || 'Some error occurred while creating the Owner.'

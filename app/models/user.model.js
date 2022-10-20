@@ -33,7 +33,7 @@ module.exports = mongoose => {
       },
       name: {
         type: String,
-        required: true,
+        required: false,
         unique: false
       }
     },
