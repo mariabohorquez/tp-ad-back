@@ -8,32 +8,26 @@ module.exports = mongoose => {
     google: {
       id: {
         type: String,
-        required: true,
         unique: true
       },
       name: {
         type: String,
-        required: true
       },
       email: {
         type: String,
-        required: true
       }
     },
     custom: {
       email: {
         type: String,
-        required: true,
         unique: true
       },
       password: {
         type: String,
-        required: true,
         unique: false
       },
       name: {
         type: String,
-        required: true,
         unique: false
       }
     },
