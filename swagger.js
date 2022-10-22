@@ -127,18 +127,23 @@ const doc = {
       google: {
         name: 'Jane Doe',
         id: '1234567890',
-        email: 'user@morfando.com'
+        email: 'user@morfando.com',
+        photoUrl: 'https://lh3.googleusercontent.com/a/mockphoto.jpg',
       },
       custom: {
         name: 'Jane Doe',
         email: 'owner@morfando.com',
         password: '123456'
       },
+      location: {
+        longitude: 30.558965,
+        latitude: 30.558965,
+      }
     },
     credentials: {
       email: 'owner@morfando.com',
       password: '123456'
-    }
+    },
   },
 }
 

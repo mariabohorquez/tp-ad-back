@@ -1,5 +1,5 @@
 const db = require('../models')
-const User = db.user
+const User = db.users
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -13,6 +13,7 @@ exports.register = (req, res) => {
           type: 'object',
           schema: { $ref: "#/definitions/createUser" }
   } */
+  // #swagger.responses[200] = { description: 'Google account already existed, log in.' }
   // #swagger.responses[201] = { description: 'User successfully created' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -28,10 +29,15 @@ exports.register = (req, res) => {
   if (req.body.role === 'owner') {
     // Create a Owner
     const owner = new User({
+      role: req.body.role,
       custom: {
         email: req.body.custom.email,
         password: req.body.custom.password,
         name: req.body.custom.name
+      },
+      location: {
+        latitude: req.body.location.latitude,
+        longitude: req.body.location.longitude,
       }
     })
 
@@ -50,12 +56,27 @@ exports.register = (req, res) => {
   }
 
   if (req.body.role === 'user') {
+    // If the user already exists, don't create it again
+    User.findOne({ 'email': req.body.google.email })
+      .then(data => {
+        if (data) {
+          res.status(200).send("User already exists");
+          return;
+        }
+      })
+
     // Create a User
     const user = new User({
+      role: req.body.role,
       google: {
         name: req.body.google.name,
         id: req.body.google.id,
-        email: req.body.google.email
+        email: req.body.google.email,
+        photoUrl: req.body.google.photoUrl
+      },
+      location: {
+        latitude: req.body.location.latitude,
+        longitude: req.body.location.longitude,
       }
     })
 
@@ -72,9 +93,6 @@ exports.register = (req, res) => {
         })
       })
   }
-
-  // TODO: Handle callback with tokens and stuff
-  // This should work with jwt.
 }
 
 exports.login = (req, res) => {
