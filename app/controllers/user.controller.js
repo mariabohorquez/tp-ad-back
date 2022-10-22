@@ -20,13 +20,14 @@ exports.register = (req, res) => {
 
   // Validate request
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: 'Content cannot be empty!'
     })
-    return
   }
 
   if (req.body.role === 'owner') {
+    console.log("Registering owner")
+
     // Create a Owner
     const owner = new User({
       role: req.body.role,
@@ -36,8 +37,8 @@ exports.register = (req, res) => {
         name: req.body.custom.name
       },
       location: {
-        latitude: req.body.location.latitude,
-        longitude: req.body.location.longitude,
+        latitude: req.body.location && req.body.location.latitude || -34.603722,
+        longitude: req.body.location && req.body.location.longitude || -58.381592,
       }
     })
 
@@ -45,10 +46,10 @@ exports.register = (req, res) => {
     owner
       .save(owner)
       .then(data => {
-        res.status(201).send(data)
+        return res.status(201).send(data);
       })
       .catch(err => {
-        res.status(500).send({
+        return res.status(500).send({
           message:
           err.message || 'Some error occurred while creating the Owner.'
         })
@@ -56,14 +57,7 @@ exports.register = (req, res) => {
   }
 
   if (req.body.role === 'user') {
-    // If the user already exists, don't create it again
-    User.findOne({ 'email': req.body.google.email })
-      .then(data => {
-        if (data) {
-          res.status(200).send("User already exists");
-          return;
-        }
-      })
+    console.log("Registering user")
 
     // Create a User
     const user = new User({
@@ -75,21 +69,36 @@ exports.register = (req, res) => {
         photoUrl: req.body.google.photoUrl
       },
       location: {
-        latitude: req.body.location.latitude,
-        longitude: req.body.location.longitude,
+        latitude: req.body.location?.latitude || -34.603722,
+        longitude: req.body.location?.longitude || -58.381592,
       }
     })
 
-    // Save User in the database
-    user
-      .save(user)
+    // If the user already exists, don't create it again
+    User.findOne({ "google.email": req.body.google.email })
       .then(data => {
-        res.status(201).send(data)
+        if (data) {
+          return res.status(200).send("User already exists");
+        } else {
+          // Save User in the database
+          user
+            .save(user)
+            .then(data => {
+              return res.status(201).send(data);
+            })
+            .catch(err => {
+              return res.status(500).send({
+                message:
+                err.message || 'Some error occurred while creating the User.'
+              })
+            })
+
+        }
       })
       .catch(err => {
-        res.status(500).send({
+        return res.status(500).send({
           message:
-          err.message || 'Some error occurred while creating the User.'
+          err.message || 'Some error occurred while looking for existing user.'
         })
       })
   }
@@ -121,7 +130,7 @@ exports.login = (req, res) => {
 
   // Validate request
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: 'Content can not be empty!'
     })
   }
@@ -165,7 +174,7 @@ exports.recoverPassword = (req, res) => {
 
   // Validate request
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: 'Content can not be empty!'
     })
   }

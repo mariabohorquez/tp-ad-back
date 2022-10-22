@@ -3,6 +3,8 @@ const cors = require("cors");
 
 const app = express();
 
+// To debug HTTP_HEADERS_SENT errors follow: https://stackoverflow.com/questions/58668188/what-to-log-to-debug-error-err-http-headers-sent
+
 const swaggerFile = require('./swagger_autogen.json')
 const swaggerUi = require('swagger-ui-express')
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile, { swaggerOptions: { defaultModelsExpandDepth: -1 }}))

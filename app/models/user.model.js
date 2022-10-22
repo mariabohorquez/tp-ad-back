@@ -15,7 +15,8 @@ module.exports = mongoose => {
       },
       email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
       },
       photoUrl: {
         type: String,
