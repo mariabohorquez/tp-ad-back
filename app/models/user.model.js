@@ -15,6 +15,11 @@ module.exports = mongoose => {
       },
       email: {
         type: String,
+        required: true
+      },
+      photoUrl: {
+        type: String,
+        required: false
       }
     },
     custom: {
@@ -47,7 +52,19 @@ module.exports = mongoose => {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'restaurant'
       }
-    ]
+    ],
+    location: {
+      latitude: {
+        type: Number,
+        required: false,
+        unique: false
+      },
+      longitude: {
+        type: Number,
+        required: false,
+        unique: false
+     },
+    },
   }, {
     timestamp: true
   })

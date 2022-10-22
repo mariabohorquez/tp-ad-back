@@ -50,6 +50,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Google account already existed, log in."
+          },
           "201": {
             "description": "User successfully created"
           },
@@ -412,7 +415,7 @@
           "Restaurant"
         ],
         "summary": "Create a restaurant.",
-        "description": "Endpoint to create a restaurant.     Price range must be $, \\$\\$, $\\$\\$ or $\\$\\$\\$ ($ is the cheapest, $\\$\\$\\$ the most expensive).",
+        "description": "Endpoint to create a restaurant.    Price range must be $, \\$\\$, $\\$\\$ or $\\$\\$\\$ ($ is the cheapest, $\\$\\$\\$ the most expensive).",
         "parameters": [
           {
             "name": "Restaurants",
@@ -1488,6 +1491,10 @@
             "email": {
               "type": "string",
               "example": "user@morfando.com"
+            },
+            "photoUrl": {
+              "type": "string",
+              "example": "https://lh3.googleusercontent.com/a/mockphoto.jpg"
             }
           }
         },
@@ -1505,6 +1512,19 @@
             "password": {
               "type": "string",
               "example": "123456"
+            }
+          }
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "example": 30.558965
+            },
+            "latitude": {
+              "type": "number",
+              "example": 30.558965
             }
           }
         }
