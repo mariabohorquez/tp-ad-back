@@ -9,9 +9,6 @@ module.exports = app => {
   // Retrieve all restaurants
   router.get('/restaurants', restaurants.findAll)
 
-  // Retrieve all restaurants matching a regex
-  router.get('/restaurants/:name', restaurants.findAllWithFilter)
-
   // Retrieve a single restaurant with id
   router.get('/restaurants/:id', restaurants.findOne)
 

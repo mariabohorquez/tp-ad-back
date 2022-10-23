@@ -11,7 +11,7 @@ module.exports = mongoose => {
         unique: true
       },
       name: {
-        type: String,
+        type: String
       },
       email: {
         type: String,
@@ -54,7 +54,7 @@ module.exports = mongoose => {
         ref: 'restaurant'
       }
     ],
-    location: {
+    coordinates: {
       latitude: {
         type: Number,
         required: false,
@@ -64,8 +64,8 @@ module.exports = mongoose => {
         type: Number,
         required: false,
         unique: false
-     },
-    },
+      }
+    }
   }, {
     timestamp: true
   })

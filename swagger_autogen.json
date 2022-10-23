@@ -446,36 +446,50 @@
         "tags": [
           "Restaurant"
         ],
-        "summary": "Get all restaurants.",
-        "description": "Endpoint to get all restaurants.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Restaurants retrieved successfully",
-            "schema": {
-              "$ref": "#/definitions/Restaurants"
-            }
-          },
-          "500": {
-            "description": "Error retrieving restaurants"
-          }
-        }
-      }
-    },
-    "/restaurants/{name}": {
-      "get": {
-        "tags": [
-          "Restaurant"
-        ],
-        "summary": "Retrieve all restaurants matching full or partial name.",
-        "description": "Retrieve all restaurants from the database.    If a name is provided, it will be used to filter the results.",
+        "summary": "Retrieve all restaurants, can be sorted and filtered.",
+        "description": "Retrieve all restaurants from the database,    can be sorted by name, rating, distance and relevance,    can be filtered by name, price range, restaurant type, minRating and maxDistance.    Need to provide location in the query parameters.",
         "parameters": [
           {
+            "name": "userId",
+            "in": "query",
+            "description": "User id, it's used to determine location and relevance according to the user",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "name",
-            "in": "path",
+            "in": "query",
+            "description": "Filter by name",
             "required": false,
-            "type": "string",
-            "description": "Text to filter by"
+            "type": "string"
+          },
+          {
+            "name": "priceRange",
+            "in": "query",
+            "description": "Filter by price range, can be $, $$, $$$ or $$$$ ($ is the cheapest, $$$$ the most expensive). Can be comma separated for multiples.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "restaurantTypes",
+            "in": "query",
+            "description": "Filter by restaurant type, can be one or more (needs to be comma separated)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "minRating",
+            "in": "query",
+            "description": "Filter by minimum rating, can be from 1 to 5",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxDistance",
+            "in": "query",
+            "description": "Filter by maximum distance, can be from 0 to 100 km",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
@@ -1177,6 +1191,10 @@
         "isClosedOverwrite": {
           "type": "boolean",
           "example": false
+        },
+        "averageRating": {
+          "type": "number",
+          "example": 4.5
         }
       },
       "required": [
@@ -1250,14 +1268,25 @@
             "country": {
               "type": "string",
               "example": "Argentina"
+            }
+          }
+        },
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "Point"
             },
-            "longitude": {
-              "type": "number",
-              "example": -100
-            },
-            "latitude": {
-              "type": "number",
-              "example": 50
+            "coordinates": {
+              "type": "array",
+              "example": [
+                -58.456,
+                -34.567
+              ],
+              "items": {
+                "type": "number"
+              }
             }
           }
         },
@@ -1515,7 +1544,7 @@
             }
           }
         },
-        "location": {
+        "coordinates": {
           "type": "object",
           "properties": {
             "longitude": {

@@ -44,7 +44,8 @@ const doc = {
       },
       $restaurantTypes: ['Italian', 'Pizza'],
       menuCategories: ['Pizza', 'Pasta'],
-      isClosedOverwrite: false
+      isClosedOverwrite: false,
+      averageRating: 4.5
     },
     createRestaurant: {
       $ownerId: '5f9f9f9f9f9f9f9f9f9f9f9f',
@@ -58,9 +59,11 @@ const doc = {
         neighborhood: 'Palermo',
         city: 'Buenos Aires',
         state: 'Buenos Aires',
-        country: 'Argentina',
-        longitude: -100.0,
-        latitude: 50.0,
+        country: 'Argentina'
+      },
+      coordinates: {
+        type: 'Point',
+        coordinates: [-58.456, -34.567]
       },
       $restaurantTypes: ['Italian', 'Pizza'],
     },
@@ -135,7 +138,7 @@ const doc = {
         email: 'owner@morfando.com',
         password: '123456'
       },
-      location: {
+      coordinates: {
         longitude: 30.558965,
         latitude: 30.558965,
       }

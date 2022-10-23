@@ -31,9 +31,18 @@ module.exports = mongoose => {
         neighborhood: String,
         city: String,
         state: String,
-        country: String,
-        longitude: mongoose.Schema.Types.Decimal128,
-        latitude: mongoose.Schema.Types.Decimal128
+        country: String
+      },
+      coordinates: {
+        type: {
+          type: String, // Don't do `{ location: { type: String } }`
+          enum: ['Point'], // 'location.type' must be 'Point'
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
       },
       restaurantTypes: [
         {
@@ -54,10 +63,17 @@ module.exports = mongoose => {
       reviews: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'review'
-      }]
+      }],
+      averageRating: {
+        type: mongoose.Schema.Types.Decimal128,
+        required: false,
+        default: 0
+      }
     },
     { timestamps: true }
   )
+
+  schema.index({ coordinates: '2dsphere' })
 
   schema.method('toJSON', function () {
     const { __v, _id, ...object } = this.toObject()

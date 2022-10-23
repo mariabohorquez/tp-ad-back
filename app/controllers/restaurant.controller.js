@@ -43,7 +43,8 @@ exports.create = (req, res) => {
     closingTime: req.body.closingTime,
     priceRange: req.body.priceRange,
     address: req.body.address || {},
-    restaurantTypes: req.body.restaurantTypes
+    restaurantTypes: req.body.restaurantTypes,
+    coordinates: req.body.coordinates || {}
   })
 
   // Save Restaurant in the database
@@ -62,62 +63,119 @@ exports.create = (req, res) => {
   // TODO: associate restaurant with owner
 }
 
+// Retrieve all Restaurants from the database.
+// Can be filtered and sorted.
 exports.findAll = (req, res) => {
   /* #swagger.tags = ['Restaurant']
-     #swagger.summary = 'Get all restaurants.'
-     #swagger.description = 'Endpoint to get all restaurants.'
-     #swagger.responses[200] = {
-      description: 'Restaurants retrieved successfully',
-      schema: { $ref: "#/definitions/Restaurants" }
-     }
-     #swagger.responses[500] = {
-      description: 'Error retrieving restaurants',
-     }
-  */
-  this.findAllWithFilter(req, res)
-}
+     #swagger.summary = 'Retrieve all restaurants, can be sorted and filtered.'
+     #swagger.description = `Retrieve all restaurants from the database,
+                             can be filtered by name, price range, restaurant type, minRating and maxDistance.`
 
-// Retrieve all Restaurants from the database.
-// Can be filtered by name.
-exports.findAllWithFilter = (req, res) => {
-  /* #swagger.tags = ['Restaurant']
-     #swagger.summary = 'Retrieve all restaurants matching full or partial name.'
-     #swagger.description = `Retrieve all restaurants from the database.
-                             If a name is provided, it will be used to filter the results.`
-     #swagger.parameters['name'] =
-      { description: 'Text to filter by',
-      required: 'false',
-      type: 'string' }
+    #swagger.parameters['userId'] = {
+      in: 'query',
+      description: 'User id, it\'s used to determine location and relevance according to the user',
+      required: true,
+    }
+
+    #swagger.parameters['name'] = {
+      in: 'query',
+      description: 'Filter by name',
+      required: false,
+    }
+
+    #swagger.parameters['priceRange'] = {
+      in: 'query',
+      description: 'Filter by price range, can be $, \$\$, $\$\$ or $\$\$\$ ($ is the cheapest, $\$\$\$ the most expensive). Can be comma separated for multiples.',
+      required: false,
+    }
+
+    #swagger.parameters['restaurantTypes'] = {
+      in: 'query',
+      description: 'Filter by restaurant type, can be one or more (needs to be comma separated)',
+      required: false,
+    }
+
+    #swagger.parameters['minRating'] = {
+      in: 'query',
+      description: 'Filter by minimum rating, can be from 1 to 5',
+      required: false,
+    }
+
+    #swagger.parameters['maxDistance'] = {
+      in: 'query',
+      description: 'Filter by maximum distance, can be from 0 to 100 km',
+      required: false,
+    }
 
      #swagger.responses[200] = {
      schema: { $ref: "#/definitions/Restaurants" }
-  }
+    }
      #swagger.responses[500] = {
      description: 'Some error occurred while retrieving restaurants.',
-  } */
+    }
+  */
 
-  const name = req.params.name === 'undefined' ? '' : req.params.name
-  const condition = name
-    ? {
-        $in: [
-          { name: { $regex: new RegExp(name), $options: 'i' } },
-          { _id: { $regex: new RegExp(name), $options: 'i' } }
+  const name = req.query.name || ''
+  console.log('name ' + name)
+  const priceRange = req.query.priceRange ? req.query.priceRange.split(/[ ,]+/) : [new RegExp('.*')]
+  console.log('priceRange: ' + priceRange)
+  const restaurantTypes = req.query.restaurantTypes ? req.query.restaurantTypes.split(/[ ,]+/) : [new RegExp('.*')]
+  console.log('restaurantTypes: ' + restaurantTypes)
+  const minRating = req.query.minRating || 0
+  console.log('minRating: ' + minRating)
+  const maxDistance = req.query.maxDistance || 100000 // distance in km
+  console.log('maxDistance: ' + maxDistance)
+
+  User.findById(req.query.userId).then(
+    user => {
+      console.log('User at coordinates: ' + user.coordinates)
+
+      Restaurant.aggregate(
+        [
+          {
+            $geoNear: {
+              near: {
+                type: 'Point',
+                coordinates: [
+                  user.coordinates.longitude, user.coordinates.latitude
+                ]
+              },
+              distanceField: 'dist.calculated',
+              maxDistance: maxDistance * 1000, // distance in meters
+              key: 'coordinates',
+              spherical: true
+            }
+          }, {
+            $match: {
+              name: {
+                $regex: name,
+                $options: 'i'
+              },
+              averageRating: {
+                $gte: minRating
+              },
+              restaurantTypes: {
+                $in: restaurantTypes
+              },
+              priceRange: {
+                $in: priceRange
+              }
+            }
+          }
         ]
-      }
-    : {}
-  console.log(condition)
-
-  Restaurant.find(condition)
-    .then(data => {
-      console.log(data)
-      res.status(200).send(data)
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-      err.message || 'Some error occurred while retrieving restaurants.'
-      })
-    })
+      )
+        .then(data => {
+          console.log(data)
+          res.status(200).send(data)
+        })
+        .catch(err => {
+          res.status(500).send({
+            message:
+          err.message || 'Some error occurred while retrieving restaurants.'
+          })
+        })
+    }
+  )
 }
 
 // Find a single Restaurant with an id
@@ -238,12 +296,12 @@ exports.createReview = (req, res) => {
     })
   }
 
-  // const user = User.findById(userId)
-  // if (!user) {
-  //   return res.status(404).send({
-  //     message: 'User not found!'
-  //   })
-  // }
+  const user = User.findById(userId)
+  if (!user) {
+    return res.status(404).send({
+      message: 'User not found!'
+    })
+  }
 
   const review = new Review({
     user: req.body.user,
@@ -278,6 +336,55 @@ exports.createReview = (req, res) => {
       res.status(500).send({
         message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
       })
+    })
+
+  // After the review is added compute the new average rating
+  Restaurant.aggregate(
+    [
+      {
+        $match: {
+          reviews: {
+            $exists: true
+          }
+        }
+      }, {
+        $lookup: {
+          from: 'reviews',
+          localField: 'reviews',
+          foreignField: '_id',
+          as: 'reviews'
+        }
+      }, {
+        $addFields: {
+          averageRating: {
+            $round: [
+              {
+                $avg: '$reviews.rating'
+              }, 1
+            ]
+          }
+        }
+      }
+    ]
+  )
+    .then(data => {
+      data.forEach(
+        function (x) {
+          console.log('x ' + x)
+          console.log('x._id ' + x._id)
+          console.log('x.averageRating ' + x.averageRating)
+          Restaurant.findOneAndUpdate(
+            { _id: x._id },
+            { $set: { averageRating: x.averageRating } },
+            { upsert: true, new: true })
+            .then(
+              data => {
+                console.log(data)
+                console.log('Average rating updated to ' + x.averageRating)
+              }
+            )
+        }
+      )
     })
 }
 
@@ -404,7 +511,7 @@ exports.close = (req, res) => {
     })
 }
 
-// Post a review to a restaurant
+// Post a dish to a restaurant
 exports.createDish = (req, res) => {
   /*  #swagger.tags = ['Dish']
       #swagger.summary = 'Create a dish.'
