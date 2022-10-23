@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint --fix app/ & git add . & git commit -m \"eslint fix\"",
+    "lint": "npx eslint --fix app/",
     "swagger": "node swagger.js & start http://localhost:8080/docs & npm start"
   },
   "dependencies": {

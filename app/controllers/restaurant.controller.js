@@ -67,7 +67,7 @@ exports.create = (req, res) => {
 // Can be filtered and sorted.
 exports.findAll = (req, res) => {
   /* #swagger.tags = ['Restaurant']
-     #swagger.summary = 'Retrieve all restaurants, can be sorted and filtered.'
+     #swagger.summary = 'Retrieve all restaurants, can be filtered.'
      #swagger.description = `Retrieve all restaurants from the database,
                              can be filtered by name, price range, restaurant type, minRating and maxDistance.`
 

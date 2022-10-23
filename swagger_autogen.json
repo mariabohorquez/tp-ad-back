@@ -446,8 +446,8 @@
         "tags": [
           "Restaurant"
         ],
-        "summary": "Retrieve all restaurants, can be sorted and filtered.",
-        "description": "Retrieve all restaurants from the database,    can be sorted by name, rating, distance and relevance,    can be filtered by name, price range, restaurant type, minRating and maxDistance.    Need to provide location in the query parameters.",
+        "summary": "Retrieve all restaurants, can be filtered.",
+        "description": "Retrieve all restaurants from the database,    can be filtered by name, price range, restaurant type, minRating and maxDistance.",
         "parameters": [
           {
             "name": "userId",
