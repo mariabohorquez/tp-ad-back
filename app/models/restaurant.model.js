@@ -6,13 +6,36 @@ module.exports = mongoose => {
         required: true,
         unique: true
       },
-      openingTime: {
-        hours: { type: Number, min: 0, max: 24, required: true },
-        minutes: { type: Number, min: 0, max: 60, required: true }
-      },
-      closingTime: {
-        hours: { type: Number, min: 0, max: 24, required: true },
-        minutes: { type: Number, min: 0, max: 60, required: true }
+      // https://stackoverflow.com/questions/17460235/mongodb-opening-hours-schema-and-query-for-open-closed
+      hours: {
+        monday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        tuesday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        wednesday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        thursday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        friday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        saturday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        },
+        sunday: {
+          open: { type: Number, required: true, min: 0, max: 1440 },
+          close: { type: Number, required: true, min: 0, max: 1440 }
+        }
       },
       isClosedOverwrite: {
         type: Boolean,

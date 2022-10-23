@@ -1109,29 +1109,99 @@
           "type": "string",
           "example": "La Pizzeria"
         },
-        "openingTime": {
+        "hours": {
           "type": "object",
           "properties": {
-            "hours": {
-              "type": "number",
-              "example": 12
+            "monday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             },
-            "minutes": {
-              "type": "number",
-              "example": 30
-            }
-          }
-        },
-        "closingTime": {
-          "type": "object",
-          "properties": {
-            "hours": {
-              "type": "number",
-              "example": 22
+            "tuesday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             },
-            "minutes": {
-              "type": "number",
-              "example": 0
+            "wednesday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "thursday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "friday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "saturday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "sunday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             }
           }
         },
@@ -1212,29 +1282,99 @@
           "type": "string",
           "example": "La Pizzeria"
         },
-        "openingTime": {
+        "hours": {
           "type": "object",
           "properties": {
-            "hours": {
-              "type": "number",
-              "example": 12
+            "monday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             },
-            "minutes": {
-              "type": "number",
-              "example": 30
-            }
-          }
-        },
-        "closingTime": {
-          "type": "object",
-          "properties": {
-            "hours": {
-              "type": "number",
-              "example": 22
+            "tuesday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             },
-            "minutes": {
-              "type": "number",
-              "example": 0
+            "wednesday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "thursday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "friday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "saturday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
+            },
+            "sunday": {
+              "type": "object",
+              "properties": {
+                "open": {
+                  "type": "number",
+                  "example": 1000
+                },
+                "closed": {
+                  "type": "number",
+                  "example": 1400
+                }
+              }
             }
           }
         },
@@ -1304,8 +1444,7 @@
       "required": [
         "ownerId",
         "name",
-        "openingTime",
-        "closingTime",
+        "hours",
         "priceRange",
         "restaurantTypes"
       ]

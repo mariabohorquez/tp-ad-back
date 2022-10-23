@@ -31,8 +31,13 @@ const doc = {
   "definitions": { 
     Restaurant: {
       name: 'La Pizzeria',
-      openingTime: {'hours': 12, 'minutes': 30},
-      closingTime: {'hours': 22, 'minutes': 0},
+      hours: {monday: {'open': 1000, 'closed': 1400},
+              tuesday: {'open': 1000, 'closed': 1400},
+              wednesday: {'open': 1000, 'closed': 1400},
+              thursday: {'open': 1000, 'closed': 1400},
+              friday: {'open': 1000, 'closed': 1400},
+              saturday: {'open': 1000, 'closed': 1400},
+              sunday: {'open': 1000, 'closed': 1400}},
       priceRange: '$$',
       address: {
         streetName: 'Calle 1',
@@ -50,8 +55,13 @@ const doc = {
     createRestaurant: {
       $ownerId: '5f9f9f9f9f9f9f9f9f9f9f9f',
       $name: 'La Pizzeria',
-      $openingTime: {'hours': 12, 'minutes': 30},
-      $closingTime: {'hours': 22, 'minutes': 0},
+      $hours: {monday: {'open': 1000, 'closed': 1400},
+              tuesday: {'open': 1000, 'closed': 1400},
+              wednesday: {'open': 1000, 'closed': 1400},
+              thursday: {'open': 1000, 'closed': 1400},
+              friday: {'open': 1000, 'closed': 1400},
+              saturday: {'open': 1000, 'closed': 1400},
+              sunday: {'open': 1000, 'closed': 1400}},
       $priceRange: '$$',
       address: {
         streetName: 'Calle 1',
