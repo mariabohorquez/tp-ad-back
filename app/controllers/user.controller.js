@@ -219,6 +219,26 @@ exports.update = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+
+  if (!req.body) {
+    return res.status(400).send({
+      message: 'Data to update cannot be empty!'
+    })
+  }
+
+  User.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update User with id=${id}. Maybe User was not found!`
+        })
+      } else res.status(200).send(data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: 'Error updating User with id=' + id + ' with error: ' + err
+      })
+    })
 }
 
 // Delete a user with the specified id in the request
