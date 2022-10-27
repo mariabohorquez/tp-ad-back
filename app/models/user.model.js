@@ -80,27 +80,30 @@ module.exports = mongoose => {
   // hash the password before the user is saved
   schema.pre('save', function hashPassword (next) {
     // hash the password only if the password has been changed or user is new
-    if (!this.isModified('password')) {
+    if (!this.isModified('custom.password')) {
       next()
       return
     }
 
     // generate the hash
-    bcrypt.hash(this.password, null, null, (err, hash) => {
+    console.log('hashing password: ' + this.custom.password)
+    bcrypt.hash(this.custom.password, 10, (err, hash) => {
       if (err) {
         next(err)
         return
       }
 
       // change the password to the hashed version
-      this.password = hash
+      this.custom.password = hash
       next()
     })
   })
 
   // method to compare a given password with the database hash
   schema.methods.comparePassword = function comparePassword (password) {
-    const data = bcrypt.compareSync(password, this.password)
+    console.log("password " + password)
+    console.log("this.password " + this.custom.password)
+    const data = bcrypt.compareSync(password, this.custom.password)
     return data
   }
 

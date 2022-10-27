@@ -1,23 +1,26 @@
 const nodemailer = require('nodemailer')
+const reader = require('fs')
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, code) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.HOST,
-      service: process.env.SERVICE,
+      host: 'smtp.ethereal.email',
       port: 587,
-      secure: true,
       auth: {
-        user: process.env.USER,
-        pass: process.env.PASS
+          user: 'abdiel15@ethereal.email',
+          pass: 'XpjCVDjxYbz1cWc8BC'
       }
-    })
+    });
+
+    const template = reader.readFileSync('./app/templates/recoveryEmail.html', 'utf8').replace('OTP_CODE', code)
+
+    console.log(template)
 
     await transporter.sendMail({
-      from: process.env.USER,
+      from:'abdiel15@ethereal.email',
       to: email,
-      subject,
-      text
+      subject: subject,
+      html: template
     })
 
     console.log('email sent sucessfully')

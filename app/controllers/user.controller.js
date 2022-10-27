@@ -1,6 +1,7 @@
 const db = require('../models')
 const authConfig = require('../config/auth.config.js')
 const sendEmail = require('./sendEmail.controller.js')
+const crypto = require('crypto')
 const User = db.users
 const Token = db.tokens
 
@@ -128,7 +129,12 @@ exports.login = (req, res) => {
           schema: { $ref: "#/definitions/credentials" }
   }
   */
-  // #swagger.responses[200] = { description: 'Successfully logged in', schema: { $ref: "#/definitions/loginResponse" } }
+  /* #swagger.responses[200] = { 
+    description: 'Successfully logged in', 
+    schema: { $ref: "#/definitions/loginResponse" }
+  }
+
+  */
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -149,6 +155,7 @@ exports.login = (req, res) => {
         })
       } else {
         // Check if password is correct
+        console.log("data is " + data)
         const passwordIsValid = data.comparePassword(req.body.password)
 
         if (!passwordIsValid) {
@@ -197,7 +204,7 @@ exports.sendRecoverPassword = (req, res) => {
   // #swagger.summary = 'Recover password of a user'
   // #swagger.description = 'Handles password recovery of a user, can only be done for owner. Sends email to recover password'
   /* #swagger.parameters['email'] = {
-          in: 'header',
+          in: 'body',
           description: 'User email',
           required: true,
           type: 'string',
@@ -208,15 +215,17 @@ exports.sendRecoverPassword = (req, res) => {
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  // Validate request
-  if (!req.body) {
+  // Sent email to recover password
+  console.log(req.body)
+
+  if (!req.body.email) {
     return res.status(400).send({
       message: 'Content can not be empty!'
     })
   }
 
-  // Sent email to recover password
-  User.findOne({ 'custom.email': req.body.email })
+  console.log("Sending email to recover password to " + req.body.email)
+  User.findOne({'custom.email': req.body.email })
     .then(data => {
       if (!data) {
         return res.status(404).send({
@@ -226,13 +235,12 @@ exports.sendRecoverPassword = (req, res) => {
         // Send email
         const token = new Token({
           userId: data._id,
-          token: crypto.randomBytes(16).toString('hex')
+          token: Math.floor(1000 + Math.random() * 9000)
         })
-        Token.save(token)
+        token.save(token)
         const email = data.custom.email
 
-        const link = `${process.env.BASE_URL}/password-reset/${data._id}/${token.token}`
-        sendEmail(email, 'Password reset', link).then(
+        sendEmail(email, 'Password reset', token.token).then(
           () => {
             return res.status(200).send('Email sent to your email account')
           }
