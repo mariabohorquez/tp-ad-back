@@ -33,7 +33,7 @@ module.exports = app => {
   // Retrieve all owner restaurants
   router.get('/users/:id/restaurants', users.findAllRestaurants)
   // Associate restaurant to owner
-  // router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
+  router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
 
   app.use('/api/v1', router)
 }
