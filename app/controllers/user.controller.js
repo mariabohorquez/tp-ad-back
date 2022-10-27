@@ -46,16 +46,25 @@ exports.register = (req, res) => {
     })
 
     // Save Owner in the database
-    owner
-      .save(owner)
+    User.findOne({ 'custom.email': req.body.custom.email })
       .then(data => {
-        return res.status(201).send(data)
-      })
-      .catch(err => {
-        return res.status(500).send({
-          message:
-          err.message || 'Some error occurred while creating the Owner.'
-        })
+        if (data) {
+          return res.status(400).send({
+            message: 'Email already exists'
+          })
+        } else {
+          owner
+            .save(owner)
+            .then(data => {
+              return res.status(201).send(data)
+            })
+            .catch(err => {
+              return res.status(500).send({
+                message:
+              err.message || 'Some error occurred while creating the Owner.'
+              })
+            })
+        }
       })
   }
 
