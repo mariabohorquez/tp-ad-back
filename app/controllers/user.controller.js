@@ -405,7 +405,11 @@ exports.delete = (req, res) => {
         message: 'Could not delete user with id=' + id + ' with error: ' + err
       })
     })
+<<<<<<< HEAD
 }
+=======
+  }
+>>>>>>> 918ccf8 (Add routes to user)
 
 // Upload a user image
 exports.uploadUserImage = (req, res) => {
