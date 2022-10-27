@@ -157,6 +157,12 @@ const doc = {
       email: 'owner@morfando.com',
       password: '123456'
     },
+    loginResponse: {
+      id: "5f9f9f9f9f9f9f9f9f9f9f9f",
+      email: "example@email.com",
+      name: "Jane Doe",
+      accessToken: "some access token"
+    }
   },
 }
 

@@ -11,7 +11,9 @@ module.exports = app => {
   // Logout a user
   router.post('/users/logout', users.logout)
   // Recover password, currently only for the owner role
-  router.post('/users/recoverPassword', users.recoverPassword)
+  router.post('/users/recoverPassword', users.sendRecoverPassword)
+  // Verify the token sent to the user's email
+  router.post('/users/verifyRecoverToken', users.verifyRecoverToken)
 
   // Retrieve a single user with id
   router.get('/users/:id', users.findOne)
@@ -33,7 +35,7 @@ module.exports = app => {
   // Retrieve all owner restaurants
   router.get('/users/:id/restaurants', users.findAllRestaurants)
   // Associate restaurant to owner
-  // router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
+  router.patch('/users/:id/restaurant/:restaurantId', users.addRestaurant)
 
   app.use('/api/v1', router)
 }

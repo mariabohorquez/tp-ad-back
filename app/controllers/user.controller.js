@@ -1,5 +1,9 @@
 const db = require('../models')
+const authConfig = require('../config/auth.config.js')
+const sendEmail = require('./sendEmail.controller.js')
+const crypto = require('crypto')
 const User = db.users
+const Token = db.tokens
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -43,16 +47,25 @@ exports.register = (req, res) => {
     })
 
     // Save Owner in the database
-    owner
-      .save(owner)
+    User.findOne({ 'custom.email': req.body.custom.email })
       .then(data => {
-        return res.status(201).send(data)
-      })
-      .catch(err => {
-        return res.status(500).send({
-          message:
-          err.message || 'Some error occurred while creating the Owner.'
-        })
+        if (data) {
+          return res.status(400).send({
+            message: 'Email already exists'
+          })
+        } else {
+          owner
+            .save(owner)
+            .then(data => {
+              return res.status(201).send(data)
+            })
+            .catch(err => {
+              return res.status(500).send({
+                message:
+              err.message || 'Some error occurred while creating the Owner.'
+              })
+            })
+        }
       })
   }
 
@@ -107,13 +120,7 @@ exports.login = (req, res) => {
   // https://www.bezkoder.com/node-js-express-login-mongodb/#Controller_for_Registration_Login_Logout
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Login a user'
-  // #swagger.description = 'Handles login of a user, must specify either accessToken (google) or credentials (custom login).'
-  /* #swagger.parameters['accessToken'] = {
-          in: 'header',
-          description: 'Token from google or custom login',
-          required: false,
-          type: 'string',
-  } */
+  // #swagger.description = 'Handles login of a user, must specify either credentials (custom login).'
   /* #swagger.parameters['credentials'] = {
           in: 'body',
           description: 'Credentials for custom login',
@@ -122,7 +129,12 @@ exports.login = (req, res) => {
           schema: { $ref: "#/definitions/credentials" }
   }
   */
-  // #swagger.responses[200] = { description: 'Successfully logged in' }
+  /* #swagger.responses[200] = { 
+    description: 'Successfully logged in', 
+    schema: { $ref: "#/definitions/loginResponse" }
+  }
+
+  */
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -134,7 +146,39 @@ exports.login = (req, res) => {
     })
   }
 
-  // TODO: Handle callback with tokens and stuff
+  // Find user by email
+  User.findOne({ 'custom.email': req.body.email })
+    .then(data => {
+      if (!data) {
+        return res.status(404).send({
+          message: 'User not found'
+        })
+      } else {
+        // Check if password is correct
+        console.log("data is " + data)
+        const passwordIsValid = data.comparePassword(req.body.password)
+
+        if (!passwordIsValid) {
+          return res.status(401).send({
+            accessToken: null,
+            message: 'Invalid Password!'
+          })
+        }
+
+        // TODO: Return refresh token
+        // // Generate token
+        // const token = jwt.sign({ id: data.id }, authConfig.secret, {
+        //   expiresIn: 86400 // 24 hours
+        // })
+
+        return res.status(200).send({
+          id: data._id,
+          email: data.custom.email,
+          name: data.custom.name,
+          accessToken: 'this is a token'
+        })
+      }
+    })
 }
 
 exports.logout = (req, res) => {
@@ -155,12 +199,12 @@ exports.logout = (req, res) => {
   // TODO: Needs to remove session from mongodb and stuff.
 }
 
-exports.recoverPassword = (req, res) => {
+exports.sendRecoverPassword = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Recover password of a user'
   // #swagger.description = 'Handles password recovery of a user, can only be done for owner. Sends email to recover password'
   /* #swagger.parameters['email'] = {
-          in: 'header',
+          in: 'body',
           description: 'User email',
           required: true,
           type: 'string',
@@ -171,14 +215,86 @@ exports.recoverPassword = (req, res) => {
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  // Validate request
-  if (!req.body) {
+  // Sent email to recover password
+  console.log(req.body)
+
+  if (!req.body.email) {
     return res.status(400).send({
       message: 'Content can not be empty!'
     })
   }
 
-  // TODO: Sends email to recover password
+  console.log("Sending email to recover password to " + req.body.email)
+  User.findOne({'custom.email': req.body.email })
+    .then(data => {
+      if (!data) {
+        return res.status(404).send({
+          message: 'User with given email does not exist'
+        })
+      } else {
+        // Send email
+        const token = new Token({
+          userId: data._id,
+          token: Math.floor(1000 + Math.random() * 9000)
+        })
+        token.save(token)
+        const email = data.custom.email
+
+        sendEmail(email, 'Password reset', token.token).then(
+          () => {
+            return res.status(200).send('Email sent to your email account')
+          }
+        )
+          .catch(err => {
+            return res.status(500).send({
+              message:
+            err.message || 'Some error occurred while sending email.'
+            })
+          })
+      }
+    })
+}
+
+exports.verifyRecoverToken = (req, res) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Reset password of a user'
+  // #swagger.description = 'Handles password reset of a user, can only be done for owner. Verifies token
+  // #swagger.parameters['userId'] = { description: 'User id', required: true, type: 'string' }
+  // #swagger.parameters['token'] = { description: 'Token', required: true, type: 'string' }
+  // #swagger.parameters['password'] = { description: 'New password', in: 'body', required: true, type: 'string' }
+
+  // #swagger.responses[200] = { description: 'Password reset' }
+  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[404] = { description: 'Error finding token or password' }
+
+  const token = req.params.token
+  const userId = req.params.userId
+
+  Token.findOne({ userId, token })
+    .then(data => {
+      if (!data) {
+        return res.status(404).send({
+          message: 'Invalid link or expired'
+        })
+      } else {
+        User.findOne({ _id: userId })
+          .then(user => {
+            if (!user) {
+              return res.status(404).send({
+                message: 'User not found'
+              })
+            } else {
+              // Update password
+              console.log('Updating password')
+              user.password = req.body.password
+              user.save()
+              return res.status(200).send({
+                message: 'Password updated'
+              })
+            }
+          })
+      }
+    })
 }
 
 // Retrieve a single user with id
@@ -196,6 +312,23 @@ exports.findOne = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+
+  if (!id) {
+    return res.status(400).send({
+      message: 'Needs to specify userId'
+    })
+  }
+
+  User.findById(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot find user with id ${id}.`
+        })
+      } else {
+        res.status(200).send(data)
+      }
+    })
 }
 
 // Update a user by the id in the request
@@ -254,6 +387,24 @@ exports.delete = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+
+  User.findByIdAndRemove(id, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete user with id=${id}. Maybe the user was not found!`
+        })
+      } else {
+        res.status(200).send({
+          message: 'User was deleted successfully!'
+        })
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: 'Could not delete user with id=' + id + ' with error: ' + err
+      })
+    })
 }
 
 // Upload a user image
@@ -281,6 +432,17 @@ exports.findAllFavoriteRestaurants = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+
+  User.findById(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot find user with id ${id}.`
+        })
+      } else {
+        res.status(200).send(data.favoriteRestaurants)
+      }
+    })
 }
 
 // Add a restaurant to favorites
@@ -291,18 +453,42 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
 
   // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
   /* #swagger.parameters['restaurantId'] = {
-          in: 'header',
+          in: 'query',
           description: 'Restaurant id to change favorite status for',
           required: true,
           type: 'string',
   } */
 
   // #swagger.responses[200] = { description: 'Restaurant successfully added to favorites' }
-  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[400] = { description: 'Restaurant id needs to be filled' }
   // #swagger.responses[404] = { description: 'Restaurant not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+  const restaurantId = req.query.restaurantId
+
+  if (!restaurantId) {
+    return res.status(400).send({
+      message: 'Restaurant id cannot be empty!'
+    })
+  }
+
+  User.findById(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot find user with id ${id}.`
+        })
+      } else {
+        if (data.favoriteRestaurants.includes(restaurantId)) {
+          data.favoriteRestaurants.pull(restaurantId)
+        } else {
+          data.favoriteRestaurants.push(restaurantId)
+        }
+        data.save()
+        res.status(200).send(data)
+      }
+    })
 }
 
 // Add a restaurant to owner's restaurants
@@ -311,13 +497,35 @@ exports.addRestaurant = (req, res) => {
   // #swagger.summary = 'Add a restaurant to owner'
   // #swagger.description = 'Adds a restaurant to owner via its id.'
 
+  // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
+  // #swagger.parameters['restaurantId'] = { description: 'Restaurant id to add to owner', type: 'string' }
+
   // #swagger.responses[200] = { description: 'Restaurant successfully added to owner' }
-  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[400] = { description: 'RestaurantId cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
   const restaurantId = req.params.restaurantId
+
+  if (!restaurantId) {
+    return res.status(400).send({
+      message: 'RestaurantId cannot be empty!'
+    })
+  }
+
+  User.findById(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot find user with id ${id}.`
+        })
+      } else {
+        data.ownedRestaurants.push(restaurantId)
+        data.save()
+        res.status(200).send(data)
+      }
+    })
 }
 
 // Return all restaurants of an owner
@@ -333,4 +541,20 @@ exports.findAllRestaurants = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
+
+  User.findById(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot find user with id ${id}.`
+        })
+      } else {
+        res.status(200).send(data.ownedRestaurants)
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || 'Some error occurred while retrieving a user.'
+      })
+    })
 }
