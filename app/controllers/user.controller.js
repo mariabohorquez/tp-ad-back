@@ -542,7 +542,7 @@ exports.findAllRestaurants = (req, res) => {
 
   const id = req.params.id
 
-  User.findById(id)
+  User.findById(id).populate('ownedRestaurants', '-_id -__v')
     .then(data => {
       if (!data) {
         res.status(404).send({
