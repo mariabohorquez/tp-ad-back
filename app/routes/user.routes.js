@@ -11,7 +11,9 @@ module.exports = app => {
   // Logout a user
   router.post('/users/logout', users.logout)
   // Recover password, currently only for the owner role
-  router.post('/users/recoverPassword', users.recoverPassword)
+  router.post('/users/recoverPassword', users.sendRecoverPassword)
+  // Verify the token sent to the user's email
+  router.post('/users/verifyRecoverToken', users.verifyRecoverToken)
 
   // Retrieve a single user with id
   router.get('/users/:id', users.findOne)
