@@ -28,6 +28,6 @@
     "eslint-plugin-promise": "^6.0.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-native": "^4.0.0",
-    "swagger-autogen": "^2.21.6"
+    "swagger-autogen": "^2.22.0"
   }
 }
