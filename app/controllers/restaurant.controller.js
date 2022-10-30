@@ -164,6 +164,13 @@ exports.findAll = (req, res) => {
         ]
       )
         .then(data => {
+          
+          const favoriteRestaurants = user.favoriteRestaurants;
+
+          data.forEach(restaurant => {
+            restaurant.isFavorite = favoriteRestaurants.includes(restaurant._id);
+          });
+
           console.log(data)
           res.status(200).send(data)
         })
