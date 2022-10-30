@@ -332,6 +332,7 @@ exports.findOne = (req, res) => {
 }
 
 // Update a user by the id in the request
+// TODO: this method overwrites the entire subdocument, not just the fields that are being updated
 exports.update = (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Update a user with id'
@@ -359,7 +360,7 @@ exports.update = (req, res) => {
     })
   }
 
-  User.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
+  User.findOneAndUpdate({_id: id}, req.body, { upsert: true, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
