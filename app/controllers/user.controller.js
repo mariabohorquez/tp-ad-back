@@ -41,8 +41,8 @@ exports.register = (req, res) => {
         name: req.body.custom.name
       },
       coordinates: {
-        latitude: (req.body.coordinates && req.body.coordinates.latitude) || -34.603722,
-        longitude: (req.body.coordinates && req.body.coordinates.longitude) || -58.381592
+        latitude: req.body.coordinates?.latitude || -34.603722,
+        longitude: req.body.coordinates?.longitude || -58.381592
       }
     })
 
@@ -81,9 +81,9 @@ exports.register = (req, res) => {
         email: req.body.google.email,
         photoUrl: req.body.google.photoUrl
       },
-      location: {
-        latitude: req.body.location?.latitude || -34.603722,
-        longitude: req.body.location?.longitude || -58.381592
+      coordinates: {
+        latitude: req.body.coordinates?.latitude || -34.603722,
+        longitude: req.body.coordinates?.longitude || -58.381592
       }
     })
 
