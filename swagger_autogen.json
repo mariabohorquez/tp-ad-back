@@ -982,7 +982,7 @@
           {
             "name": "dishId",
             "in": "path",
-            "required": false,
+            "required": true,
             "type": "string",
             "description": "Dish id"
           }
@@ -1674,7 +1674,7 @@
           "type": "number",
           "example": 1000
         },
-        "discount": {
+        "discounts": {
           "type": "number",
           "example": 0
         },

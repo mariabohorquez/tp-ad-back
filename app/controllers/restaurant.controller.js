@@ -702,16 +702,18 @@ exports.updateDish = (req, res) => {
     })
   }
 
-  Restaurant.findOneAndUpdate(
-    { _id: id, 'menu._id': dishId },
-    { $set: { 'menu.$': req.body } },
-    { upsert: false, new: true })
+  Dish.findOneAndUpdate({_id: dishId},
+    { $set: req.body },
+    { upsert: true, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update Dish with restaurant=${id} and dish=${dishId}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was updated successfully.' })
+      } else {
+        data.save()
+        res.status(200).send(data)
+      } 
     })
     .catch(err => {
       res.status(500).send({

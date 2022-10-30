@@ -111,7 +111,7 @@ const doc = {
     Dish: {
       $name: 'Pizza Margarita',
       $price: 1000,
-      discount: 0,
+      discounts: 0,
       description: 'Pizza con tomate, queso y albahaca',
       $category: 'Pizzas',
       $ingredients: ['tomate', 'queso', 'albahaca'],
