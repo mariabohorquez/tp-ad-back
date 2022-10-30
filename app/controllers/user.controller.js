@@ -91,7 +91,7 @@ exports.register = (req, res) => {
     User.findOne({ 'google.email': req.body.google.email })
       .then(data => {
         if (data) {
-          return res.status(200).send('User already exists')
+          return res.status(200).send(data)
         } else {
           // Save User in the database
           user
