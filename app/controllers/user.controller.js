@@ -453,7 +453,7 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
 
   // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
   /* #swagger.parameters['restaurantId'] = {
-          in: 'query',
+          in: 'body',
           description: 'Restaurant id to change favorite status for',
           required: true,
           type: 'string',
@@ -465,7 +465,7 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
-  const restaurantId = req.query.restaurantId
+  const restaurantId = req.body.restaurantId
 
   if (!restaurantId) {
     return res.status(400).send({
