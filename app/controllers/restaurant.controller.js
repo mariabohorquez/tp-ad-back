@@ -407,7 +407,7 @@ exports.findAllReviews = (req, res) => {
 
   const id = req.params.restaurantId
 
-  Restaurant.findById(id).populate('reviews', '-_id -__v')
+  Restaurant.findById(id).populate('reviews', '-__v')
     .then(data => {
       res.status(200).send(data.reviews)
     })
@@ -606,7 +606,7 @@ exports.findAllDishes = (req, res) => {
 
   const restaurantId = req.params.restaurantId
 
-  Restaurant.findById(restaurantId).populate('menu', '-_id -__v')
+  Restaurant.findById(restaurantId).populate('menu', ' -__v')
     .then(data => {
       res.status(200).send(data.menu)
     })
@@ -640,7 +640,7 @@ exports.findOneDish = (req, res) => {
   const id = req.params.restaurantId
   const dishId = req.params.dishId
 
-  Restaurant.findById(id).populate('menu', '-_id -__v')
+  Restaurant.findById(id).populate('menu', ' -__v')
     .then(data => {
       res.status(200).send(data.menu.id(dishId))
     })
@@ -838,7 +838,7 @@ exports.findAllCategories = (req, res) => {
   */
   const id = req.params.restaurantId
 
-  Restaurant.findById(id).populate('menuCategories', '-_id -__v')
+  Restaurant.findById(id).populate('menuCategories', ' -__v')
     .then(data => {
       res.status(200).send(data.menuCategories)
     })
