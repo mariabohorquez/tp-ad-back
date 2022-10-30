@@ -323,7 +323,7 @@ exports.createReview = (req, res) => {
   Restaurant.findOneAndUpdate(
     { _id: restaurantId },
     { $push: { reviews: review } },
-    { upsert: true, new: true })
+    { upsert: false, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
@@ -375,7 +375,7 @@ exports.createReview = (req, res) => {
           Restaurant.findOneAndUpdate(
             { _id: x._id },
             { $set: { averageRating: x.averageRating } },
-            { upsert: true, new: true })
+            { upsert: false, new: true })
             .then(
               data => {
                 console.log(data)
@@ -536,7 +536,6 @@ exports.createDish = (req, res) => {
         description: 'Error creating dish',
       }
   */
-
   const id = req.params.restaurantId
 
   if (!req.body) {
@@ -545,42 +544,46 @@ exports.createDish = (req, res) => {
     })
   }
 
+  console.log(req.body.ingredients)
+
   const dish = new Dish({
     name: req.body.name,
     category: req.body.category,
     price: req.body.price,
     picture: req.body.picture,
-    ingredients: req.body.ingredients,
+    ingredients: req.body.ingredients.toString(),
     isVegan: req.body.isVegan,
-    isGlutenFree: req.body.isGlutenFree
+    isGlutenFree: req.body.isGlutenFree,
+    discounts: req.body.discounts || 0
   })
 
   console.log(dish)
 
   dish
     .save(dish)
+    .then(dishData => {
+      // Add dish to array
+      Restaurant.findOneAndUpdate(
+        { _id: id },
+        { $push: { menu: dishData.id } },
+        { upsert: false, new: true })
+        .then(data => {
+          if (!data) {
+            res.status(404).send({
+              message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
+            })
+          } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
+        })
+        .catch(err => {
+          res.status(500).send({
+            message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
+          })
+        })
+    })
     .catch(err => {
       res.status(500).send({
         message:
       err.message || 'Some error occurred while creating dish: ' + dish
-      })
-    })
-
-  // Add dish to array
-  Restaurant.findOneAndUpdate(
-    { _id: id },
-    { $push: { menu: dish } },
-    { upsert: true, new: true })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
-        })
-      } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
       })
     })
 }
@@ -689,7 +692,7 @@ exports.updateDish = (req, res) => {
   Restaurant.findOneAndUpdate(
     { _id: id, 'menu._id': dishId },
     { $set: { 'menu.$': req.body } },
-    { upsert: true, new: true })
+    { upsert: false, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
@@ -786,7 +789,7 @@ exports.createCategory = (req, res) => {
       }
   */
   const restaurantId = req.params.restaurantId
-  const category = req.body.category
+  const category = req.body.name
 
   if (!category) {
     return res.status(400).send({
@@ -800,7 +803,7 @@ exports.createCategory = (req, res) => {
   Restaurant.findOneAndUpdate(
     { _id: restaurantId },
     { $push: { menuCategories: category } },
-    { upsert: true, new: true })
+    { upsert: false, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
@@ -878,7 +881,7 @@ exports.deleteCategory = (req, res) => {
   Restaurant.findOneAndUpdate(
     { _id: id },
     { $pull: { menuCategories: category } },
-    { upsert: true, new: true })
+    { upsert: false, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
@@ -931,7 +934,7 @@ exports.updateCategory = (req, res) => {
   Restaurant.findOneAndUpdate(
     { _id: id, menuCategories: category },
     { $set: { 'menuCategories.$': newCategory } },
-    { upsert: true, new: true })
+    { upsert: false, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({

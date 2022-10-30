@@ -129,8 +129,8 @@ exports.login = (req, res) => {
           schema: { $ref: "#/definitions/credentials" }
   }
   */
-  /* #swagger.responses[200] = { 
-    description: 'Successfully logged in', 
+  /* #swagger.responses[200] = {
+    description: 'Successfully logged in',
     schema: { $ref: "#/definitions/loginResponse" }
   }
 
@@ -155,7 +155,7 @@ exports.login = (req, res) => {
         })
       } else {
         // Check if password is correct
-        console.log("data is " + data)
+        console.log('data is ' + data)
         const passwordIsValid = data.comparePassword(req.body.password)
 
         if (!passwordIsValid) {
@@ -224,8 +224,8 @@ exports.sendRecoverPassword = (req, res) => {
     })
   }
 
-  console.log("Sending email to recover password to " + req.body.email)
-  User.findOne({'custom.email': req.body.email })
+  console.log('Sending email to recover password to ' + req.body.email)
+  User.findOne({ 'custom.email': req.body.email })
     .then(data => {
       if (!data) {
         return res.status(404).send({

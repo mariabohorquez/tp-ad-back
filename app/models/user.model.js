@@ -101,8 +101,8 @@ module.exports = mongoose => {
 
   // method to compare a given password with the database hash
   schema.methods.comparePassword = function comparePassword (password) {
-    console.log("password " + password)
-    console.log("this.password " + this.custom.password)
+    console.log('password ' + password)
+    console.log('this.password ' + this.custom.password)
     const data = bcrypt.compareSync(password, this.custom.password)
     return data
   }
