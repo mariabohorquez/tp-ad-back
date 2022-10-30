@@ -727,6 +727,9 @@ exports.deleteDish = (req, res) => {
       }
   */
 
+  // TODO: add a pre remove hook to delete the file from the orphaned menu
+  // https://stackoverflow.com/questions/51767118/delete-document-and-all-references-in-another-schema-mongodb
+
   const dishId = req.params.dishId
 
   Restaurant.findByIdAndRemove(dishId, { useFindAndModify: false })
