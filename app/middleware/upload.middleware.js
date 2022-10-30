@@ -4,7 +4,7 @@ const { GridFsStorage } = require('multer-gridfs-storage')
 
 const db = require('../models')
 const promise = db.mongoose
-  .connect(db.url + '/test', {
+  .connect(db.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     ssl: true
@@ -16,7 +16,6 @@ const promise = db.mongoose
     console.log('Failed when trying to establish a connection to image db', err)
     process.exit()
   })
-
 
 const storage = new GridFsStorage({
   db: promise,
