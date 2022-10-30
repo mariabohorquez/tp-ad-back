@@ -7,19 +7,19 @@ const sendEmail = async (email, subject, code) => {
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
-          user: 'abdiel15@ethereal.email',
-          pass: 'XpjCVDjxYbz1cWc8BC'
+        user: 'abdiel15@ethereal.email',
+        pass: 'XpjCVDjxYbz1cWc8BC'
       }
-    });
+    })
 
     const template = reader.readFileSync('./app/templates/recoveryEmail.html', 'utf8').replace('OTP_CODE', code)
 
     console.log(template)
 
     await transporter.sendMail({
-      from:'abdiel15@ethereal.email',
+      from: 'abdiel15@ethereal.email',
       to: email,
-      subject: subject,
+      subject,
       html: template
     })
 

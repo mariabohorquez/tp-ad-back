@@ -7,7 +7,7 @@ const options = {
 const swaggerAutogen = require('swagger-autogen')(options)
 
 const outputFile = './swagger_autogen.json'
-const endpointsFiles = ['app/routes/utils.routes.js', 'app/routes/user.routes.js', 'app/routes/restaurant.routes.js']
+const endpointsFiles = ['app/routes/utils.routes.js', 'app/routes/user.routes.js', 'app/routes/restaurant.routes.js', 'app/routes/image.routes.js']
 
 const doc = { 
   "info": {
@@ -23,8 +23,9 @@ const doc = {
   "host": undefined,
   "schemes": undefined,
   "consumes": [
-    "application/json"
-  ],
+    "application/json",
+    "multipart/form-data"
+],
   "produces": [
     "application/json"
   ],

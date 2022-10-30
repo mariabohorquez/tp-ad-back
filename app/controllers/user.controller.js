@@ -129,8 +129,8 @@ exports.login = (req, res) => {
           schema: { $ref: "#/definitions/credentials" }
   }
   */
-  /* #swagger.responses[200] = { 
-    description: 'Successfully logged in', 
+  /* #swagger.responses[200] = {
+    description: 'Successfully logged in',
     schema: { $ref: "#/definitions/loginResponse" }
   }
 
@@ -155,7 +155,7 @@ exports.login = (req, res) => {
         })
       } else {
         // Check if password is correct
-        console.log("data is " + data)
+        console.log('data is ' + data)
         const passwordIsValid = data.comparePassword(req.body.password)
 
         if (!passwordIsValid) {
@@ -224,8 +224,8 @@ exports.sendRecoverPassword = (req, res) => {
     })
   }
 
-  console.log("Sending email to recover password to " + req.body.email)
-  User.findOne({'custom.email': req.body.email })
+  console.log('Sending email to recover password to ' + req.body.email)
+  User.findOne({ 'custom.email': req.body.email })
     .then(data => {
       if (!data) {
         return res.status(404).send({
@@ -255,7 +255,7 @@ exports.sendRecoverPassword = (req, res) => {
     })
 }
 
-exports.verifyRecoverToken = (req, res) => {
+exports.verifyRecoveryToken = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Reset password of a user'
   // #swagger.description = 'Handles password reset of a user, can only be done for owner. Verifies token
@@ -542,7 +542,7 @@ exports.findAllRestaurants = (req, res) => {
 
   const id = req.params.id
 
-  User.findById(id).populate('ownedRestaurants', ' -__v')
+  User.findById(id).populate('ownedRestaurants', '-__v')
     .then(data => {
       if (!data) {
         res.status(404).send({

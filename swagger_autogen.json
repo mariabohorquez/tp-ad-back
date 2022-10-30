@@ -11,7 +11,8 @@
   },
   "basePath": "/api/v1",
   "consumes": [
-    "application/json"
+    "application/json",
+    "multipart/form-data"
   ],
   "produces": [
     "application/json"
@@ -169,7 +170,7 @@
         }
       }
     },
-    "/users/verifyRecoverToken": {
+    "/users/verifyRecoveryToken": {
       "post": {
         "tags": [
           "Auth"
@@ -1222,6 +1223,86 @@
             "description": "Error updating restaurant with category"
           }
         }
+      }
+    },
+    "/images": {
+      "post": {
+        "tags": [
+          "Image"
+        ],
+        "summary": "Upload an image",
+        "description": "Endpoint to upload an image.    Must be jpg, jpeg or png format.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id for object to associate image to",
+            "required": true,
+            "type": "string",
+            "in": "formData"
+          },
+          {
+            "name": "type",
+            "description": "Collection it belongs to, must be either user, restaurant or dish",
+            "required": true,
+            "type": "string",
+            "in": "formData"
+          },
+          {
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
+            "required": true,
+            "type": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image   successfully."
+          },
+          "400": {
+            "description": "Error with given parameters."
+          },
+          "404": {
+            "description": "Object the id belongs to not found."
+          },
+          "500": {
+            "description": "Error uploading image."
+          }
+        }
+      },
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/images/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
       }
     }
   },
