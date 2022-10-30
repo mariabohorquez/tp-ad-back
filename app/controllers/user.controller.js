@@ -427,6 +427,7 @@ exports.findAllFavoriteRestaurants = (req, res) => {
   // #swagger.summary = 'Get all favorite restaurants of a user'
   // #swagger.description = 'Gets all favorite restaurants of a user via its id.'
 
+  // #swagger.parameters['id'] = { description: 'User id', type: 'string', in: 'path' }
   // #swagger.responses[200] = { description: 'Favorites successfully retrieved', schema: { $ref: "#/definitions/Restaurants" } }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
@@ -542,7 +543,7 @@ exports.findAllRestaurants = (req, res) => {
 
   const id = req.params.id
 
-  User.findById(id).populate('ownedRestaurants', ' -__v')
+  User.findById(id).populate('ownedRestaurants')
     .then(data => {
       if (!data) {
         res.status(404).send({

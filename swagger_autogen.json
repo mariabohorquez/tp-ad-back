@@ -214,7 +214,7 @@
             "name": "id",
             "description": "User id",
             "type": "string",
-            "in": "query",
+            "in": "path",
             "required": true
           },
           {
@@ -227,10 +227,13 @@
           },
           {
             "name": "restaurantId",
-            "in": "query",
+            "in": "body",
             "description": "Restaurant id to add to owner",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
           }
         ],
         "responses": {
@@ -406,7 +409,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User id"
           }
         ],
         "responses": {
@@ -440,10 +444,13 @@
           },
           {
             "name": "restaurantId",
-            "in": "query",
+            "in": "body",
             "description": "Restaurant id to change favorite status for",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
           }
         ],
         "responses": {
@@ -975,7 +982,7 @@
           {
             "name": "dishId",
             "in": "path",
-            "required": true,
+            "required": false,
             "type": "string",
             "description": "Dish id"
           }

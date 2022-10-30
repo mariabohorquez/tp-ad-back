@@ -164,7 +164,7 @@ exports.findAll = (req, res) => {
         ]
       )
         .then(data => {
-          
+
           const favoriteRestaurants = user.favoriteRestaurants;
 
           data.forEach(restaurant => {
@@ -180,6 +180,13 @@ exports.findAll = (req, res) => {
           err.message || 'Some error occurred while retrieving restaurants.'
           })
         })
+    }
+  ).catch(
+    err => {
+      res.status(500).send({
+        message:
+      err.message || 'User not send.'
+      })
     }
   )
 }
@@ -414,7 +421,7 @@ exports.findAllReviews = (req, res) => {
 
   const id = req.params.restaurantId
 
-  Restaurant.findById(id).populate('reviews', '-__v')
+  Restaurant.findById(id).populate('reviews')
     .then(data => {
       res.status(200).send(data.reviews)
     })
@@ -616,7 +623,7 @@ exports.findAllDishes = (req, res) => {
 
   const restaurantId = req.params.restaurantId
 
-  Restaurant.findById(restaurantId).populate('menu', ' -__v')
+  Restaurant.findById(restaurantId).populate('menu')
     .then(data => {
       res.status(200).send(data.menu)
     })
@@ -647,12 +654,11 @@ exports.findOneDish = (req, res) => {
       }
   */
 
-  const id = req.params.restaurantId
   const dishId = req.params.dishId
 
-  Restaurant.findById(id).populate('menu', ' -__v')
+  Dish.findById(dishId)
     .then(data => {
-      res.status(200).send(data.menu.id(dishId))
+      res.status(200).send(data)
     })
     .catch(err => {
       res.status(500).send({
@@ -851,7 +857,7 @@ exports.findAllCategories = (req, res) => {
   */
   const id = req.params.restaurantId
 
-  Restaurant.findById(id).populate('menuCategories', ' -__v')
+  Restaurant.findById(id).populate('menuCategories')
     .then(data => {
       res.status(200).send(data.menuCategories)
     })
