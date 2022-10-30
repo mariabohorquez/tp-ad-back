@@ -40,9 +40,9 @@ exports.register = (req, res) => {
         password: req.body.custom.password,
         name: req.body.custom.name
       },
-      location: {
-        latitude: (req.body.location && req.body.location.latitude) || -34.603722,
-        longitude: (req.body.location && req.body.location.longitude) || -58.381592
+      coordinates: {
+        latitude: (req.body.coordinates && req.body.coordinates.latitude) || -34.603722,
+        longitude: (req.body.coordinates && req.body.coordinates.longitude) || -58.381592
       }
     })
 
