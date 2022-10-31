@@ -745,25 +745,59 @@ exports.deleteDish = (req, res) => {
   // TODO: add a pre remove hook to delete the file from the orphaned menu
   // https://stackoverflow.com/questions/51767118/delete-document-and-all-references-in-another-schema-mongodb
 
-  const dishId = req.params.dishId
+  const restaurantId = req.params.restaurantId;
+  const dishId = req.params.dishId;
 
-  Restaurant.findByIdAndRemove(dishId, { useFindAndModify: false })
-    .then(data => {
-      if (!data) {
+  Dish.findByIdAndDelete(dishId)
+  .then(data => {
+    if (data){
+      Restaurant.findOneAndUpdate(
+        { _id: restaurantId },
+        { $pull: { menu: dishId } },
+        { upsert: false, new: true })
+        .then(data => {
+          if (!data) {
+            res.status(404).send({
+              message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
+            })
+          } else res.status(200).send({ message: 'Dish deleted from Restaurant' })
+        })
+        .catch(err => {
+          res.status(500).send({
+            message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
+          })
+        })
+    }
+      else{
         res.status(404).send({
           message: `Cannot delete dish with id=${dishId}. Maybe the dish was not found!`
         })
-      } else {
-        res.status(200).send({
-          message: 'Dish was deleted successfully!'
-        })
       }
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).send({
+      message: 'Could not delete Dish with id=' + dishId + ' with error: ' + err
     })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Could not delete Dish with id=' + dishId + ' with error: ' + err
-      })
-    })
+  });
+
+  // Restaurant.findByIdAndRemove(dishId, { useFindAndModify: false })
+  //   .then(data => {
+  //     if (!data) {
+  //       res.status(404).send({
+  //         message: `Cannot delete dish with id=${dishId}. Maybe the dish was not found!`
+  //       })
+  //     } else {
+  //       res.status(200).send({
+  //         message: 'Dish was deleted successfully!'
+  //       })
+  //     }
+  //   })
+  //   .catch(err => {
+  //     res.status(500).send({
+  //       message: 'Could not delete Dish with id=' + dishId + ' with error: ' + err
+  //     })
+  //   })
 }
 
 // Upload a dish image
