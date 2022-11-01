@@ -342,64 +342,65 @@ exports.createReview = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${restaurantId}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Review posted successfully.' })
+      } else {
+        // After the review is added compute the new average rating
+        Restaurant.aggregate(
+          [
+            {
+              $match: {
+                reviews: {
+                  $exists: true
+                }
+              }
+            }, {
+              $lookup: {
+                from: 'reviews',
+                localField: 'reviews',
+                foreignField: '_id',
+                as: 'reviews'
+              }
+            }, {
+              $addFields: {
+                averageRating: {
+                  $round: [
+                    {
+                      $avg: '$reviews.rating'
+                    }, 1
+                  ]
+                }
+              }
+            }
+          ]
+        )
+          .then(data => {
+            data.forEach(
+              function (x) {
+                console.log('x ' + x)
+                console.log('x._id ' + x._id)
+                console.log('x.averageRating ' + x.averageRating)
+                Restaurant.findOneAndUpdate(
+                  { _id: x._id },
+                  { $set: { averageRating: x.averageRating } },
+                  { upsert: false, new: true })
+                  .then(
+                    data => {
+                      console.log(data)
+                      console.log('Average rating updated to ' + x.averageRating)
+                    }
+                  )
+                  .catch(err => {
+                    console.error('Error creating the average rating: ', err)
+                  })
+              }
+            )
+          })
+        res.status(200).send({ message: 'Review posted successfully.' })
+      }
     })
     .catch(err => {
       res.status(500).send({
         message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
       })
-    })
-
-  // After the review is added compute the new average rating
-  Restaurant.aggregate(
-    [
-      {
-        $match: {
-          reviews: {
-            $exists: true
-          }
-        }
-      }, {
-        $lookup: {
-          from: 'reviews',
-          localField: 'reviews',
-          foreignField: '_id',
-          as: 'reviews'
-        }
-      }, {
-        $addFields: {
-          averageRating: {
-            $round: [
-              {
-                $avg: '$reviews.rating'
-              }, 1
-            ]
-          }
-        }
-      }
-    ]
-  )
-    .then(data => {
-      data.forEach(
-        function (x) {
-          console.log('x ' + x)
-          console.log('x._id ' + x._id)
-          console.log('x.averageRating ' + x.averageRating)
-          Restaurant.findOneAndUpdate(
-            { _id: x._id },
-            { $set: { averageRating: x.averageRating } },
-            { upsert: false, new: true })
-            .then(
-              data => {
-                console.log(data)
-                console.log('Average rating updated to ' + x.averageRating)
-              }
-            )
-            .catch(err => {
-              console.error('Error creating the average rating: ', err)
-            })
-        }
-      )
     })
 }
 
