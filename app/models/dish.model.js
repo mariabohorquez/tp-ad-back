@@ -3,7 +3,7 @@ module.exports = mongoose => {
     name: {
       type: String,
       required: true,
-      unique: true
+      unique: false
     },
     category: {
       type: String,
