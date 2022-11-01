@@ -164,12 +164,11 @@ exports.findAll = (req, res) => {
         ]
       )
         .then(data => {
-
-          const favoriteRestaurants = user.favoriteRestaurants;
+          const favoriteRestaurants = user.favoriteRestaurants
 
           data.forEach(restaurant => {
-            restaurant.isFavorite = favoriteRestaurants.includes(restaurant._id);
-          });
+            restaurant.isFavorite = favoriteRestaurants.includes(restaurant._id)
+          })
 
           console.log(data)
           res.status(200).send(data)
@@ -396,6 +395,9 @@ exports.createReview = (req, res) => {
                 console.log('Average rating updated to ' + x.averageRating)
               }
             )
+            .catch(err => {
+              console.error('Error creating the average rating: ', err)
+            })
         }
       )
     })
@@ -663,7 +665,7 @@ exports.findOneDish = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message:
-      err.message || 'Some error occurred while retrieving the menu for restaurant' + id
+      err.message || 'Some error occurred while retrieving the dish ' + dishId
       })
     })
 }
@@ -702,7 +704,7 @@ exports.updateDish = (req, res) => {
     })
   }
 
-  Dish.findOneAndUpdate({_id: dishId},
+  Dish.findOneAndUpdate({ _id: dishId },
     { $set: req.body },
     { upsert: true, new: true })
     .then(data => {
@@ -713,7 +715,7 @@ exports.updateDish = (req, res) => {
       } else {
         data.save()
         res.status(200).send(data)
-      } 
+      }
     })
     .catch(err => {
       res.status(500).send({
@@ -745,41 +747,40 @@ exports.deleteDish = (req, res) => {
   // TODO: add a pre remove hook to delete the file from the orphaned menu
   // https://stackoverflow.com/questions/51767118/delete-document-and-all-references-in-another-schema-mongodb
 
-  const restaurantId = req.params.restaurantId;
-  const dishId = req.params.dishId;
+  const restaurantId = req.params.restaurantId
+  const dishId = req.params.dishId
 
   Dish.findByIdAndDelete(dishId)
-  .then(data => {
-    if (data){
-      Restaurant.findOneAndUpdate(
-        { _id: restaurantId },
-        { $pull: { menu: dishId } },
-        { upsert: false, new: true })
-        .then(data => {
-          if (!data) {
-            res.status(404).send({
-              message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
-            })
-          } else res.status(200).send({ message: 'Dish deleted from Restaurant' })
-        })
-        .catch(err => {
-          res.status(500).send({
-            message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
+    .then(data => {
+      if (data) {
+        Restaurant.findOneAndUpdate(
+          { _id: restaurantId },
+          { $pull: { menu: dishId } },
+          { upsert: false, new: true })
+          .then(data => {
+            if (!data) {
+              res.status(404).send({
+                message: `Cannot update Dish with id=${dishId}. Maybe Dish was not found!`
+              })
+            } else res.status(200).send({ message: 'Dish deleted' })
           })
-        })
-    }
-      else{
+          .catch(err => {
+            res.status(500).send({
+              message: 'Error updating Restaurant with id=' + dishId + ' with error: ' + err
+            })
+          })
+      } else {
         res.status(404).send({
           message: `Cannot delete dish with id=${dishId}. Maybe the dish was not found!`
         })
       }
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).send({
-      message: 'Could not delete Dish with id=' + dishId + ' with error: ' + err
     })
-  });
+    .catch(err => {
+      console.log(err)
+      res.status(500).send({
+        message: 'Could not delete Dish with id=' + dishId + ' with error: ' + err
+      })
+    })
 
   // Restaurant.findByIdAndRemove(dishId, { useFindAndModify: false })
   //   .then(data => {

@@ -360,7 +360,7 @@ exports.update = (req, res) => {
     })
   }
 
-  User.findOneAndUpdate({_id: id}, req.body, { upsert: true, new: true })
+  User.findOneAndUpdate({ _id: id }, req.body, { upsert: true, new: true })
     .then(data => {
       if (!data) {
         res.status(404).send({
