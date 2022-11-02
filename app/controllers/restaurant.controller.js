@@ -31,6 +31,8 @@ exports.create = (req, res) => {
   } */
 
   // Validate request
+  const userId = req.params.userId;
+
   if (!req.body.name) {
     res.status(400).send({ message: 'Content cannot be empty!' })
     return
@@ -49,8 +51,7 @@ exports.create = (req, res) => {
   // Save Restaurant in the database
   restaurant
     .save(restaurant)
-    .then(data => {
-      res.status(201).send(data)
+    .then(restaurant => {
     })
     .catch(err => {
       res.status(500).send({
@@ -58,8 +59,6 @@ exports.create = (req, res) => {
       err.message || 'Some error occurred while creating the Restaurant.'
       })
     })
-
-  // TODO: associate restaurant with owner
 }
 
 // Retrieve all Restaurants from the database.

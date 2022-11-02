@@ -4,7 +4,7 @@ module.exports = app => {
   const router = require('express').Router()
 
   // Create a new restaurant
-  router.post('/restaurants', restaurants.create)
+  router.post('/restaurants/:userId', restaurants.create)
 
   // Retrieve all restaurants
   router.get('/restaurants', restaurants.findAll)
