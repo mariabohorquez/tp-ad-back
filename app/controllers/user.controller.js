@@ -353,26 +353,45 @@ exports.update = (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const id = req.params.id
-
   if (!req.body) {
     return res.status(400).send({
       message: 'Data to update cannot be empty!'
     })
   }
 
-  User.findOneAndUpdate({ _id: id }, req.body, { upsert: true, new: true })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update User with id=${id}. Maybe User was not found!`
-        })
-      } else res.status(200).send(data)
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Error updating User with id=' + id + ' with error: ' + err
+  const name = req.body.name;
+  
+  User.findById(id)
+  .then(user => {
+    if (!user){
+      res.status(404).send({
+        message: `Cannot update User with id=${id}. Maybe User was not found!`
       })
-    })
+    }
+    else{
+      if (user.role === 'user'){
+        user.google.name = name;
+      }
+      else if (user.role === 'owner'){
+        user.custom.name = name;
+      }
+
+      user.save().then(newUser => {
+        if (newUser){
+          res.status(200).send(newUser);
+        }
+        else{
+          res.status(500).send({
+            message: `Cannot update User with id=${id}. User Role undefined`
+          })
+        }
+      }).catch(err => {
+        res.status(500).send({
+          message: 'Error updating User with id=' + id + ' with error: ' + err
+        })
+      })
+    }
+  })
 }
 
 // Delete a user with the specified id in the request
