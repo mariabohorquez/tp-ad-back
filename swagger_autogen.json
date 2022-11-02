@@ -1281,16 +1281,34 @@
     },
     "/images/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Image"
+        ],
+        "summary": "Get an image",
+        "description": "Endpoint to get an image.    Must be jpg, jpeg or png format.",
         "parameters": [
           {
             "name": "id",
-            "in": "path",
+            "description": "Id of image",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "in": "path"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Image found successfully."
+          },
+          "400": {
+            "description": "Id is required."
+          },
+          "404": {
+            "description": "Image not found."
+          },
+          "500": {
+            "description": "Error getting image."
+          }
+        }
       },
       "delete": {
         "description": "",

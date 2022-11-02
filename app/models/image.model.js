@@ -1,15 +1,8 @@
 
 module.exports = mongoose => {
   const schema = mongoose.Schema({
-    path: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    originalname: {
-      type: String,
-      required: true
-    }
+    data: Buffer,
+    contentType: String
   })
 
   const Image = mongoose.model('image', schema)

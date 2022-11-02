@@ -2,9 +2,13 @@ module.exports = app => {
   const image = require('../controllers/image.controller.js')
 
   const router = require('express').Router()
+  const multer = require('multer')
+
+  const multerStorage = multer.memoryStorage();
+  const uploadMulter = multer({ storage: multerStorage, });
 
   // Upload a new image
-  router.post('/images', image.upload)
+  router.post('/images', uploadMulter.single('file'), image.upload)
 
   // Get all images
   router.get('/images', image.getAll)

@@ -1,11 +1,5 @@
 const db = require('../models')
-const uploadFilesMiddleware = require('../middleware/upload.middleware.js')
-
-// For debugging
-const fs = require('fs')
-const { parse, stringify } = require('flatted')
-const formidable = require('formidable')
-const { nextTick } = require('process')
+const multer = require('multer')
 
 // Models
 const Image = db.images
@@ -30,9 +24,6 @@ exports.upload = async (req, res) => {
      #swagger.responses[404] = { description: 'Object the id belongs to not found.' }
      #swagger.responses[500] = { description: 'Error uploading image.' }
   */
-  uploadFilesMiddleware(req, res).then(
-    async (result) => {
-      console.log('result: ', result)
       console.log('body ' + JSON.stringify(req.body))
       console.log('file ' + req.file)
       if (req.file == undefined) {
@@ -40,24 +31,24 @@ exports.upload = async (req, res) => {
       }
 
       // Check if id belongs to an object
-      let object = null
-      if (req.body.type == 'user') {
-        object = await User.findOne({ _id: req.body.id })
-      } else if (req.body.type == 'restaurant') {
-        object = await Restaurant.findOne({ _id: req.body.id })
-      } else if (req.body.type == 'dish') {
-        object = await Dish.findOne({ _id: req.body.id })
-      }
+      // let object = null
+      // if (req.body.type == 'user') {
+      //   object = await User.findOne({ _id: req.body.id })
+      // } else if (req.body.type == 'restaurant') {
+      //   object = await Restaurant.findOne({ _id: req.body.id })
+      // } else if (req.body.type == 'dish') {
+      //   object = await Dish.findOne({ _id: req.body.id })
+      // }
 
-      if (!object) {
-        return res.status(404).send({ message: 'Object not found.' })
-      }
+      // if (!object) {
+      //   return res.status(404).send({ message: 'Object not found.' })
+      // }
 
       // Create a image
       const image = new Image({
         name: req.file.originalname,
         type: req.file.mimetype,
-        data: req.file.buffer,
+        data: new Buffer.from(req.file.buffer, 'base64'),
         belongsTo: req.body.id,
         belongsToCollection: req.body.type
       })
@@ -71,14 +62,39 @@ exports.upload = async (req, res) => {
         .catch(err => {
           res.status(500).send({ message: 'Error uploading image.' })
         })
-    }
-  )
-}
-
-exports.getAll = (req, res) => {
 }
 
 exports.getOne = (req, res) => {
+  // #swagger.auto = false
+  // #swagger.tags = ['Image']
+  // #swagger.summary = 'Get an image'
+  /* #swagger.description = `Endpoint to get an image.
+                             Must be jpg, jpeg or png format.`
+     #swagger.parameters['id'] = { description: 'Id of image', required: 'true', type: 'string', in: 'path', name: 'id' }
+
+     #swagger.responses[200] = { description: 'Image found successfully.' }
+     #swagger.responses[400] = { description: 'Id is required.' }
+     #swagger.responses[404] = { description: 'Image not found.' }
+     #swagger.responses[500] = { description: 'Error getting image.' }
+  */
+  const id = req.params.id
+
+  if (!id) {
+    return res.status(400).send({ message: 'Id is required.' })
+  }
+
+  Image.findById(id).lean().exec()
+    .then(data => {
+      if (!data)
+        res.status(404).send({ message: 'Image not found.' })
+      else res.status(200).send(data)
+    })
+    .catch(err => {
+      res.status(500).send({ message: 'Error getting image.' })
+    })
+}
+
+exports.getAll = (req, res) => {
 }
 
 exports.delete = (req, res) => {
