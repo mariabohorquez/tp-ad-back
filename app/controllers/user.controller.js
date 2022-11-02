@@ -55,7 +55,7 @@ exports.register = (req, res) => {
           })
         } else {
           owner
-            .save(owner)
+            .save()
             .then(data => {
               return res.status(201).send(data)
             })
@@ -95,7 +95,7 @@ exports.register = (req, res) => {
         } else {
           // Save User in the database
           user
-            .save(user)
+            .save()
             .then(data => {
               return res.status(201).send(data)
             })
@@ -237,7 +237,7 @@ exports.sendRecoverPassword = (req, res) => {
           userId: data._id,
           token: Math.floor(1000 + Math.random() * 9000)
         })
-        token.save(token)
+        token.save()
         const email = data.custom.email
 
         sendEmail(email, 'Password reset', token.token).then(

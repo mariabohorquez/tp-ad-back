@@ -338,7 +338,7 @@ exports.createReview = (req, res) => {
         console.log(review)
 
         review
-          .save(review)
+          .save()
           .then(newReview => {
             // Add review to array
             Restaurant.findOneAndUpdate(
@@ -563,7 +563,7 @@ exports.createDish = (req, res) => {
   console.log(dish)
 
   dish
-    .save(dish)
+    .save()
     .then(dishData => {
       // Add dish to array
       Restaurant.findOneAndUpdate(
