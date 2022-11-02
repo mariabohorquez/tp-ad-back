@@ -308,100 +308,74 @@ exports.createReview = (req, res) => {
     })
   }
 
-  const user = User.findById(userId)
-  if (!user) {
-    return res.status(404).send({
-      message: 'User not found!'
-    })
-  }
+  console.log('Review body: ' + req.body)
 
-  const review = new Review({
-    user: req.body.user,
-    rating: req.body.rating,
-    comment: req.body.comment
-  })
-
-  console.log(review)
-
-  review
-    .save(review)
-    .catch(err => {
-      res.status(500).send({
-        message:
-      err.message || 'Some error occurred while creating the review.'
-      })
-    })
-
-  // Add review to array
-  Restaurant.findOneAndUpdate(
-    { _id: restaurantId },
-    { $push: { reviews: review } },
-    { upsert: false, new: true })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update Restaurant with id=${restaurantId}. Maybe Restaurant was not found!`
+  User.findById(userId).then(
+    user => {
+      if (!user) {
+        return res.status(404).send({
+          message: `Cannot find user with id=${userId}. Maybe user was not found!`
         })
       } else {
-        // After the review is added compute the new average rating
-        Restaurant.aggregate(
-          [
-            {
-              $match: {
-                reviews: {
-                  $exists: true
-                }
-              }
-            }, {
-              $lookup: {
-                from: 'reviews',
-                localField: 'reviews',
-                foreignField: '_id',
-                as: 'reviews'
-              }
-            }, {
-              $addFields: {
-                averageRating: {
-                  $round: [
-                    {
-                      $avg: '$reviews.rating'
-                    }, 1
-                  ]
-                }
-              }
-            }
-          ]
-        )
-          .then(data => {
-            data.forEach(
-              function (x) {
-                console.log('x ' + x)
-                console.log('x._id ' + x._id)
-                console.log('x.averageRating ' + x.averageRating)
+        const review = new Review({
+          name: user.google.name,
+          rating: req.body.rating,
+          comment: req.body.comment
+        })
+
+        console.log(review)
+
+        review
+          .save(review)
+          .then(newReview => {
+            // Add review to array
+            Restaurant.findOneAndUpdate(
+              { _id: restaurantId },
+              { $push: { reviews: newReview } },
+              { upsert: false, new: true }).populate('reviews')
+              .then(restaurant => {
+                // After the review is added compute the new average rating
+                const reviews = restaurant.reviews
+                console.log("reviews: " + reviews)
+                let sum = 0
+                reviews.forEach(review => {
+                  sum += review.rating
+                })
+                const averageRating = sum / reviews.length
                 Restaurant.findOneAndUpdate(
-                  { _id: x._id },
-                  { $set: { averageRating: x.averageRating } },
+                  { _id: restaurantId },
+                  { $set: { averageRating: averageRating } },
                   { upsert: false, new: true })
                   .then(
                     data => {
                       console.log(data)
-                      console.log('Average rating updated to ' + x.averageRating)
+                      console.log('Average rating updated to ' + averageRating)
                     }
                   )
                   .catch(err => {
                     console.error('Error creating the average rating: ', err)
                   })
-              }
-            )
+                return res.status(200).send({ message: 'Review posted successfully.' })
+              })
+              .catch(err => {
+                return res.status(500).send({
+                  message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
+                })
+              })
           })
-        res.status(200).send({ message: 'Review posted successfully.' })
+          .catch(err => {
+            return res.status(500).send({
+              message:
+            err.message || 'Some error occurred while creating the review.'
+            })
+          })
       }
+    }
+  ).catch(err => {
+    return res.status(500).send({
+      message: 'Error retrieving user with id=' + userId + ' with error: ' + err
     })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
-      })
-    })
+  })
 }
 
 // Get all reviews from a restaurant
