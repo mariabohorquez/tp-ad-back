@@ -40,20 +40,33 @@ exports.create = (req, res) => {
 
   // Create a Restaurant
   const restaurant = new Restaurant({
-    name: req.body.name,
-    hours: req.body.hours,
-    priceRange: req.body.priceRange,
+    name : req.body.name,
+    hours : req.body.hours,
+    priceRange : req.body.priceRange,
     address: req.body.address || {},
-    restaurantTypes: req.body.restaurantTypes,
+    restaurantTypes : req.body.restaurantTypes,
     coordinates: req.body.coordinates || {}
-  })
+  });
 
   // Save Restaurant in the database
   restaurant
-    .save(restaurant)
+    .save()
     .then(restaurant => {
+      User.findByIdAndUpdate(
+        { _id: userId },
+        { $push: { ownedRestaurants: restaurant._id } },
+        { useFindAndModify: false, returnDocument: 'after' }
+      ).then(user => {
+        res.status(201).send(restaurant);
+      }).catch(err => {
+        console.error(err);
+        res.status(500).send({
+          message: 'Error updating User with id=' + userId + ' with error: ' + err
+        })
+      })
     })
     .catch(err => {
+      console.error(err);
       res.status(500).send({
         message:
       err.message || 'Some error occurred while creating the Restaurant.'
