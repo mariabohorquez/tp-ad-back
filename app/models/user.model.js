@@ -41,7 +41,8 @@ module.exports = mongoose => {
     profilePicture: {
       type: Buffer,
       required: false,
-      unique: false
+      unique: false,
+      default : [],
     },
     favoriteRestaurants: [
       {
