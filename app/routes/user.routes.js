@@ -1,6 +1,6 @@
 module.exports = app => {
   const users = require('../controllers/user.controller.js')
-
+  const multerUploader = require('./multerUploader')
   const router = require('express').Router()
 
   // Auth routes
@@ -25,7 +25,7 @@ module.exports = app => {
   router.delete('/users/:id', users.delete)
 
   // Upload a user image
-  router.post('/users/:id/image', users.uploadUserImage)
+  router.post('/users/:id/image', multerUploader.single('file'), users.uploadUserImage)
 
   // Normal user specific routes
   router.get('/users/:id/favorites', users.findAllFavoriteRestaurants)

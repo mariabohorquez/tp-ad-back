@@ -2,7 +2,10 @@ const db = require('../models')
 const authConfig = require('../config/auth.config.js')
 const sendEmail = require('./sendEmail.controller.js')
 const crypto = require('crypto')
+const multer = require('multer')
+const allowedImageFormats = require('./imageSupport.js')
 const User = db.users
+const Image = db.images
 const Token = db.tokens
 
 exports.register = (req, res) => {
@@ -410,16 +413,65 @@ exports.delete = (req, res) => {
 
 // Upload a user image
 exports.uploadUserImage = (req, res) => {
-  /*  #swagger.tags = ['User']
-      #swagger.summary = 'Upload a user image.'
-      #swagger.description = 'Endpoint to upload a user image.'
-      #swagger.parameters['id'] = { description: 'user id', required: 'true', type: 'string' }
-      #swagger.parameters['image'] = { description: 'user image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
-      #swagger.responses[200] = { description: 'User image uploaded successfully.' }
-      #swagger.responses[400] = { description: 'Error with given parameters.' }
-      #swagger.responses[404] = { description: 'User not found.' }
-      #swagger.responses[500] = { description: 'Error uploading user image.' }
+  // #swagger.auto = false
+  // #swagger.tags = ['User']
+  // #swagger.summary = 'Upload an user image'
+  /* #swagger.description = `Endpoint to upload an user image.
+                             Must be jpg, jpeg or png format.`
+     #swagger.parameters['id'] = { description: 'Id for object to associate image to', required: 'true', type: 'string', in: 'path', name: 'id' }
+     #swagger.parameters['image'] = { description: 'File: must be jpg, jpeg or png', required: 'true', name: 'file', type: 'file', in: 'formData' }
+     #swagger.responses[200] = { description: 'Image uploaded successfully.' }
+     #swagger.responses[400] = { description: 'Error with given parameters.' }
+     #swagger.responses[404] = { description: 'Object the id belongs to not found.' }
+     #swagger.responses[500] = { description: 'Error uploading image.' }
   */
+
+  const id = req.params.id
+  const reqImage = req.file
+
+  if (!id) {
+    return res.status(400).send({
+      message: 'Id cannot be empty!'
+    })
+  }
+
+  if (!reqImage) {
+    return res.status(400).send({ message: 'Please upload an image!' })
+  }
+
+  const image = new Image({
+    name: reqImage.originalname,
+    type: reqImage.mimetype,
+    data: new Buffer.from(reqImage.buffer, 'base64')
+  })
+
+  if (!allowedImageFormats.includes(image.type)) {
+    return res.status(400).send({ message: `Please upload a valid image format: ${allowedImageFormats}` })
+  }
+
+  User.findById(id)
+    .then(user => {
+      image.save().then(savedImage => {
+        user.profilePicture = savedImage.id
+        console.log(savedImage)
+        console.log(user)
+        user.save().then(updatedUser => {
+          res.status(200).send(updatedUser)
+        }).catch(err => {
+          res.status(500).send({
+            message: `Error updating the user: ${err}`
+          })
+        })
+      }).catch(err => {
+        res.status(500).send({
+          message: `Error uploading image: ${err}`
+        })
+      })
+    }).catch(err => {
+      res.status(500).send({
+        message: `Cannot find user with id ${id}.`
+      })
+    })
 }
 
 // Find all favorite restaurants of a user
