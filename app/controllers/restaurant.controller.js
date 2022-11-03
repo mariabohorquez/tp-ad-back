@@ -179,6 +179,10 @@ exports.findAll = (req, res) => {
           const favoriteRestaurants = user.favoriteRestaurants
 
           data.forEach(restaurant => {
+
+            if (!restaurant.averageRating)
+              restaurant.averageRating = 0;
+
             restaurant.isFavorite = favoriteRestaurants.includes(restaurant._id)
           })
 
@@ -224,7 +228,14 @@ exports.findOne = (req, res) => {
 
   Restaurant.findById(id)
     .then(data => {
-      if (!data) { res.status(404).send({ message: 'Not found Restaurant with id ' + id }) } else res.status(200).send(data)
+      if (!data) { res.status(404).send({ message: 'Not found Restaurant with id ' + id }) } 
+      else{
+
+        if (!data.averageRating)
+          data.averageRating = 0;
+
+        res.status(200).send(data)
+      } 
     })
     .catch(err => {
       res
@@ -370,12 +381,15 @@ exports.createReview = (req, res) => {
                 return res.status(200).send({ message: 'Review posted successfully.' })
               })
               .catch(err => {
+                console.error(err);
                 return res.status(500).send({
                   message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
                 })
               })
           })
           .catch(err => {
+            console.error(err);
+
             return res.status(500).send({
               message:
             err.message || 'Some error occurred while creating the review.'
@@ -384,6 +398,8 @@ exports.createReview = (req, res) => {
       }
     }
   ).catch(err => {
+    console.err(err);
+
     return res.status(500).send({
       message: 'Error retrieving user with id=' + userId + ' with error: ' + err
     })

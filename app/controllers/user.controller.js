@@ -570,6 +570,13 @@ exports.findAllRestaurants = (req, res) => {
           message: `Cannot find user with id ${id}.`
         })
       } else {
+
+        data.ownedRestaurants.forEach(item => {
+          if (!item.averageRating)
+            item.averageRating = 0;
+        })
+
+
         res.status(200).send(data.ownedRestaurants)
       }
     })
