@@ -613,28 +613,46 @@ exports.findAllRestaurants = (req, res) => {
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  const id = req.params.id
+  const id = req.params.id;
 
-  User.findById(id).populate('ownedRestaurants')
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot find user with id ${id}.`
-        })
-      } else {
-
-        data.ownedRestaurants.forEach(item => {
-          if (!item.averageRating)
-            item.averageRating = 0;
-        })
-
-
-        res.status(200).send(data.ownedRestaurants)
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || 'Some error occurred while retrieving a user.'
+  User.findById(id).populate({
+    path : 'ownedRestaurants',
+    populate : {
+      path : 'pictures',
+      model : 'image',
+    }
+  }).then(data => {
+    if (!data){
+      res.status(400).send({
+        message: `User Id ${id} can not be founded`
       })
+    }else{
+      const restaurants = data.ownedRestaurants.map(item => {
+
+        const restInfo = {
+          name : item.name,
+          address : item.address.neighborhood + ' ' + item.address.streetNumber,
+          score : Number(item.averageRating),
+          restaurantId : item.id,
+          pictures : item.pictures,
+        }
+
+        const img64 = restInfo.pictures.map(element => {
+          const str = element.data.toString('base64');
+          return str;
+        });
+
+        restInfo.pictures = img64;
+
+        return restInfo;
+      });
+
+      res.status(200).send(restaurants);
+    }
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: err.message || 'Some error occurred while retrieving a user.'
     })
+  })
 }
