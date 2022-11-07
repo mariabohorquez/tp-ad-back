@@ -19,11 +19,10 @@ module.exports = mongoose => {
       required: true,
       unique: false
     },
-    picture: {
-      type: Buffer,
-      required: false,
-      unique: false
-    },
+    pictures: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'image'
+    }],
     ingredients: {
       type: String, // fresa, leche, azucar
       required: true,

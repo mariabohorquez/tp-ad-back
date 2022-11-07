@@ -1,6 +1,6 @@
 module.exports = app => {
   const restaurants = require('../controllers/restaurant.controller.js')
-
+  const multerUploader = require('./multerUploader')
   const router = require('express').Router()
 
   // Create a new restaurant
@@ -26,7 +26,7 @@ module.exports = app => {
   router.get('/restaurants/:restaurantId/reviews', restaurants.findAllReviews)
 
   // Restaurant Image
-  router.post('/restaurants/:restaurantId/image', restaurants.uploadRestaurantImage)
+  router.post('/restaurants/:restaurantId/image', multerUploader.single('file'), restaurants.uploadRestaurantImage)
 
   // Dishes CRUD
   router.post('/restaurants/:restaurantId/dishes', restaurants.createDish)
@@ -34,7 +34,7 @@ module.exports = app => {
   router.get('/restaurants/:restaurantId/dishes/:dishId', restaurants.findOneDish)
   router.patch('/restaurants/:restaurantId/dishes/:dishId', restaurants.updateDish)
   router.delete('/restaurants/:restaurantId/dishes/:dishId', restaurants.deleteDish)
-  router.post('/restaurants/:restaurantId/dishes/:dishId', restaurants.uploadDishImage)
+  router.post('/restaurants/:restaurantId/dishes/:dishId', multerUploader.single('file'), restaurants.uploadDishImage)
 
   // Menu categories CRUD
   router.post('/restaurants/:restaurantId/categories', restaurants.createCategory)

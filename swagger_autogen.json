@@ -218,11 +218,10 @@
             "required": true
           },
           {
-            "name": "image",
-            "description": "user image",
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
             "required": true,
             "type": "file",
-            "format": "binary",
             "in": "formData"
           },
           {
@@ -362,37 +361,36 @@
         "tags": [
           "User"
         ],
-        "summary": "Upload a user image.",
-        "description": "Endpoint to upload a user image.",
+        "summary": "Upload an user image",
+        "description": "Endpoint to upload an user image.    Must be jpg, jpeg or png format.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "user id"
+            "description": "Id for object to associate image to"
           },
           {
-            "name": "image",
-            "description": "user image",
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
             "required": true,
             "type": "file",
-            "format": "binary",
             "in": "formData"
           }
         ],
         "responses": {
           "200": {
-            "description": "User image uploaded successfully."
+            "description": "Image uploaded successfully."
           },
           "400": {
             "description": "Error with given parameters."
           },
           "404": {
-            "description": "User not found."
+            "description": "Object the id belongs to not found."
           },
           "500": {
-            "description": "Error uploading user image."
+            "description": "Error uploading image."
           }
         }
       }
@@ -858,37 +856,36 @@
         "tags": [
           "Restaurant"
         ],
-        "summary": "Upload a restaurant image.",
-        "description": "Endpoint to upload a restaurant image.",
+        "summary": "Upload a Restaurant image",
+        "description": "Endpoint to upload a Restaurant image.    Must be jpg, jpeg or png format.",
         "parameters": [
           {
             "name": "restaurantId",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "Restaurant id"
+            "description": "Restaurant Id to add image"
           },
           {
-            "name": "image",
-            "description": "Restaurant image",
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
             "required": true,
             "type": "file",
-            "format": "binary",
             "in": "formData"
           }
         ],
         "responses": {
           "200": {
-            "description": "Restaurant image uploaded successfully."
+            "description": "Image uploaded successfully."
           },
           "400": {
             "description": "Error with given parameters."
           },
           "404": {
-            "description": "Restaurant not found."
+            "description": "Object the id belongs to not found."
           },
           "500": {
-            "description": "Error uploading restaurant image."
+            "description": "Error uploading image."
           }
         }
       }
@@ -1086,44 +1083,43 @@
         "tags": [
           "Dish"
         ],
-        "summary": "Upload a dish image.",
-        "description": "Endpoint to upload a dish image.",
+        "summary": "Upload a dish image",
+        "description": "Endpoint to upload a dish image.    Must be jpg, jpeg or png format.",
         "parameters": [
           {
             "name": "restaurantId",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "Restaurant id"
+            "description": "Restaurant Id to find the dish"
           },
           {
             "name": "dishId",
             "in": "path",
             "required": true,
             "type": "string",
-            "description": "Dish id"
+            "description": "Dish Id to add image"
           },
           {
-            "name": "image",
-            "description": "Dish image",
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
             "required": true,
             "type": "file",
-            "format": "binary",
             "in": "formData"
           }
         ],
         "responses": {
           "200": {
-            "description": "Dish image uploaded successfully"
+            "description": "Image uploaded successfully."
           },
           "400": {
-            "description": "Error with given parameters"
+            "description": "Error with given parameters."
           },
           "404": {
-            "description": "Restaurant or dish not found"
+            "description": "Object the id belongs to not found."
           },
           "500": {
-            "description": "Error uploading dish image"
+            "description": "Error uploading image."
           }
         }
       }

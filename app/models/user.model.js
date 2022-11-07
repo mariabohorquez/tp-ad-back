@@ -39,10 +39,8 @@ module.exports = mongoose => {
       }
     },
     profilePicture: {
-      type: Buffer,
-      required: false,
-      unique: false,
-      default : [],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'image'
     },
     favoriteRestaurants: [
       {

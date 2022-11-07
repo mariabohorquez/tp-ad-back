@@ -3,6 +3,8 @@ const Restaurant = db.restaurants
 const Review = db.reviews
 const Dish = db.dishes
 const User = db.users
+const Image = db.images
+const allowedImageFormats = require('./imageSupport.js')
 
 // Create and Save a new Restaurant
 exports.create = (req, res) => {
@@ -440,16 +442,63 @@ exports.findAllReviews = (req, res) => {
 
 // Upload a restaurant image
 exports.uploadRestaurantImage = (req, res) => {
-  /*  #swagger.tags = ['Restaurant']
-      #swagger.summary = 'Upload a restaurant image.'
-      #swagger.description = 'Endpoint to upload a restaurant image.'
-      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
-      #swagger.parameters['image'] = { description: 'Restaurant image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
-      #swagger.responses[200] = { description: 'Restaurant image uploaded successfully.' }
-      #swagger.responses[400] = { description: 'Error with given parameters.' }
-      #swagger.responses[404] = { description: 'Restaurant not found.' }
-      #swagger.responses[500] = { description: 'Error uploading restaurant image.' }
+  // #swagger.auto = false
+  // #swagger.tags = ['Restaurant']
+  // #swagger.summary = 'Upload a Restaurant image'
+  /* #swagger.description = `Endpoint to upload a Restaurant image.
+                             Must be jpg, jpeg or png format.`
+     #swagger.parameters['restaurantId'] = { description: 'Restaurant Id to add image', required: 'true', type: 'string', in: 'path', name: 'restaurantId' }
+     #swagger.parameters['image'] = { description: 'File: must be jpg, jpeg or png', required: 'true', name: 'file', type: 'file', in: 'formData' }
+     #swagger.responses[200] = { description: 'Image uploaded successfully.' }
+     #swagger.responses[400] = { description: 'Error with given parameters.' }
+     #swagger.responses[404] = { description: 'Object the id belongs to not found.' }
+     #swagger.responses[500] = { description: 'Error uploading image.' }
   */
+
+  const restaurantId = req.params.restaurantId
+  const reqImage = req.file
+
+  if (!restaurantId) {
+    return res.status(400).send({
+      message: 'restaurantId cannot be empty!'
+    })
+  }
+
+  if (!reqImage) {
+    return res.status(400).send({ message: 'Please upload an image!' })
+  }
+
+  const image = new Image({
+    name: reqImage.originalname,
+    type: reqImage.mimetype,
+    data: new Buffer.from(reqImage.buffer, 'base64')
+  })
+
+  if (!allowedImageFormats.includes(image.type)) {
+    return res.status(400).send({ message: `Please upload a valid image format: ${allowedImageFormats}` })
+  }
+
+  Restaurant.findById(restaurantId)
+    .then(restaurant => {
+      image.save().then(savedImage => {
+        restaurant.pictures.push(savedImage.id)
+        restaurant.save().then(updatedRestaurant => {
+          res.status(200).send(updatedRestaurant)
+        }).catch(err => {
+          res.status(500).send({
+            message: `Error updating the restaurant: ${err}`
+          })
+        })
+      }).catch(err => {
+        res.status(500).send({
+          message: `Error uploading image: ${err}`
+        })
+      })
+    }).catch(err => {
+      res.status(404).send({
+        message: `Cannot find restaurant with id ${id}.`
+      })
+    })
 }
 
 // Delete a Restaurant with the specified id in the request
@@ -806,17 +855,83 @@ exports.deleteDish = (req, res) => {
 
 // Upload a dish image
 exports.uploadDishImage = (req, res) => {
-  /*  #swagger.tags = ['Dish']
-      #swagger.summary = 'Upload a dish image.'
-      #swagger.description = 'Endpoint to upload a dish image.'
-      #swagger.parameters['restaurantId'] = { description: 'Restaurant id', required: 'true', type: 'string' }
-      #swagger.parameters['dishId'] = { description: 'Dish id', required: 'true', type: 'string' }
-      #swagger.parameters['image'] = { description: 'Dish image', required: 'true', type: 'file', format: 'binary', in: 'formData' }
-      #swagger.responses[200] = { description: 'Dish image uploaded successfully' }
-      #swagger.responses[400] = { description: 'Error with given parameters' }
-      #swagger.responses[404] = { description: 'Restaurant or dish not found' }
-      #swagger.responses[500] = { description: 'Error uploading dish image' }
+  // #swagger.auto = false
+  // #swagger.tags = ['Dish']
+  // #swagger.summary = 'Upload a dish image'
+  /* #swagger.description = `Endpoint to upload a dish image.
+                             Must be jpg, jpeg or png format.`
+     #swagger.parameters['restaurantId'] = { description: 'Restaurant Id to find the dish', required: 'true', type: 'string', in: 'path', name: 'restaurantId' }
+     #swagger.parameters['dishId'] = { description: 'Dish Id to add image', required: 'true', type: 'string', in: 'path', name: 'dishId' }
+     #swagger.parameters['image'] = { description: 'File: must be jpg, jpeg or png', required: 'true', name: 'file', type: 'file', in: 'formData' }
+     #swagger.responses[200] = { description: 'Image uploaded successfully.' }
+     #swagger.responses[400] = { description: 'Error with given parameters.' }
+     #swagger.responses[404] = { description: 'Object the id belongs to not found.' }
+     #swagger.responses[500] = { description: 'Error uploading image.' }
   */
+
+  const restaurantId = req.params.restaurantId
+  const dishId = req.params.dishId
+  const reqImage = req.file
+
+  if (!restaurantId) {
+    return res.status(400).send({
+      message: 'restaurantId cannot be empty!'
+    })
+  }
+
+  if (!dishId) {
+    return res.status(400).send({
+      message: 'dishId cannot be empty!'
+    })
+  }
+
+  if (!reqImage) {
+    return res.status(400).send({ message: 'Please upload an image!' })
+  }
+
+  const image = new Image({
+    name: reqImage.originalname,
+    type: reqImage.mimetype,
+    data: new Buffer.from(reqImage.buffer, 'base64')
+  })
+
+  if (!allowedImageFormats.includes(image.type)) {
+    return res.status(400).send({ message: `Please upload a valid image format: ${allowedImageFormats}` })
+  }
+
+  Restaurant.findById(restaurantId)
+    .then(restaurant => {
+      Dish.findById(dishId)
+        .then(dish => {
+          if (!restaurant.menu.includes(dish.id)) {
+            return res.status(404).send({
+              message: `Cannot find dish with id ${dishId}, on restaurant ${restaurantId}.`
+            })
+          }
+          image.save().then(savedImage => {
+            dish.pictures.push(savedImage.id)
+            dish.save().then(updatedDish => {
+              res.status(200).send(updatedDish)
+            }).catch(err => {
+              res.status(500).send({
+                message: `Error updating the dish: ${err}`
+              })
+            })
+          }).catch(err => {
+            res.status(500).send({
+              message: `Error uploading image: ${err}`
+            })
+          })
+        }).catch(err => {
+          return res.status(404).send({
+            message: `Cannot find dish with id ${dishId}, on restaurant ${restaurantId}.`
+          })
+        })
+    }).catch(err => {
+      res.status(404).send({
+        message: `Cannot find restaurant with id ${restaurantId}.`
+      })
+    })
 }
 
 // Create a category for a restaurant

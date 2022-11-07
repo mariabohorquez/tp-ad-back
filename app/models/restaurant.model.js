@@ -91,7 +91,11 @@ module.exports = mongoose => {
         type: mongoose.Schema.Types.Decimal128,
         required: false,
         default: 0
-      }
+      },
+      pictures: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'image'
+      }]
     },
     { timestamps: true }
   )
