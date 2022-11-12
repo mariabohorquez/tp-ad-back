@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt')
 
 module.exports = mongoose => {
   const schema = mongoose.Schema({
+    isLoggedIn: Boolean,
     role: {
       type: String,
       enum: ['user', 'owner'],

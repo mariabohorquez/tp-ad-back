@@ -37,6 +37,7 @@ exports.register = (req, res) => {
 
     // Create a Owner
     const owner = new User({
+      isLoggedIn: false,
       role: req.body.role,
       custom: {
         email: req.body.custom.email,
@@ -77,6 +78,7 @@ exports.register = (req, res) => {
 
     // Create a User
     const user = new User({
+      isLoggedIn: true,
       role: req.body.role,
       google: {
         name: req.body.google.name,
@@ -168,18 +170,24 @@ exports.login = (req, res) => {
           })
         }
 
-        // TODO: Return refresh token
-        // // Generate token
-        // const token = jwt.sign({ id: data.id }, authConfig.secret, {
-        //   expiresIn: 86400 // 24 hours
-        // })
-
-        return res.status(200).send({
-          id: data._id,
-          email: data.custom.email,
-          name: data.custom.name,
-          accessToken: 'this is a token'
-        })
+        User.findByIdAndUpdate(data._id, { isLoggedIn: true }, { new: true })
+        .then(
+          data => {
+            return res.status(200).send({
+              id: data._id,
+              email: data.custom.email,
+              name: data.custom.name,
+              accessToken: 'this is a token'
+            })
+          }
+        )
+        .catch(
+          err => {
+            return res.status(500).send({
+              message: 'Error updating user with id ' + data._id
+            })
+          }
+        )
       }
     })
 }
@@ -199,7 +207,29 @@ exports.logout = (req, res) => {
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  // TODO: Needs to remove session from mongodb and stuff.
+  userId = req.headers.userId
+
+  // Validate request
+  if (!userId) {
+    return res.status(400).send({
+      message: 'UserId must be set in header'
+    })
+  }
+
+  User.findByIdAndUpdate
+  (userId, { isLoggedIn: false }, { new: true })
+    .then( data => {
+      return res.status(200).send({
+        message: 'User logged out successfully'
+      })
+    }
+    )
+    .catch(err => {
+      return res.status(500).send({
+        message: 'Error updating user with id ' + userId
+      })
+    }
+    )
 }
 
 exports.sendRecoverPassword = (req, res) => {
@@ -258,7 +288,7 @@ exports.sendRecoverPassword = (req, res) => {
     })
 }
 
-exports.verifyRecoverToken = (req, res) => {
+exports.verifyRecoveryToken = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Reset password of a user'
   // #swagger.description = 'Handles password reset of a user, can only be done for owner. Verifies token

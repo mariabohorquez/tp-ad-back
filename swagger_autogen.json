@@ -169,7 +169,7 @@
         }
       }
     },
-    "/users/verifyRecoverToken": {
+    "/users/verifyRecoveryToken": {
       "post": {
         "tags": [
           "Auth"
@@ -490,6 +490,9 @@
               "$ref": "#/definitions/Restaurants"
             }
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "404": {
             "description": "User not found"
           },
@@ -538,7 +541,7 @@
         }
       }
     },
-    "/restaurants": {
+    "/restaurants/{userId}": {
       "post": {
         "tags": [
           "Restaurant"
@@ -570,7 +573,9 @@
             "description": "Error creating restaurant"
           }
         }
-      },
+      }
+    },
+    "/restaurants": {
       "get": {
         "tags": [
           "Restaurant"
