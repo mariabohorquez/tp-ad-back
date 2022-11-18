@@ -158,7 +158,8 @@ exports.findAll = (req, res) => {
               key: 'coordinates',
               spherical: true
             }
-          }, {
+          }, 
+          {
             $match: {
               name: {
                 $regex: name,
@@ -177,21 +178,45 @@ exports.findAll = (req, res) => {
           }
         ]
       )
-        .then(data => {
-          const favoriteRestaurants = user.favoriteRestaurants
+        .then(async restaurants => {
 
-          data.forEach(restaurant => {
+          try {
+            await Restaurant.populate(restaurants, {
+              path : 'pictures'
+            });
+          } catch (error) {
+            res.status(500).send({
+              message:
+              err.message || 'Some error occurred while retrieving restaurants.'
+            })
+          }
 
-            if (!restaurant.averageRating)
-              restaurant.averageRating = 0;
+          const favoriteRestaurants = user.favoriteRestaurants;
+          const returnData = restaurants.map(item => {
 
-            restaurant.isFavorite = favoriteRestaurants.includes(restaurant._id)
-          })
+            const restInfo = {
+              name : item.name,
+              address : item.address.neighborhood + ' ' + item.address.streetNumber,
+              score : Number(item.averageRating),
+              restaurantId : item.id,
+              pictures : item.pictures,
+              isFavorite : favoriteRestaurants.includes(item._id)
+            }
+    
+            const img64 = restInfo.pictures.map(element => {
+              const str = element.data.toString('base64');
+              return str;
+            });
+    
+            restInfo.pictures = img64;
+    
+            return restInfo;
+          });
 
-          console.log(data)
-          res.status(200).send(data)
+          res.status(200).send(returnData);
         })
         .catch(err => {
+          console.error(err);
           res.status(500).send({
             message:
           err.message || 'Some error occurred while retrieving restaurants.'
@@ -200,6 +225,8 @@ exports.findAll = (req, res) => {
     }
   ).catch(
     err => {
+      console.error(err)
+
       res.status(500).send({
         message:
       err.message || 'User not send.'
