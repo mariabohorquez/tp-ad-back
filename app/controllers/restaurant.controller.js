@@ -198,7 +198,7 @@ exports.findAll = (req, res) => {
               name : item.name,
               address : item.address.neighborhood + ' ' + item.address.streetNumber,
               score : Number(item.averageRating),
-              restaurantId : item.id,
+              restaurantId : item._id,
               pictures : item.pictures,
               isFavorite : favoriteRestaurants.includes(item._id)
             }
