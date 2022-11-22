@@ -6,7 +6,8 @@ const multer = require('multer')
 const allowedImageFormats = require('./imageSupport.js')
 const User = db.users
 const Image = db.images
-const Token = db.tokens
+const Token = db.tokens;
+const Restaurant = db.restaurants;
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -507,13 +508,39 @@ exports.findAllFavoriteRestaurants = (req, res) => {
   const id = req.params.id
 
   User.findById(id).populate('favoriteRestaurants')
-    .then(data => {
+    .then(async data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot find user with id ${id}.`
         })
       } else {
-        res.status(200).send(data.favoriteRestaurants)
+
+        try {
+          await Restaurant.populate(data.favoriteRestaurants, {
+            path : 'pictures'
+          });
+        } catch (err) {
+          res.status(500).send({
+            message:
+            err.message || 'Some error occurred while retrieving restaurants.'
+          })
+        }
+
+        const restaurants = data.favoriteRestaurants.map(item => {
+
+          const restInfo = {
+            name : item.name,
+            address : item.address.neighborhood + ' ' + item.address.streetNumber,
+            score : Number(item.averageRating),
+            restaurantId : item._id,
+            pictures : [], // TO DO : populate images
+            isFavorite : true
+          }
+
+          return restInfo;
+        });
+
+        res.status(200).send(restaurants)
       }
     })
 }
