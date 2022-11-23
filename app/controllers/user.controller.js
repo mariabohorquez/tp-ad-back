@@ -399,11 +399,29 @@ exports.delete = async (req, res) => {
   const password = req.body.password;
   const email = req.body.email;
 
+  if (!password){
+    return res.status(400).send({
+      message: 'Password can not be empty'
+    })
+  }
+
+  if (!userId){
+    return res.status(400).send({
+      message: 'User Id is required'
+    })
+  }
+
+  if (!email){
+    return res.status(400).send({
+      message: 'Email is required'
+    })
+  }
+
   try {
     var user = await User.findById(userId);
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    return res.status(500).send({
       message: 'Could not delete user with id=' + userId + ' with error: ' + error
     });
   }
