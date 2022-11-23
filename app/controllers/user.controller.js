@@ -384,7 +384,7 @@ exports.update = (req, res) => {
 }
 
 // Delete a user with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Delete a user with id'
   // #swagger.description = 'Deletes a user via its id.'
@@ -395,25 +395,65 @@ exports.delete = (req, res) => {
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  const id = req.params.id
+  const userId = req.params.id
+  const password = req.body.password;
+  const email = req.body.email;
 
-  User.findByIdAndRemove(id, { useFindAndModify: false })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot delete user with id=${id}. Maybe the user was not found!`
-        })
-      } else {
-        res.status(200).send({
-          message: 'User was deleted successfully!'
-        })
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: 'Could not delete user with id=' + id + ' with error: ' + err
+  try {
+    var user = await User.findById(userId);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: 'Could not delete user with id=' + userId + ' with error: ' + error
+    });
+  }
+
+  if (!user){
+    return res.status(404).send({
+      message: `Cannot delete user with id=${userId}. Maybe the user was not found!`
+    });
+  }
+
+  const samePasswords = user.comparePassword(password);
+
+  if (!samePasswords){
+    return res.status(401).send({
+      message: `User password is incorrect`
+    });
+  }
+
+  var userMail = '';
+
+  if (user.role === 'user'){
+    userMail = user.google.email;
+  }else if (user.role === 'owner'){
+    userMail = user.custom.email;
+  }
+
+  if (email !== userMail){
+    return res.status(401).send({
+      message: `User email is incorrect`
+    });
+  }
+
+  User.findByIdAndRemove(userId, { useFindAndModify: false })
+  .then(data => {
+    if (!data){
+      res.status(404).send({
+        message: `Cannot delete user with id=${id}. Maybe the user was not found!`
+      });
+    }else{
+      res.status(200).send({
+        message: 'User was deleted successfully!'
       })
+    }
+  })
+  .catch(err => {
+    console.warn(err);
+    res.status(500).send({
+      message: 'Could not delete user with id=' + userId + ' with error: ' + err
     })
+  })
 }
 
 // Upload a user image
