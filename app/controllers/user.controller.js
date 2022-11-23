@@ -2,12 +2,11 @@ const db = require('../models')
 const authConfig = require('../config/auth.config.js')
 const sendEmail = require('./sendEmail.controller.js')
 const crypto = require('crypto')
-const multer = require('multer')
 const allowedImageFormats = require('./imageSupport.js')
 const User = db.users
 const Image = db.images
-const Token = db.tokens;
-const Restaurant = db.restaurants;
+const Token = db.tokens
+const Restaurant = db.restaurants
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -169,12 +168,6 @@ exports.login = (req, res) => {
           })
         }
 
-        // TODO: Return refresh token
-        // // Generate token
-        // const token = jwt.sign({ id: data.id }, authConfig.secret, {
-        //   expiresIn: 86400 // 24 hours
-        // })
-
         return res.status(200).send({
           id: data._id,
           email: data.custom.email,
@@ -203,7 +196,7 @@ exports.logout = (req, res) => {
   // TODO: Needs to remove session from mongodb and stuff.
 }
 
-exports.sendRecoverPassword = (req, res) => {
+exports.sendRecoveryPassword = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Recover password of a user'
   // #swagger.description = 'Handles password recovery of a user, can only be done for owner. Sends email to recover password'
@@ -259,20 +252,26 @@ exports.sendRecoverPassword = (req, res) => {
     })
 }
 
-exports.verifyRecoverToken = (req, res) => {
+exports.verifyRecoveryToken = (req, res) => {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Reset password of a user'
-  // #swagger.description = 'Handles password reset of a user, can only be done for owner. Verifies token
-  // #swagger.parameters['userId'] = { description: 'User id', required: true, type: 'string' }
-  // #swagger.parameters['token'] = { description: 'Token', required: true, type: 'string' }
-  // #swagger.parameters['password'] = { description: 'New password', in: 'body', required: true, type: 'string' }
+  // #swagger.description = 'Handles password reset of a user, can only be done for owner. Verifies token'
+  /* #swagger.parameters['reset'] = {
+          in: 'body',
+          description: 'Body for password reset',
+          required: false,
+          type: 'object',
+          schema: { $ref: "#/definitions/recoveryRequest" }
+  }
+  */
 
   // #swagger.responses[200] = { description: 'Password reset' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'Error finding token or password' }
 
-  const token = req.params.token
-  const userId = req.params.userId
+  const token = req.body.token
+  const userId = req.body.userId
+  const password = req.body.password
 
   Token.findOne({ userId, token })
     .then(data => {
@@ -281,21 +280,10 @@ exports.verifyRecoverToken = (req, res) => {
           message: 'Invalid link or expired'
         })
       } else {
-        User.findOne({ _id: userId })
+        User.findById(userId)
           .then(user => {
-            if (!user) {
-              return res.status(404).send({
-                message: 'User not found'
-              })
-            } else {
-              // Update password
-              console.log('Updating password')
-              user.password = req.body.password
-              user.save()
-              return res.status(200).send({
-                message: 'Password updated'
-              })
-            }
+            user.custom.password = password
+            user.save()
           })
       }
     })
@@ -363,39 +351,36 @@ exports.update = (req, res) => {
     })
   }
 
-  const name = req.body.name;
-  
-  User.findById(id)
-  .then(user => {
-    if (!user){
-      res.status(404).send({
-        message: `Cannot update User with id=${id}. Maybe User was not found!`
-      })
-    }
-    else{
-      if (user.role === 'user'){
-        user.google.name = name;
-      }
-      else if (user.role === 'owner'){
-        user.custom.name = name;
-      }
+  const name = req.body.name
 
-      user.save().then(newUser => {
-        if (newUser){
-          res.status(200).send(newUser);
-        }
-        else{
-          res.status(500).send({
-            message: `Cannot update User with id=${id}. User Role undefined`
-          })
-        }
-      }).catch(err => {
-        res.status(500).send({
-          message: 'Error updating User with id=' + id + ' with error: ' + err
+  User.findById(id)
+    .then(user => {
+      if (!user) {
+        res.status(404).send({
+          message: `Cannot update User with id=${id}. Maybe User was not found!`
         })
-      })
-    }
-  })
+      } else {
+        if (user.role === 'user') {
+          user.google.name = name
+        } else if (user.role === 'owner') {
+          user.custom.name = name
+        }
+
+        user.save().then(newUser => {
+          if (newUser) {
+            res.status(200).send(newUser)
+          } else {
+            res.status(500).send({
+              message: `Cannot update User with id=${id}. User Role undefined`
+            })
+          }
+        }).catch(err => {
+          res.status(500).send({
+            message: 'Error updating User with id=' + id + ' with error: ' + err
+          })
+        })
+      }
+    })
 }
 
 // Delete a user with the specified id in the request
@@ -514,11 +499,10 @@ exports.findAllFavoriteRestaurants = (req, res) => {
           message: `Cannot find user with id ${id}.`
         })
       } else {
-
         try {
           await Restaurant.populate(data.favoriteRestaurants, {
-            path : 'pictures'
-          });
+            path: 'pictures'
+          })
         } catch (err) {
           res.status(500).send({
             message:
@@ -527,18 +511,17 @@ exports.findAllFavoriteRestaurants = (req, res) => {
         }
 
         const restaurants = data.favoriteRestaurants.map(item => {
-
           const restInfo = {
-            name : item.name,
-            address : item.address.neighborhood + ' ' + item.address.streetNumber,
-            score : Number(item.averageRating).toFixed(2),
-            restaurantId : item._id,
-            pictures : [], // TO DO : populate images
-            isFavorite : true
+            name: item.name,
+            address: item.address.neighborhood + ' ' + item.address.streetNumber,
+            score: Number(item.averageRating).toFixed(2),
+            restaurantId: item._id,
+            pictures: [], // TO DO : populate images
+            isFavorite: true
           }
 
-          return restInfo;
-        });
+          return restInfo
+        })
 
         res.status(200).send(restaurants)
       }
@@ -640,46 +623,45 @@ exports.findAllRestaurants = (req, res) => {
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  const id = req.params.id;
+  const id = req.params.id
 
   User.findById(id).populate({
-    path : 'ownedRestaurants',
-    populate : {
-      path : 'pictures',
-      model : 'image',
+    path: 'ownedRestaurants',
+    populate: {
+      path: 'pictures',
+      model: 'image'
     }
   }).then(data => {
-    if (!data){
+    if (!data) {
       res.status(400).send({
         message: `User Id ${id} can not be founded`
       })
-    }else{
+    } else {
       const restaurants = data.ownedRestaurants.map(item => {
-
         const restInfo = {
-          name : item.name,
-          address : item.address.neighborhood + ' ' + item.address.streetNumber,
-          score : Number(item.averageRating),
-          restaurantId : item.id,
-          pictures : item.pictures,
+          name: item.name,
+          address: item.address.neighborhood + ' ' + item.address.streetNumber,
+          score: Number(item.averageRating),
+          restaurantId: item.id,
+          pictures: item.pictures
         }
 
         const img64 = restInfo.pictures.map(element => {
-          const str = element.data.toString('base64');
-          return str;
-        });
+          const str = element.data.toString('base64')
+          return str
+        })
 
-        restInfo.pictures = img64;
+        restInfo.pictures = img64
 
-        return restInfo;
-      });
+        return restInfo
+      })
 
-      res.status(200).send(restaurants);
+      res.status(200).send(restaurants)
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      message: err.message || 'Some error occurred while retrieving a user.'
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || 'Some error occurred while retrieving a user.'
+      })
     })
-  })
 }

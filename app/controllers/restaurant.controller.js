@@ -33,7 +33,7 @@ exports.create = (req, res) => {
   } */
 
   // Validate request
-  const userId = req.params.userId;
+  const userId = req.params.userId
 
   if (!req.body.name) {
     res.status(400).send({ message: 'Content cannot be empty!' })
@@ -42,13 +42,13 @@ exports.create = (req, res) => {
 
   // Create a Restaurant
   const restaurant = new Restaurant({
-    name : req.body.name,
-    hours : req.body.hours,
-    priceRange : req.body.priceRange,
+    name: req.body.name,
+    hours: req.body.hours,
+    priceRange: req.body.priceRange,
     address: req.body.address || {},
-    restaurantTypes : req.body.restaurantTypes,
+    restaurantTypes: req.body.restaurantTypes,
     coordinates: req.body.coordinates || {}
-  });
+  })
 
   // Save Restaurant in the database
   restaurant
@@ -59,16 +59,16 @@ exports.create = (req, res) => {
         { $push: { ownedRestaurants: restaurant._id } },
         { useFindAndModify: false, returnDocument: 'after' }
       ).then(user => {
-        res.status(201).send(restaurant);
+        res.status(201).send(restaurant)
       }).catch(err => {
-        console.error(err);
+        console.error(err)
         res.status(500).send({
           message: 'Error updating User with id=' + userId + ' with error: ' + err
         })
       })
     })
     .catch(err => {
-      console.error(err);
+      console.error(err)
       res.status(500).send({
         message:
       err.message || 'Some error occurred while creating the Restaurant.'
@@ -158,7 +158,7 @@ exports.findAll = (req, res) => {
               key: 'coordinates',
               spherical: true
             }
-          }, 
+          },
           {
             $match: {
               name: {
@@ -179,44 +179,42 @@ exports.findAll = (req, res) => {
         ]
       )
         .then(async restaurants => {
-
           try {
             await Restaurant.populate(restaurants, {
-              path : 'pictures'
-            });
+              path: 'pictures'
+            })
           } catch (error) {
             res.status(500).send({
               message:
-              err.message || 'Some error occurred while retrieving restaurants.'
+              error.message || 'Some error occurred while retrieving restaurants.'
             })
           }
 
-          const favoriteRestaurants = user.favoriteRestaurants;
+          const favoriteRestaurants = user.favoriteRestaurants
           const returnData = restaurants.map(item => {
-
             const restInfo = {
-              name : item.name,
-              address : item.address.neighborhood + ' ' + item.address.streetNumber,
-              score : Number(item.averageRating).toFixed(2),
-              restaurantId : item._id,
-              pictures : item.pictures,
-              isFavorite : favoriteRestaurants.includes(item._id)
+              name: item.name,
+              address: item.address.neighborhood + ' ' + item.address.streetNumber,
+              score: Number(item.averageRating).toFixed(2),
+              restaurantId: item._id,
+              pictures: item.pictures,
+              isFavorite: favoriteRestaurants.includes(item._id)
             }
-    
-            const img64 = restInfo.pictures.map(element => {
-              const str = element.data.toString('base64');
-              return str;
-            });
-    
-            restInfo.pictures = img64;
-    
-            return restInfo;
-          });
 
-          res.status(200).send(returnData);
+            const img64 = restInfo.pictures.map(element => {
+              const str = element.data.toString('base64')
+              return str
+            })
+
+            restInfo.pictures = img64
+
+            return restInfo
+          })
+
+          res.status(200).send(returnData)
         })
         .catch(err => {
-          console.error(err);
+          console.error(err)
           res.status(500).send({
             message:
           err.message || 'Some error occurred while retrieving restaurants.'
@@ -257,14 +255,11 @@ exports.findOne = (req, res) => {
 
   Restaurant.findById(id)
     .then(data => {
-      if (!data) { res.status(404).send({ message: 'Not found Restaurant with id ' + id }) } 
-      else{
-
-        if (!data.averageRating)
-          data.averageRating = 0;
+      if (!data) { res.status(404).send({ message: 'Not found Restaurant with id ' + id }) } else {
+        if (!data.averageRating) { data.averageRating = 0 }
 
         res.status(200).send(data)
-      } 
+      }
     })
     .catch(err => {
       res
@@ -388,7 +383,7 @@ exports.createReview = (req, res) => {
               .then(restaurant => {
                 // After the review is added compute the new average rating
                 const reviews = restaurant.reviews
-                console.log("reviews: " + reviews)
+                console.log('reviews: ' + reviews)
                 let sum = 0
                 reviews.forEach(review => {
                   sum += review.rating
@@ -396,7 +391,7 @@ exports.createReview = (req, res) => {
                 const averageRating = sum / reviews.length
                 Restaurant.findOneAndUpdate(
                   { _id: restaurantId },
-                  { $set: { averageRating: averageRating } },
+                  { $set: { averageRating } },
                   { upsert: false, new: true })
                   .then(
                     data => {
@@ -410,14 +405,14 @@ exports.createReview = (req, res) => {
                 return res.status(200).send({ message: 'Review posted successfully.' })
               })
               .catch(err => {
-                console.error(err);
+                console.error(err)
                 return res.status(500).send({
                   message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
                 })
               })
           })
           .catch(err => {
-            console.error(err);
+            console.error(err)
 
             return res.status(500).send({
               message:
@@ -427,7 +422,7 @@ exports.createReview = (req, res) => {
       }
     }
   ).catch(err => {
-    console.err(err);
+    console.err(err)
 
     return res.status(500).send({
       message: 'Error retrieving user with id=' + userId + ' with error: ' + err
@@ -523,7 +518,7 @@ exports.uploadRestaurantImage = (req, res) => {
       })
     }).catch(err => {
       res.status(404).send({
-        message: `Cannot find restaurant with id ${id}.`
+        message: `Cannot find restaurant with id ${restaurantId}: ` + err
       })
     })
 }

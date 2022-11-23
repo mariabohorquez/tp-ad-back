@@ -162,7 +162,12 @@ const doc = {
       email: "example@email.com",
       name: "Jane Doe",
       accessToken: "some access token"
-    }
+    },
+    recoveryRequest: {
+      userId: "5f9f9f9f9f9f9f9f9f9f9f9f",
+      token: "1234",
+      password: "123456",
+    },
   },
 }
 

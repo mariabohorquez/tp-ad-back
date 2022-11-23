@@ -7,8 +7,8 @@ const sendEmail = async (email, subject, code) => {
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
-        user: 'abdiel15@ethereal.email',
-        pass: 'XpjCVDjxYbz1cWc8BC'
+        user: 'shayna.lakin@ethereal.email',
+        pass: 'TQa1xgbcRyz9t79uG1'
       }
     })
 
@@ -17,7 +17,7 @@ const sendEmail = async (email, subject, code) => {
     console.log(template)
 
     await transporter.sendMail({
-      from: 'abdiel15@ethereal.email',
+      from: 'shayna.lakin@ethereal.email',
       to: email,
       subject,
       html: template
