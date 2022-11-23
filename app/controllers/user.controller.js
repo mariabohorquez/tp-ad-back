@@ -22,7 +22,7 @@ exports.register = (req, res) => {
   } */
   // #swagger.responses[200] = { description: 'Google account already existed, log in.' }
   // #swagger.responses[201] = { description: 'User successfully created' }
-  // #swagger.responses[400] = { description: 'Content cannot be empty' }
+  // #swagger.responses[400] = { description: 'Error with given parameters.' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   // Validate request
@@ -564,43 +564,6 @@ exports.changeRestaurantFavoriteStatus = (req, res) => {
     })
 }
 
-// Add a restaurant to owner's restaurants
-exports.addRestaurant = (req, res) => {
-  // #swagger.tags = ['User']
-  // #swagger.summary = 'Add a restaurant to owner'
-  // #swagger.description = 'Adds a restaurant to owner via its id.'
-
-  // #swagger.parameters['id'] = { description: 'User id', type: 'string' }
-  // #swagger.parameters['restaurantId'] = { description: 'Restaurant id to add to owner', type: 'string' }
-
-  // #swagger.responses[200] = { description: 'Restaurant successfully added to owner' }
-  // #swagger.responses[400] = { description: 'RestaurantId cannot be empty' }
-  // #swagger.responses[404] = { description: 'User not found' }
-  // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
-
-  const id = req.params.id
-  const restaurantId = req.params.restaurantId
-
-  if (!restaurantId) {
-    return res.status(400).send({
-      message: 'RestaurantId cannot be empty!'
-    })
-  }
-
-  User.findById(id)
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot find user with id ${id}.`
-        })
-      } else {
-        data.ownedRestaurants.push(restaurantId)
-        data.save()
-        res.status(200).send(data)
-      }
-    })
-}
-
 // Return all restaurants of an owner
 exports.findAllRestaurants = (req, res) => {
   // #swagger.tags = ['User']
@@ -624,7 +587,7 @@ exports.findAllRestaurants = (req, res) => {
   }).then(data => {
     if (!data){
       res.status(400).send({
-        message: `User Id ${id} can not be founded`
+        message: `User Id ${id} can not be found`
       })
     }else{
       const restaurants = data.ownedRestaurants.map(item => {
