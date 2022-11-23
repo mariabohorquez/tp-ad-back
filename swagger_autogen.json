@@ -57,7 +57,7 @@
             "description": "User successfully created"
           },
           "400": {
-            "description": "Content cannot be empty"
+            "description": "Error with given parameters."
           },
           "500": {
             "description": "Internal server error, returns specific error message"
@@ -185,6 +185,39 @@
             "schema": {
               "$ref": "#/definitions/recoveryRequest"
             }
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.    If it is a user, it must specify the google fields.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          {
+            "name": "id",
+            "description": "User id",
+            "type": "string",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "file",
+            "description": "File: must be jpg, jpeg or png",
+            "required": true,
+            "type": "file",
+            "in": "formData"
+          },
+          {
+            "name": "restaurantId",
+            "in": "body",
+            "description": "Restaurant id to change favorite status for",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
           }
         ],
         "responses": {
@@ -192,7 +225,7 @@
             "description": "Password reset"
           },
           "400": {
-            "description": "Content cannot be empty"
+            "description": "Restaurant id needs to be filled"
           },
           "404": {
             "description": "Error finding token or password"
@@ -448,55 +481,16 @@
         }
       }
     },
-    "/users/{id}/restaurant/{restaurantId}": {
-      "patch": {
-        "tags": [
-          "User"
-        ],
-        "summary": "Add a restaurant to owner",
-        "description": "Adds a restaurant to owner via its id.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "User id"
-          },
-          {
-            "name": "restaurantId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "Restaurant id to add to owner"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Restaurant successfully added to owner"
-          },
-          "400": {
-            "description": "RestaurantId cannot be empty"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error, returns specific error message"
-          }
-        }
-      }
-    },
     "/restaurants/{userId}": {
       "post": {
         "tags": [
           "Restaurant"
         ],
         "summary": "Create a restaurant.",
-        "description": "Endpoint to create a restaurant.    Price range must be $, \\$\\$, $\\$\\$ or $\\$\\$\\$ ($ is the cheapest, $\\$\\$\\$ the most expensive).",
+        "description": "Endpoint to create a restaurant. Must add ownerId in the request Body.    Price range must be $, \\$\\$, $\\$\\$ or $\\$\\$\\$ ($ is the cheapest, $\\$\\$\\$ the most expensive).",
         "parameters": [
           {
-            "name": "Restaurants",
+            "name": "Restaurant",
             "in": "body",
             "description": "Restaurant object",
             "required": true,
@@ -648,7 +642,7 @@
             }
           },
           "400": {
-            "description": "Error with given body."
+            "description": "Error with given parameters."
           },
           "404": {
             "description": "Restaurant not found"
@@ -759,7 +753,7 @@
             "description": "Review posted successfully"
           },
           "400": {
-            "description": "Body cannot be empty"
+            "description": "Error with given parameters."
           },
           "404": {
             "description": "User or restaurant not found"
@@ -874,10 +868,10 @@
             "description": "Error with given parameters"
           },
           "404": {
-            "description": "Restaurant not found"
+            "description": "Restaurant not found."
           },
           "500": {
-            "description": "Error creating dish"
+            "description": "Error creating dish."
           }
         }
       },
@@ -1354,7 +1348,7 @@
       "properties": {
         "ownerId": {
           "type": "string",
-          "example": "5f9f9f9f9f9f9f9f9f9f9f9f"
+          "example": "Owner object ID"
         },
         "name": {
           "type": "string",

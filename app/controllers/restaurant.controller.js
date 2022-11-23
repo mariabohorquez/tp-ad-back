@@ -11,10 +11,10 @@ exports.create = (req, res) => {
   // #swagger.auto = false
   // #swagger.tags = ['Restaurant']
   // #swagger.summary = 'Create a restaurant.'
-  /* #swagger.description = `Endpoint to create a restaurant.
+  /* #swagger.description = `Endpoint to create a restaurant. Must add ownerId in the request Body.
                              Price range must be $, \$\$, $\$\$ or $\$\$\$ ($ is the cheapest, $\$\$\$ the most expensive).`
   */
-  /* #swagger.parameters['Restaurants'] = {
+  /* #swagger.parameters['Restaurant'] = {
     in: 'body',
     description: 'Restaurant object',
     required: true,
@@ -33,10 +33,17 @@ exports.create = (req, res) => {
   } */
 
   // Validate request
-  const userId = req.params.userId
+  const ownerId = req.body.ownerId;
+
+  console.log(ownerId)
+
+  if(!ownerId){
+    res.status(400).send({ message: 'Owner Id is required!' })
+    return
+  }
 
   if (!req.body.name) {
-    res.status(400).send({ message: 'Content cannot be empty!' })
+    res.status(400).send({ message: 'Restaurant name is required!' })
     return
   }
 
@@ -50,30 +57,41 @@ exports.create = (req, res) => {
     coordinates: req.body.coordinates || {}
   })
 
-  // Save Restaurant in the database
-  restaurant
-    .save()
-    .then(restaurant => {
-      User.findByIdAndUpdate(
-        { _id: userId },
-        { $push: { ownedRestaurants: restaurant._id } },
-        { useFindAndModify: false, returnDocument: 'after' }
-      ).then(user => {
-        res.status(201).send(restaurant)
+  Restaurant.findOne({ 'name': req.body.name })
+  .then(data => {
+    if (data) {
+      return res.status(400).send({
+        message: 'Restaurant already exists'
+      })
+    } else {
+      // Save Restaurant in the database
+      User.findById(ownerId)
+      .then(user => {
+        restaurant.save().then(savedRestaurant => {
+          user.ownedRestaurants.push(savedRestaurant.id)
+          console.log(savedRestaurant)
+          console.log(user)
+          user.save().then(updatedUser => {
+            res.status(201).send(savedRestaurant)
+          }).catch(err => {
+            res.status(500).send({
+              message: `Error updating the user: ${err}`
+            })
+          })
+        }).catch(err => {
+          res.status(500).send({
+            message: `Error saving the Restaurant: ${err}`
+          })
+        })
       }).catch(err => {
-        console.error(err)
         res.status(500).send({
-          message: 'Error updating User with id=' + userId + ' with error: ' + err
+          message: `Cannot find user with id ${ownerId}.`
         })
       })
-    })
-    .catch(err => {
-      console.error(err)
-      res.status(500).send({
-        message:
-      err.message || 'Some error occurred while creating the Restaurant.'
-      })
-    })
+    }
+  })
+
+  
 }
 
 // Retrieve all Restaurants from the database.
@@ -286,7 +304,7 @@ exports.update = (req, res) => {
         schema: { $ref: "#/definitions/Restaurant" }
       }
       #swagger.responses[400] = {
-        description: 'Error with given body.',
+        description: 'Error with given parameters.',
       }
       #swagger.responses[404] = {
         description: 'Restaurant not found',
@@ -337,7 +355,7 @@ exports.createReview = (req, res) => {
         description: 'Review posted successfully',
       }
       #swagger.responses[400] = {
-        description: 'Body cannot be empty',
+        description: 'Error with given parameters.',
       }
       #swagger.responses[404] = {
         description: 'User or restaurant not found',
@@ -361,7 +379,7 @@ exports.createReview = (req, res) => {
     user => {
       if (!user) {
         return res.status(404).send({
-          message: `Cannot find user with id=${userId}. Maybe user was not found!`
+          message: `Cannot find user with id=${userId}!`
         })
       } else {
         const review = new Review({
@@ -372,16 +390,23 @@ exports.createReview = (req, res) => {
 
         console.log(review)
 
-        review
-          .save()
-          .then(newReview => {
+        Restaurant.findById(restaurantId).populate('reviews').then(restaurant => {
+          if(!restaurant){
+            return res.status(404).send({
+              message: 'Restaurant not found.'
+            })
+          }
+            console.log(restaurant)
+            restaurant.reviews.forEach(aReview => {
+              if(aReview.name === user.google.name){
+                return res.status(400).send({
+                  message: `The user with id=${userId}, already made a review!`
+                })
+              }
+            })
             // Add review to array
-            Restaurant.findOneAndUpdate(
-              { _id: restaurantId },
-              { $push: { reviews: newReview } },
-              { upsert: false, new: true }).populate('reviews')
-              .then(restaurant => {
-                // After the review is added compute the new average rating
+            review.save().then(newReview => {   
+                restaurant.reviews.push(newReview)
                 const reviews = restaurant.reviews
                 console.log('reviews: ' + reviews)
                 let sum = 0
@@ -389,36 +414,29 @@ exports.createReview = (req, res) => {
                   sum += review.rating
                 })
                 const averageRating = sum / reviews.length
-                Restaurant.findOneAndUpdate(
-                  { _id: restaurantId },
-                  { $set: { averageRating } },
-                  { upsert: false, new: true })
-                  .then(
-                    data => {
-                      console.log(data)
-                      console.log('Average rating updated to ' + averageRating)
-                    }
-                  )
-                  .catch(err => {
-                    console.error('Error creating the average rating: ', err)
+                restaurant.averageRating = averageRating
+                restaurant.save().then( updatedRestaurant => {
+                  return res.status(200).send({ message: 'Review posted successfully.' })  
+                })
+                .catch(err => {
+                  console.error(err);
+                  return res.status(500).send({
+                    message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
                   })
-                return res.status(200).send({ message: 'Review posted successfully.' })
+                })             
               })
               .catch(err => {
                 console.error(err)
-                return res.status(500).send({
-                  message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
+                return res.status(500).send({ message: err.message || 'Some error occurred while creating the review.'
                 })
               })
+        })
+        .catch(err => {
+          console.error(err);
+          return res.status(500).send({
+            message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
           })
-          .catch(err => {
-            console.error(err)
-
-            return res.status(500).send({
-              message:
-            err.message || 'Some error occurred while creating the review.'
-            })
-          })
+        })
       }
     }
   ).catch(err => {
@@ -620,13 +638,13 @@ exports.createDish = (req, res) => {
         description: 'Error with given parameters',
       }
       #swagger.responses[404] = {
-        description: 'Restaurant not found',
+        description: 'Restaurant not found.',
       }
       #swagger.responses[500] = {
-        description: 'Error creating dish',
+        description: 'Error creating dish.',
       }
   */
-  const id = req.params.restaurantId
+  const restaurantId = req.params.restaurantId
 
   if (!req.body) {
     return res.status(400).send({
@@ -636,7 +654,7 @@ exports.createDish = (req, res) => {
 
   console.log(req.body.ingredients)
 
-  const dish = new Dish({
+  const newDish = new Dish({
     name: req.body.name,
     category: req.body.category,
     price: req.body.price,
@@ -647,35 +665,45 @@ exports.createDish = (req, res) => {
     discounts: req.body.discounts || 0
   })
 
-  console.log(dish)
-
-  dish
-    .save()
-    .then(dishData => {
-      // Add dish to array
-      Restaurant.findOneAndUpdate(
-        { _id: id },
-        { $push: { menu: dishData.id } },
-        { upsert: false, new: true })
-        .then(data => {
-          if (!data) {
-            res.status(404).send({
-              message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
-            })
-          } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
+  console.log(newDish)
+  Restaurant.findById(restaurantId).populate('menu').then(restaurant => {
+    if(!restaurant){
+      return res.status(404).send({
+        message: 'Restaurant not found.'
+      })
+    }
+    console.log(restaurant)
+    restaurant.menu.forEach(aDish => {
+      if(aDish.name === newDish.name){
+        return res.status(400).send({
+          message: `The Dish=${aDish.name }, already exists!`
+        })
+      }
+    })
+    newDish.save().then(savedDish => {   
+        restaurant.menu.push(savedDish)
+        restaurant.save().then( updatedRestaurant => {
+          return res.status(201).send({ message: 'Dish created successfully.' })  
         })
         .catch(err => {
-          res.status(500).send({
-            message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
+          console.error(err);
+          return res.status(500).send({
+            message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
           })
+        })             
+      })
+      .catch(err => {
+        console.error(err);
+        return res.status(500).send({ message: err.message || 'Some error occurred while creating the Dish.'
         })
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-      err.message || 'Some error occurred while creating dish: ' + dish
       })
     })
+  .catch(err => {
+    console.error(err);
+    return res.status(500).send({
+      message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
+    })
+  })
 }
 
 // Get all dishes from a restaurant
@@ -993,23 +1021,39 @@ exports.createCategory = (req, res) => {
   console.log('New category is: ' + category)
 
   // Add category to array
-  Restaurant.findOneAndUpdate(
-    { _id: restaurantId },
-    { $push: { menuCategories: category } },
-    { upsert: false, new: true })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update Restaurant with id=${restaurantId}. Maybe Restaurant was not found!`
+  Restaurant.findById(restaurantId).populate('menuCategories').then(restaurant => {
+    if(!restaurant){
+      return res.status(404).send({
+        message: 'Restaurant not found.'
+      })
+    }
+    console.log(restaurant)
+    restaurant.menuCategories.forEach(aCategory => {
+      if(aCategory === category){
+        return res.status(400).send({
+          message: `The Category=${aCategory}, already exists!`
         })
-      } else res.status(201).send({ message: 'Restaurant was updated successfully.' })
+      }
+    })
+    restaurant.menuCategories.push(category)
+    restaurant.save().then( updatedRestaurant => {
+      return res.status(201).send({ message: 'Category created successfully' })  
     })
     .catch(err => {
-      res.status(500).send({
+      console.error(err);
+      return res.status(500).send({
         message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
       })
+    })             
+  })
+  .catch(err => {
+    console.error(err);
+    return res.status(500).send({
+      message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
     })
+  })
 }
+
 
 // Get all categories from a restaurant
 exports.findAllCategories = (req, res) => {

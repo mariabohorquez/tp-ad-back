@@ -53,7 +53,7 @@ const doc = {
       averageRating: 4.5
     },
     createRestaurant: {
-      $ownerId: '5f9f9f9f9f9f9f9f9f9f9f9f',
+      $ownerId: 'Owner object ID',
       $name: 'La Pizzeria',
       $hours: {monday: {'open': 1000, 'close': 1400},
               tuesday: {'open': 1000, 'close': 1400},
