@@ -12,7 +12,7 @@ module.exports = mongoose => {
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: 3600
+      expires: 300
     }
   })
 

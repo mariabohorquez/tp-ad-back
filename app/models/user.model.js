@@ -80,6 +80,7 @@ module.exports = mongoose => {
   schema.pre('save', function hashPassword (next) {
     // hash the password only if the password has been changed or user is new
     if (!this.isModified('custom.password')) {
+      console.log('password not modified')
       next()
       return
     }

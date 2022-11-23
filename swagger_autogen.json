@@ -169,7 +169,7 @@
         }
       }
     },
-    "/users/verifyRecoverToken": {
+    "/users/recoveryToken": {
       "post": {
         "tags": [
           "Auth"
@@ -178,27 +178,12 @@
         "description": "Handles password reset of a user, can only be done for owner. Verifies token",
         "parameters": [
           {
-            "name": "userId",
-            "description": "User id",
-            "required": true,
-            "type": "string",
-            "in": "query"
-          },
-          {
-            "name": "token",
-            "description": "Token",
-            "required": true,
-            "type": "string",
-            "in": "query"
-          },
-          {
-            "name": "password",
-            "description": "New password",
+            "name": "reset",
             "in": "body",
-            "required": true,
+            "description": "Body for password reset",
+            "required": false,
             "schema": {
-              "type": "object",
-              "properties": {}
+              "$ref": "#/definitions/recoveryRequest"
             }
           },
           {
@@ -237,19 +222,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Restaurants successfully retrieved",
-            "schema": {
-              "$ref": "#/definitions/Restaurants"
-            }
+            "description": "Password reset"
           },
           "400": {
             "description": "Restaurant id needs to be filled"
           },
           "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error, returns specific error message"
+            "description": "Error finding token or password"
           }
         }
       }
@@ -502,7 +481,7 @@
         }
       }
     },
-    "/restaurants": {
+    "/restaurants/{userId}": {
       "post": {
         "tags": [
           "Restaurant"
@@ -534,7 +513,9 @@
             "description": "Error creating restaurant"
           }
         }
-      },
+      }
+    },
+    "/restaurants": {
       "get": {
         "tags": [
           "Restaurant"
@@ -1820,6 +1801,23 @@
         "accessToken": {
           "type": "string",
           "example": "some access token"
+        }
+      }
+    },
+    "recoveryRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "example": "5f9f9f9f9f9f9f9f9f9f9f9f"
+        },
+        "token": {
+          "type": "string",
+          "example": "1234"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
         }
       }
     }
