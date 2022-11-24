@@ -163,10 +163,16 @@ const doc = {
       name: "Jane Doe",
       accessToken: "some access token"
     },
+    emailRequest: {
+      email: 'test@morfando.com'
+    },
     recoveryRequest: {
       userId: "5f9f9f9f9f9f9f9f9f9f9f9f",
       token: "1234",
       password: "123456",
+    },
+    logoutRequest: {
+      userId: "5f9f9f9f9f9f9f9f9f9f9f9f",
     },
   },
 }

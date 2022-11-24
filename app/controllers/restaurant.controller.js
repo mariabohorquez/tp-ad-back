@@ -33,11 +33,11 @@ exports.create = (req, res) => {
   } */
 
   // Validate request
-  const ownerId = req.body.ownerId;
+  const ownerId = req.body.ownerId
 
   console.log(ownerId)
 
-  if(!ownerId){
+  if (!ownerId) {
     res.status(400).send({ message: 'Owner Id is required!' })
     return
   }
@@ -57,41 +57,39 @@ exports.create = (req, res) => {
     coordinates: req.body.coordinates || {}
   })
 
-  Restaurant.findOne({ 'name': req.body.name })
-  .then(data => {
-    if (data) {
-      return res.status(400).send({
-        message: 'Restaurant already exists'
-      })
-    } else {
+  Restaurant.findOne({ name: req.body.name })
+    .then(data => {
+      if (data) {
+        return res.status(400).send({
+          message: 'Restaurant already exists'
+        })
+      } else {
       // Save Restaurant in the database
-      User.findById(ownerId)
-      .then(user => {
-        restaurant.save().then(savedRestaurant => {
-          user.ownedRestaurants.push(savedRestaurant.id)
-          console.log(savedRestaurant)
-          console.log(user)
-          user.save().then(updatedUser => {
-            res.status(201).send(savedRestaurant)
+        User.findById(ownerId)
+          .then(user => {
+            restaurant.save().then(savedRestaurant => {
+              user.ownedRestaurants.push(savedRestaurant.id)
+              console.log(savedRestaurant)
+              console.log(user)
+              user.save().then(updatedUser => {
+                res.status(201).send(savedRestaurant)
+              }).catch(err => {
+                res.status(500).send({
+                  message: `Error updating the user: ${err}`
+                })
+              })
+            }).catch(err => {
+              res.status(500).send({
+                message: `Error saving the Restaurant: ${err}`
+              })
+            })
           }).catch(err => {
             res.status(500).send({
-              message: `Error updating the user: ${err}`
+              message: `Cannot find user with id ${ownerId}.`
             })
           })
-        }).catch(err => {
-          res.status(500).send({
-            message: `Error saving the Restaurant: ${err}`
-          })
-        })
-      }).catch(err => {
-        res.status(500).send({
-          message: `Cannot find user with id ${ownerId}.`
-        })
-      })
-    }
-  })
-
-  
+      }
+    })
 }
 
 // Retrieve all Restaurants from the database.
@@ -391,52 +389,51 @@ exports.createReview = (req, res) => {
         console.log(review)
 
         Restaurant.findById(restaurantId).populate('reviews').then(restaurant => {
-          if(!restaurant){
+          if (!restaurant) {
             return res.status(404).send({
               message: 'Restaurant not found.'
             })
           }
-            console.log(restaurant)
-            restaurant.reviews.forEach(aReview => {
-              if(aReview.name === user.google.name){
-                return res.status(400).send({
-                  message: `The user with id=${userId}, already made a review!`
-                })
-              }
-            })
-            // Add review to array
-            review.save().then(newReview => {   
-                restaurant.reviews.push(newReview)
-                const reviews = restaurant.reviews
-                console.log('reviews: ' + reviews)
-                let sum = 0
-                reviews.forEach(review => {
-                  sum += review.rating
-                })
-                const averageRating = sum / reviews.length
-                restaurant.averageRating = averageRating
-                restaurant.save().then( updatedRestaurant => {
-                  return res.status(200).send({ message: 'Review posted successfully.' })  
-                })
-                .catch(err => {
-                  console.error(err);
-                  return res.status(500).send({
-                    message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
-                  })
-                })             
+          console.log(restaurant)
+          restaurant.reviews.forEach(aReview => {
+            if (aReview.name === user.google.name) {
+              return res.status(400).send({
+                message: `The user with id=${userId}, already made a review!`
               })
+            }
+          })
+          // Add review to array
+          review.save().then(newReview => {
+            restaurant.reviews.push(newReview)
+            const reviews = restaurant.reviews
+            console.log('reviews: ' + reviews)
+            let sum = 0
+            reviews.forEach(review => {
+              sum += review.rating
+            })
+            const averageRating = sum / reviews.length
+            restaurant.averageRating = averageRating
+            restaurant.save().then(updatedRestaurant => {
+              return res.status(200).send({ message: 'Review posted successfully.' })
+            })
               .catch(err => {
                 console.error(err)
-                return res.status(500).send({ message: err.message || 'Some error occurred while creating the review.'
+                return res.status(500).send({
+                  message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
                 })
               })
-        })
-        .catch(err => {
-          console.error(err);
-          return res.status(500).send({
-            message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
           })
+            .catch(err => {
+              console.error(err)
+              return res.status(500).send({ message: err.message || 'Some error occurred while creating the review.' })
+            })
         })
+          .catch(err => {
+            console.error(err)
+            return res.status(500).send({
+              message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
+            })
+          })
       }
     }
   ).catch(err => {
@@ -667,43 +664,42 @@ exports.createDish = (req, res) => {
 
   console.log(newDish)
   Restaurant.findById(restaurantId).populate('menu').then(restaurant => {
-    if(!restaurant){
+    if (!restaurant) {
       return res.status(404).send({
         message: 'Restaurant not found.'
       })
     }
     console.log(restaurant)
     restaurant.menu.forEach(aDish => {
-      if(aDish.name === newDish.name){
+      if (aDish.name === newDish.name) {
         return res.status(400).send({
-          message: `The Dish=${aDish.name }, already exists!`
+          message: `The Dish=${aDish.name}, already exists!`
         })
       }
     })
-    newDish.save().then(savedDish => {   
-        restaurant.menu.push(savedDish)
-        restaurant.save().then( updatedRestaurant => {
-          return res.status(201).send({ message: 'Dish created successfully.' })  
-        })
+    newDish.save().then(savedDish => {
+      restaurant.menu.push(savedDish)
+      restaurant.save().then(updatedRestaurant => {
+        return res.status(201).send({ message: 'Dish created successfully.' })
+      })
         .catch(err => {
-          console.error(err);
+          console.error(err)
           return res.status(500).send({
             message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
           })
-        })             
-      })
-      .catch(err => {
-        console.error(err);
-        return res.status(500).send({ message: err.message || 'Some error occurred while creating the Dish.'
         })
+    })
+      .catch(err => {
+        console.error(err)
+        return res.status(500).send({ message: err.message || 'Some error occurred while creating the Dish.' })
+      })
+  })
+    .catch(err => {
+      console.error(err)
+      return res.status(500).send({
+        message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
       })
     })
-  .catch(err => {
-    console.error(err);
-    return res.status(500).send({
-      message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
-    })
-  })
 }
 
 // Get all dishes from a restaurant
@@ -762,8 +758,7 @@ exports.findOneDish = (req, res) => {
 
   Dish.findById(dishId)
     .then(data => {
-
-      const dish = data.toJSON();
+      const dish = data.toJSON()
       res.status(200).send(dish)
     })
     .catch(err => {
@@ -1024,38 +1019,37 @@ exports.createCategory = (req, res) => {
 
   // Add category to array
   Restaurant.findById(restaurantId).populate('menuCategories').then(restaurant => {
-    if(!restaurant){
+    if (!restaurant) {
       return res.status(404).send({
         message: 'Restaurant not found.'
       })
     }
     console.log(restaurant)
     restaurant.menuCategories.forEach(aCategory => {
-      if(aCategory === category){
+      if (aCategory === category) {
         return res.status(400).send({
           message: `The Category=${aCategory}, already exists!`
         })
       }
     })
     restaurant.menuCategories.push(category)
-    restaurant.save().then( updatedRestaurant => {
-      return res.status(201).send({ message: 'Category created successfully' })  
+    restaurant.save().then(updatedRestaurant => {
+      return res.status(201).send({ message: 'Category created successfully' })
     })
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send({
-        message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
+      .catch(err => {
+        console.error(err)
+        return res.status(500).send({
+          message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
+        })
       })
-    })             
   })
-  .catch(err => {
-    console.error(err);
-    return res.status(500).send({
-      message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
+    .catch(err => {
+      console.error(err)
+      return res.status(500).send({
+        message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
+      })
     })
-  })
 }
-
 
 // Get all categories from a restaurant
 exports.findAllCategories = (req, res) => {

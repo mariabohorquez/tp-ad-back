@@ -23,7 +23,7 @@ const sendEmail = async (email, subject, code) => {
       html: template
     })
 
-    console.log('email sent sucessfully')
+    console.log('email sent successfully')
   } catch (error) {
     console.log(error, 'email not sent')
   }

@@ -65,6 +65,9 @@ module.exports = mongoose => {
         required: false,
         unique: false
       }
+    },
+    isLoggedIn: {
+      type: Boolean
     }
   }, {
     timestamp: true

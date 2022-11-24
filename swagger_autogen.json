@@ -115,10 +115,12 @@
         "parameters": [
           {
             "name": "userId",
-            "in": "header",
+            "in": "body",
             "description": "Id of user",
-            "required": false,
-            "type": "string"
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/logoutRequest"
+            }
           }
         ],
         "responses": {
@@ -127,6 +129,9 @@
           },
           "400": {
             "description": "Content cannot be empty"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal server error, returns specific error message"
@@ -148,8 +153,7 @@
             "description": "User email",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {}
+              "$ref": "#/definitions/emailRequest"
             }
           }
         ],
@@ -185,39 +189,6 @@
             "schema": {
               "$ref": "#/definitions/recoveryRequest"
             }
-          },
-          {
-            "name": "user",
-            "in": "body",
-            "description": "User information, must specify if it is a user or an owner. If it is an owner, it must specify the custom fields.    If it is a user, it must specify the google fields.",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          {
-            "name": "id",
-            "description": "User id",
-            "type": "string",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "file",
-            "description": "File: must be jpg, jpeg or png",
-            "required": true,
-            "type": "file",
-            "in": "formData"
-          },
-          {
-            "name": "restaurantId",
-            "in": "body",
-            "description": "Restaurant id to change favorite status for",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
           }
         ],
         "responses": {
@@ -225,7 +196,7 @@
             "description": "Password reset"
           },
           "400": {
-            "description": "Restaurant id needs to be filled"
+            "description": "Content cannot be empty"
           },
           "404": {
             "description": "Error finding token or password"
@@ -325,6 +296,12 @@
         "responses": {
           "200": {
             "description": "User successfully  "
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "User not found"
@@ -481,7 +458,7 @@
         }
       }
     },
-    "/restaurants/{userId}": {
+    "/restaurants": {
       "post": {
         "tags": [
           "Restaurant"
@@ -513,9 +490,7 @@
             "description": "Error creating restaurant"
           }
         }
-      }
-    },
-    "/restaurants": {
+      },
       "get": {
         "tags": [
           "Restaurant"
@@ -1804,6 +1779,15 @@
         }
       }
     },
+    "emailRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test@morfando.com"
+        }
+      }
+    },
     "recoveryRequest": {
       "type": "object",
       "properties": {
@@ -1818,6 +1802,15 @@
         "password": {
           "type": "string",
           "example": "123456"
+        }
+      }
+    },
+    "logoutRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "example": "5f9f9f9f9f9f9f9f9f9f9f9f"
         }
       }
     }

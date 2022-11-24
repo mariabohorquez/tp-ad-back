@@ -43,6 +43,7 @@ exports.register = (req, res) => {
         password: req.body.custom.password,
         name: req.body.custom.name
       },
+      isLoggedIn: false,
       coordinates: {
         latitude: req.body.coordinates?.latitude || -34.603722,
         longitude: req.body.coordinates?.longitude || -58.381592
@@ -94,9 +95,12 @@ exports.register = (req, res) => {
     User.findOne({ 'google.email': req.body.google.email })
       .then(data => {
         if (data) {
+          data.isLoggedIn = true
+          data.save()
           return res.status(200).send(data)
         } else {
           // Save User in the database
+          user.isLoggedIn = true
           user
             .save()
             .then(data => {
@@ -168,6 +172,10 @@ exports.login = (req, res) => {
           })
         }
 
+        // Update logged in status
+        data.isLoggedIn = true
+        data.save()
+
         return res.status(200).send({
           id: data._id,
           email: data.custom.email,
@@ -183,17 +191,43 @@ exports.logout = (req, res) => {
   // #swagger.summary = 'Logout a user'
   // #swagger.description = 'Handles logout of a user, must specify if it is a user or an owner to know strategy.'
   /* #swagger.parameters['userId'] = {
-          in: 'header',
+          in: 'body',
           description: 'Id of user',
-          required: false,
-          type: 'string',
+          required: true,
+          schema: { $ref: "#/definitions/logoutRequest" }
   }
   */
   // #swagger.responses[200] = { description: 'Successfully logged out' }
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
-  // TODO: Needs to remove session from mongodb and stuff.
+  const userId = req.body.userId
+
+  if (!userId) {
+    return res.status(400).send({
+      message: 'Content can not be empty!'
+    })
+  }
+
+  User.findById(userId)
+    .then(data => {
+      if (!data) {
+        return res.status(404).send({
+          message: 'User not found'
+        })
+      } else {
+        data.isLoggedIn = false
+        data.save()
+        return res.status(200).send({
+          message: 'Successfully logged out'
+        })
+      }
+    })
+    .catch(err => {
+      return res.status(500).send({
+        message: 'Error retrieving user with id ' + userId + ' ' + err
+      })
+    })
 }
 
 exports.sendRecoveryPassword = (req, res) => {
@@ -204,7 +238,7 @@ exports.sendRecoveryPassword = (req, res) => {
           in: 'body',
           description: 'User email',
           required: true,
-          type: 'string',
+          schema: { $ref: "#/definitions/emailRequest" }
   }
   */
   // #swagger.responses[200] = { description: 'Email sent' }
@@ -396,82 +430,82 @@ exports.delete = async (req, res) => {
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
 
   const userId = req.params.id
-  const password = req.body.password;
-  const email = req.body.email;
+  const password = req.body.password
+  const email = req.body.email
 
-  if (!password){
+  if (!password) {
     return res.status(400).send({
       message: 'Password can not be empty'
     })
   }
 
-  if (!userId){
+  if (!userId) {
     return res.status(400).send({
       message: 'User Id is required'
     })
   }
 
-  if (!email){
+  if (!email) {
     return res.status(400).send({
       message: 'Email is required'
     })
   }
 
   try {
-    var user = await User.findById(userId);
+    let user = await User.findById(userId)
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).send({
       message: 'Could not delete user with id=' + userId + ' with error: ' + error
-    });
+    })
   }
 
-  if (!user){
+  if (!user) {
     return res.status(404).send({
       message: `Cannot delete user with id=${userId}. Maybe the user was not found!`
-    });
+    })
   }
 
-  const samePasswords = user.comparePassword(password);
+  const samePasswords = user.comparePassword(password)
 
-  if (!samePasswords){
+  if (!samePasswords) {
     return res.status(401).send({
-      message: `User password is incorrect`
-    });
+      message: 'User password is incorrect'
+    })
   }
 
-  var userMail = '';
+  let userMail = ''
 
-  if (user.role === 'user'){
-    userMail = user.google.email;
-  }else if (user.role === 'owner'){
-    userMail = user.custom.email;
+  if (user.role === 'user') {
+    userMail = user.google.email
+  } else if (user.role === 'owner') {
+    userMail = user.custom.email
   }
 
-  if (email !== userMail){
+  if (email !== userMail) {
     return res.status(401).send({
-      message: `User email is incorrect`
-    });
+      message: 'User email is incorrect'
+    })
   }
 
   User.findByIdAndRemove(userId, { useFindAndModify: false })
-  .then(data => {
-    if (!data){
-      res.status(404).send({
-        message: `Cannot delete user with id=${id}. Maybe the user was not found!`
-      });
-    }else{
-      res.status(200).send({
-        message: 'User was deleted successfully!'
-      })
-    }
-  })
-  .catch(err => {
-    console.warn(err);
-    res.status(500).send({
-      message: 'Could not delete user with id=' + userId + ' with error: ' + err
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete user with id=${userId}. Maybe the user was not found!`
+        })
+      } else {
+        res.status(200).send({
+          message: 'User was deleted successfully!'
+        })
+      }
     })
-  })
+    .catch(err => {
+      console.warn(err)
+      res.status(500).send({
+        message: 'Could not delete user with id=' + userId + ' with error: ' + err
+      })
+    })
 }
 
 // Upload a user image
