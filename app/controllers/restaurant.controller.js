@@ -762,7 +762,9 @@ exports.findOneDish = (req, res) => {
 
   Dish.findById(dishId)
     .then(data => {
-      res.status(200).send(data)
+
+      const dish = data.toJSON();
+      res.status(200).send(dish)
     })
     .catch(err => {
       res.status(500).send({
