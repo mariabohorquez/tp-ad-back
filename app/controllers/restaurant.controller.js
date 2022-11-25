@@ -271,10 +271,13 @@ exports.findOne = (req, res) => {
 
   Restaurant.findById(id)
     .then(data => {
-      if (!data) { res.status(404).send({ message: 'Not found Restaurant with id ' + id }) } else {
-        if (!data.averageRating) { data.averageRating = 0 }
-
-        res.status(200).send(data)
+      if (!data){
+        res.status(404).send({
+          message : 'Not found Restaurant with id ' + id
+        });
+      }
+      else{
+        res.status(200).send(data.toJSON());
       }
     })
     .catch(err => {
@@ -725,7 +728,12 @@ exports.findAllDishes = (req, res) => {
 
   Restaurant.findById(restaurantId).populate('menu')
     .then(data => {
-      res.status(200).send(data.menu)
+
+      const dishes = data.menu.map(item => {
+        return item.toJSON();
+      })
+
+      res.status(200).send(dishes)
     })
     .catch(err => {
       res.status(500).send({
@@ -758,8 +766,15 @@ exports.findOneDish = (req, res) => {
 
   Dish.findById(dishId)
     .then(data => {
-      const dish = data.toJSON()
-      res.status(200).send(dish)
+
+      if (!data){
+        res.status(404).send({
+          message : `Dish not founded`
+        });
+      }else{
+        const dish = data.toJSON();
+        res.status(200).send(dish)
+      }
     })
     .catch(err => {
       res.status(500).send({
