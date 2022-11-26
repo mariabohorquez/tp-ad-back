@@ -44,7 +44,8 @@ module.exports = mongoose => {
     timestamp: true
   })
 
-  schema.method('toJSON', function () {
+  schema.method('toJSON', async function () {
+    await mongoose.model('dish').populate(this, {path: 'pictures'})
     const { __v, _id, ...object } = this.toObject()
     object.id = _id
     object.price = Number(object.price)

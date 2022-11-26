@@ -102,7 +102,8 @@ module.exports = mongoose => {
 
   schema.index({ coordinates: '2dsphere' })
 
-  schema.method('toJSON', function () {
+  schema.method('toJSON', async function () {
+    await mongoose.model('restaurant').populate(this, {path: 'pictures'})
     const { __v, _id, ...object } = this.toObject()
     object.id = _id;
     object.averageRating = Number(object.averageRating);
