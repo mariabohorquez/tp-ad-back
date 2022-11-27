@@ -50,12 +50,15 @@ exports.create = (req, res) => {
   // Create a Restaurant
   const restaurant = new Restaurant({
     name: req.body.name,
-    hours: req.body.hours,
     priceRange: req.body.priceRange,
     address: req.body.address || {},
     restaurantTypes: req.body.restaurantTypes,
-    coordinates: req.body.coordinates || {}
+    coordinates: req.body.coordinates || {},
+    openingTimes : req.body.openingTimes.map(item => {return Date(item)}),
+    closingTimes : req.body.closingTimes.map(item => {return Date(item)}),
+    isClosedOverwrite : req.body.isClosedOverwrite
   })
+
 
   Restaurant.findOne({ name: req.body.name })
     .then(data => {
@@ -69,8 +72,6 @@ exports.create = (req, res) => {
           .then(user => {
             restaurant.save().then(savedRestaurant => {
               user.ownedRestaurants.push(savedRestaurant.id)
-              console.log(savedRestaurant)
-              console.log(user)
               user.save().then(updatedUser => {
                 res.status(201).send(savedRestaurant)
               }).catch(err => {
@@ -329,7 +330,7 @@ exports.update = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send(data)
+      } else res.status(200).send(data.toJSON())
     })
     .catch(err => {
       res.status(500).send({
@@ -374,8 +375,6 @@ exports.createReview = (req, res) => {
     })
   }
 
-  console.log('Review body: ' + req.body)
-
   User.findById(userId).then(
     user => {
       if (!user) {
@@ -389,15 +388,12 @@ exports.createReview = (req, res) => {
           comment: req.body.comment
         })
 
-        console.log(review)
-
         Restaurant.findById(restaurantId).populate('reviews').then(restaurant => {
           if (!restaurant) {
             return res.status(404).send({
               message: 'Restaurant not found.'
             })
           }
-          console.log(restaurant)
           restaurant.reviews.forEach(aReview => {
             if (aReview.name === user.google.name) {
               return res.status(400).send({
@@ -409,7 +405,6 @@ exports.createReview = (req, res) => {
           review.save().then(newReview => {
             restaurant.reviews.push(newReview)
             const reviews = restaurant.reviews
-            console.log('reviews: ' + reviews)
             let sum = 0
             reviews.forEach(review => {
               sum += review.rating
@@ -420,7 +415,6 @@ exports.createReview = (req, res) => {
               return res.status(200).send({ message: 'Review posted successfully.' })
             })
               .catch(err => {
-                console.error(err)
                 return res.status(500).send({
                   message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
                 })
@@ -652,7 +646,6 @@ exports.createDish = (req, res) => {
     })
   }
 
-  console.log(req.body.ingredients)
 
   const newDish = new Dish({
     name: req.body.name,
@@ -665,7 +658,6 @@ exports.createDish = (req, res) => {
     discounts: req.body.discounts || 0
   })
 
-  console.log(newDish)
   Restaurant.findById(restaurantId).populate('menu').then(restaurant => {
     if (!restaurant) {
       return res.status(404).send({
