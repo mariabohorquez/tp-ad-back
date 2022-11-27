@@ -271,14 +271,21 @@ exports.findOne = (req, res) => {
   const id = req.params.id
 
   Restaurant.findById(id)
-    .then(data => {
+    .then(async data => {
       if (!data){
         res.status(404).send({
           message : 'Not found Restaurant with id ' + id
         });
       }
       else{
-        res.status(200).send(data.toJSON());
+        try {
+          const resto = await data.toJSON();
+          res.status(200).send(resto);
+        } catch (error) {
+          res
+          .status(500)
+          .send({ message: 'Error retrieving Restaurant with id=' + id + ' with error: ' + error })
+        }
       }
     })
     .catch(err => {
