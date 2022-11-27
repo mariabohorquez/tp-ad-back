@@ -144,16 +144,16 @@ exports.findAll = (req, res) => {
      description: 'Some error occurred while retrieving restaurants.',
     }
   */
-
+  
   const name = req.query.name || ''
   console.log('name ' + name)
   const priceRange = req.query.priceRange ? req.query.priceRange.split(/[ ,]+/) : [new RegExp('.*')]
   console.log('priceRange: ' + priceRange)
-  const restaurantTypes = req.query.restaurantTypes ? req.query.restaurantTypes.split(/[ ,]+/) : [new RegExp('.*')]
+  const restaurantTypes = req.query.restaurantTypes ? req.query.restaurantTypes : [new RegExp('.*')]
   console.log('restaurantTypes: ' + restaurantTypes)
-  const minRating = req.query.minRating || 0
+  const minRating = req.query.minRating ? Number(req.query.minRating) : 0
   console.log('minRating: ' + minRating)
-  const maxDistance = req.query.maxDistance || 100000 // distance in km
+  const maxDistance = req.query.maxDistance && Number(req.query.maxDistance) > 0 ? Number(req.query.maxDistance) : 100000 // distance in km
   console.log('maxDistance: ' + maxDistance)
 
   User.findById(req.query.userId).then(
