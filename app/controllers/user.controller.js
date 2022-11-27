@@ -95,6 +95,10 @@ exports.register = (req, res) => {
     User.findOne({ 'google.email': req.body.google.email })
       .then(data => {
         if (data) {
+          data.coordinates = {
+            latitude: req.body.coordinates?.latitude || -34.603722,
+            longitude: req.body.coordinates?.longitude || -58.381592
+          }
           data.isLoggedIn = true
           data.save()
           return res.status(200).send(data)
