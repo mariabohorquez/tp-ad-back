@@ -78,11 +78,32 @@ module.exports = mongoose => {
 
   schema.index({ coordinates: '2dsphere' })
 
-  schema.method('toJSON', async function () {
-    await mongoose.model('restaurant').populate(this, {path: 'pictures'})
+  schema.methods.toRestaurantCardObject = function toRestaurantCardObject(user = undefined){
+    
+    const { __v, _id, ...object } = this.toObject()
+
+    const restCard = {
+      name: object.name,
+      address: object.address.streetName + ' ' + object.address.streetNumber,
+      score: Number(object.averageRating).toFixed(2),
+      restaurantId: _id,
+      isFavorite: user ? user.favoriteRestaurants.includes(object._id) : false,
+      pictures : object.pictures.map(item => item.data.toString('base64'))
+    }
+
+    return restCard
+  }
+
+  schema.method('toJSON', function () {
     const { __v, _id, ...object } = this.toObject()
     object.id = _id;
     object.averageRating = Number(object.averageRating);
+
+    if (object.pictures.length > 0 && object.pictures[0].data)
+      object.pictures = object.pictures.map(item => item.data.toString('base64'))
+    else
+      object.pictures = [];
+
     return object
   })
 

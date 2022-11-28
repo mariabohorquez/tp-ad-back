@@ -699,24 +699,11 @@ exports.findAllRestaurants = (req, res) => {
         message: `User Id ${id} can not be found`
       })
     } else {
+
       const restaurants = data.ownedRestaurants.map(item => {
-        const restInfo = {
-          name: item.name,
-          address: item.address.neighborhood + ' ' + item.address.streetNumber,
-          score: Number(item.averageRating),
-          restaurantId: item.id,
-          pictures: item.pictures
-        }
+        return item.toRestaurantCardObject();
+      });
 
-        const img64 = restInfo.pictures.map(element => {
-          const str = element.data.toString('base64')
-          return str
-        })
-
-        restInfo.pictures = img64
-
-        return restInfo
-      })
 
       res.status(200).send(restaurants)
     }

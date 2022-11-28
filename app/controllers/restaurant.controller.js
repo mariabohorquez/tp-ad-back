@@ -95,7 +95,7 @@ exports.create = (req, res) => {
 
 // Retrieve all Restaurants from the database.
 // Can be filtered and sorted.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   /* #swagger.tags = ['Restaurant']
      #swagger.summary = 'Retrieve all restaurants, can be filtered.'
      #swagger.description = `Retrieve all restaurants from the database,
@@ -153,101 +153,75 @@ exports.findAll = (req, res) => {
   console.log('restaurantTypes: ' + restaurantTypes)
   const minRating = req.query.minRating ? Number(req.query.minRating) : 0
   console.log('minRating: ' + minRating)
-  const maxDistance = req.query.maxDistance && Number(req.query.maxDistance) > 0 ? Number(req.query.maxDistance) : 100000 // distance in km
-  console.log('maxDistance: ' + maxDistance)
+  const maxDistance = req.query.maxDistance && Number(req.query.maxDistance) > 0 ? Number(req.query.maxDistance) : 10 // distance in km
+  console.log('maxDistance: ' + maxDistance);
 
-  User.findById(req.query.userId).then(
-    user => {
-      console.log('User at coordinates: ' + user.coordinates)
 
-      Restaurant.aggregate(
-        [
-          {
-            $geoNear: {
-              near: {
-                type: 'Point',
-                coordinates: [
-                  user.coordinates.longitude, user.coordinates.latitude
-                ]
-              },
-              distanceField: 'dist.calculated',
-              maxDistance: maxDistance * 1000, // distance in meters
-              key: 'coordinates',
-              spherical: true
-            }
-          },
-          {
-            $match: {
-              name: {
-                $regex: name,
-                $options: 'i'
-              },
-              averageRating: {
-                $gte: minRating
-              },
-              restaurantTypes: {
-                $in: restaurantTypes
-              },
-              priceRange: {
-                $in: priceRange
-              }
-            }
-          }
-        ]
-      )
-        .then(async restaurants => {
-          try {
-            await Restaurant.populate(restaurants, {
-              path: 'pictures'
-            })
-          } catch (error) {
-            res.status(500).send({
-              message:
-              error.message || 'Some error occurred while retrieving restaurants.'
-            })
-          }
+  try {
+    var user = await User.findById(req.query.userId);
 
-          const favoriteRestaurants = user.favoriteRestaurants
-          const returnData = restaurants.map(item => {
-            const restInfo = {
-              name: item.name,
-              address: item.address.neighborhood + ' ' + item.address.streetNumber,
-              score: Number(item.averageRating).toFixed(2),
-              restaurantId: item._id,
-              pictures: item.pictures,
-              isFavorite: favoriteRestaurants.includes(item._id)
-            }
-
-            const img64 = restInfo.pictures.map(element => {
-              const str = element.data.toString('base64')
-              return str
-            })
-
-            restInfo.pictures = img64
-
-            return restInfo
-          })
-
-          res.status(200).send(returnData)
-        })
-        .catch(err => {
-          console.error(err)
-          res.status(500).send({
-            message:
-          err.message || 'Some error occurred while retrieving restaurants.'
-          })
-        })
-    }
-  ).catch(
-    err => {
-      console.error(err)
-
+    if (!user){
       res.status(500).send({
         message:
-      err.message || 'User not send.'
+        err.message || 'User not send.'
       })
+    }else{
+      console.log('User at coordinates: ' + user.coordinates)
     }
-  )
+
+    var restaurants = await Restaurant.aggregate(
+      [
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [
+                user.coordinates.latitude, user.coordinates.longitude
+              ]
+            },
+            distanceField: 'dist.calculated',
+            maxDistance: maxDistance * 1000, // distance in meters
+            key: 'coordinates',
+            spherical: true
+          }
+        },
+        {
+          $match: {
+            name: {
+              $regex: name,
+              $options: 'i'
+            },
+            priceRange: {
+              $in: priceRange
+            },
+            averageRating: {
+              $gte: minRating
+            },
+            restaurantTypes: {
+              $in: restaurantTypes
+            },
+          }
+        }
+      ]
+    );
+
+    await Restaurant.populate(restaurants, {
+      path: 'pictures'
+    });
+
+    const returnData = restaurants.map(item => {
+      const resto = new Restaurant(item);
+      return resto.toRestaurantCardObject(user);
+    });
+
+    res.status(200).send(returnData);
+
+  } catch (error) {
+    res.status(500).send({
+      message:
+      err.message || 'Some error occurred while retrieving restaurants.'
+    })
+  }
 }
 
 // Find a single Restaurant with an id
@@ -279,8 +253,8 @@ exports.findOne = (req, res) => {
       }
       else{
         try {
-          const resto = await data.toJSON();
-          res.status(200).send(resto);
+          await data.populate('pictures');
+          res.status(200).send(data.toJSON());
         } catch (error) {
           res
           .status(500)
@@ -330,6 +304,7 @@ exports.update = (req, res) => {
   }
 
   const id = req.params.id
+  
 
   Restaurant.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
     .then(data => {
@@ -337,7 +312,9 @@ exports.update = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send(data.toJSON())
+      } else{
+        res.status(200).send(data.toJSON())
+      } 
     })
     .catch(err => {
       res.status(500).send({
@@ -419,7 +396,7 @@ exports.createReview = (req, res) => {
             const averageRating = sum / reviews.length
             restaurant.averageRating = averageRating
             restaurant.save().then(updatedRestaurant => {
-              return res.status(200).send({ message: 'Review posted successfully.' })
+              return res.status(200).send(updatedRestaurant);
             })
               .catch(err => {
                 return res.status(500).send({
