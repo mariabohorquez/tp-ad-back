@@ -87,7 +87,7 @@ module.exports = mongoose => {
       address: object.address.streetName + ' ' + object.address.streetNumber,
       score: Number(object.averageRating).toFixed(2),
       restaurantId: _id,
-      isFavorite: user ? user.favoriteRestaurants.includes(object._id) : false,
+      isFavorite: user ? user.favoriteRestaurants.includes(_id) : false,
       pictures : object.pictures.map(item => item.data.toString('base64'))
     }
 

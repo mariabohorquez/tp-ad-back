@@ -579,7 +579,7 @@ exports.uploadUserImage = (req, res) => {
 }
 
 // Find all favorite restaurants of a user
-exports.findAllFavoriteRestaurants = (req, res) => {
+exports.findAllFavoriteRestaurants = async (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Get all favorite restaurants of a user'
   // #swagger.description = 'Gets all favorite restaurants of a user via its id.'
@@ -591,40 +591,38 @@ exports.findAllFavoriteRestaurants = (req, res) => {
 
   const id = req.params.id
 
-  User.findById(id).populate('favoriteRestaurants')
-    .then(async data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot find user with id ${id}.`
-        })
-      } else {
-        try {
-          await Restaurant.populate(data.favoriteRestaurants, {
-            path: 'pictures'
-          })
-        } catch (err) {
-          res.status(500).send({
-            message:
-            err.message || 'Some error occurred while retrieving restaurants.'
-          })
+  try {
+    var user = await User.findById(id);
+
+    if (!user){
+      res.status(404).send({
+        message: `Cannot find user with id ${id}.`
+      })
+    }else{
+      
+      await user.populate({
+        path: 'favoriteRestaurants',
+        populate: {
+          path: 'pictures',
+          model: 'image'
         }
+      });
 
-        const restaurants = data.favoriteRestaurants.map(item => {
-          const restInfo = {
-            name: item.name,
-            address: item.address.neighborhood + ' ' + item.address.streetNumber,
-            score: Number(item.averageRating).toFixed(2),
-            restaurantId: item._id,
-            pictures: [], // TO DO : populate images
-            isFavorite: true
-          }
+      const restaurants = user.favoriteRestaurants.map(item => {
+        const ret = item.toRestaurantCardObject();
+        ret.isFavorite = true;
+        return ret;
+      })
 
-          return restInfo
-        })
+      res.status(200).send(restaurants)
+    }
 
-        res.status(200).send(restaurants)
-      }
+  } catch (error) {
+    res.status(500).send({
+            message:
+            error.message || 'Some error occurred while retrieving restaurants.'
     })
+  }
 }
 
 // Add a restaurant to favorites
