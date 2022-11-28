@@ -219,7 +219,7 @@ exports.findAll = async (req, res) => {
   } catch (error) {
     res.status(500).send({
       message:
-      err.message || 'Some error occurred while retrieving restaurants.'
+      error.message || 'Some error occurred while retrieving restaurants.'
     })
   }
 }
@@ -378,13 +378,15 @@ exports.createReview = (req, res) => {
               message: 'Restaurant not found.'
             })
           }
-          restaurant.reviews.forEach(aReview => {
+
+          for (const aReview of restaurant.reviews) {
             if (aReview.name === user.google.name) {
               return res.status(400).send({
-                message: `The user with id=${userId}, already made a review!`
+                message: `You can't create more than one of review from same user account`
               })
             }
-          })
+          }
+          
           // Add review to array
           review.save().then(newReview => {
             restaurant.reviews.push(newReview)
@@ -405,12 +407,12 @@ exports.createReview = (req, res) => {
               })
           })
             .catch(err => {
-              console.error(err)
+              console.warn(err)
               return res.status(500).send({ message: err.message || 'Some error occurred while creating the review.' })
             })
         })
           .catch(err => {
-            console.error(err)
+            console.warn(err)
             return res.status(500).send({
               message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
             })
@@ -418,7 +420,7 @@ exports.createReview = (req, res) => {
       }
     }
   ).catch(err => {
-    console.err(err)
+    console.warn(err)
 
     return res.status(500).send({
       message: 'Error retrieving user with id=' + userId + ' with error: ' + err
@@ -662,19 +664,19 @@ exports.createDish = (req, res) => {
         return res.status(201).send({ message: 'Dish created successfully.' })
       })
         .catch(err => {
-          console.error(err)
+          console.warn(err)
           return res.status(500).send({
             message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
           })
         })
     })
       .catch(err => {
-        console.error(err)
+        console.warn(err)
         return res.status(500).send({ message: err.message || 'Some error occurred while creating the Dish.' })
       })
   })
     .catch(err => {
-      console.error(err)
+      console.warn(err)
       return res.status(500).send({
         message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
       })
@@ -1028,14 +1030,14 @@ exports.createCategory = (req, res) => {
       return res.status(201).send({ message: 'Category created successfully' })
     })
       .catch(err => {
-        console.error(err)
+        console.warn(err)
         return res.status(500).send({
           message: 'Error updating Restaurant with id=' + restaurantId + ' with error: ' + err
         })
       })
   })
     .catch(err => {
-      console.error(err)
+      console.warn(err)
       return res.status(500).send({
         message: 'Error retrieving Restaurant with id=' + restaurantId + ' with error: ' + err
       })
