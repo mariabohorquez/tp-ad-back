@@ -43,7 +43,7 @@ exports.register = (req, res) => {
         password: req.body.custom.password,
         name: req.body.custom.name
       },
-      isLoggedIn: false,
+      isLoggedIn: true,
       coordinates: {
         latitude: req.body.coordinates?.latitude || -34.603722,
         longitude: req.body.coordinates?.longitude || -58.381592
@@ -61,7 +61,7 @@ exports.register = (req, res) => {
           owner
             .save()
             .then(data => {
-              return res.status(201).send(data)
+              return res.status(201).send(data.toUserObject())
             })
             .catch(err => {
               return res.status(500).send({
@@ -88,27 +88,29 @@ exports.register = (req, res) => {
       coordinates: {
         latitude: req.body.coordinates?.latitude || -34.603722,
         longitude: req.body.coordinates?.longitude || -58.381592
-      }
+      },
+      isLoggedIn : true
     })
 
     // If the user already exists, don't create it again
     User.findOne({ 'google.email': req.body.google.email })
-      .then(data => {
+      .then(async data => {
         if (data) {
           data.coordinates = {
             latitude: req.body.coordinates?.latitude || -34.603722,
             longitude: req.body.coordinates?.longitude || -58.381592
           }
           data.isLoggedIn = true
-          data.save()
-          return res.status(200).send(data)
+          await data.save();
+          await data.populate('profilePicture')
+          return res.status(200).send(data.toUserObject());
         } else {
           // Save User in the database
-          user.isLoggedIn = true
           user
             .save()
             .then(data => {
-              return res.status(201).send(data)
+
+              return res.status(201).send(data.toUserObject())
             })
             .catch(err => {
               return res.status(500).send({
@@ -363,7 +365,7 @@ exports.findOne = (req, res) => {
 
 // Update a user by the id in the request
 // TODO: this method overwrites the entire subdocument, not just the fields that are being updated
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   // #swagger.tags = ['User']
   // #swagger.summary = 'Update a user with id'
   // #swagger.description = 'Updates a user via its id.'
@@ -381,44 +383,46 @@ exports.update = (req, res) => {
   // #swagger.responses[400] = { description: 'Content cannot be empty' }
   // #swagger.responses[404] = { description: 'User not found' }
   // #swagger.responses[500] = { description: 'Internal server error, returns specific error message' }
-
   const id = req.params.id
-  if (!req.body) {
+  if (!req.body || !id) {
     return res.status(400).send({
       message: 'Data to update cannot be empty!'
     })
   }
 
-  const name = req.body.name
+  const name = req.body.name;
 
-  User.findById(id)
-    .then(user => {
-      if (!user) {
-        res.status(404).send({
-          message: `Cannot update User with id=${id}. Maybe User was not found!`
-        })
+
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user){
+      res.status(404).send({
+        message: `Cannot update User with id=${id}. Maybe User was not found!`
+      })
+    }else{
+      if (user.role === 'user') {
+        user.google.name = name
+      } else if (user.role === 'owner') {
+        user.custom.name = name
+      }
+
+      const savedUser = await user.save();
+      if (savedUser) {
+        res.status(200).send(savedUser.toUserObject())
       } else {
-        if (user.role === 'user') {
-          user.google.name = name
-        } else if (user.role === 'owner') {
-          user.custom.name = name
-        }
-
-        user.save().then(newUser => {
-          if (newUser) {
-            res.status(200).send(newUser)
-          } else {
-            res.status(500).send({
-              message: `Cannot update User with id=${id}. User Role undefined`
-            })
-          }
-        }).catch(err => {
-          res.status(500).send({
-            message: 'Error updating User with id=' + id + ' with error: ' + err
-          })
+        res.status(500).send({
+          message: `Cannot update User with id=${id}. User Role undefined`
         })
       }
+    }
+
+  } catch (error) {
+    res.status(500).send({
+      message: 'Error updating User with id=' + id + ' with error: ' + error
     })
+  }
 }
 
 // Delete a user with the specified id in the request
@@ -554,10 +558,9 @@ exports.uploadUserImage = (req, res) => {
     .then(user => {
       image.save().then(savedImage => {
         user.profilePicture = savedImage.id
-        console.log(savedImage)
-        console.log(user)
-        user.save().then(updatedUser => {
-          res.status(200).send(updatedUser)
+        user.save().then(async updatedUser => {
+          await updatedUser.populate('profilePicture');
+          res.status(200).send(updatedUser.toUserObject());
         }).catch(err => {
           res.status(500).send({
             message: `Error updating the user: ${err}`

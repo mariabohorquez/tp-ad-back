@@ -110,6 +110,43 @@ module.exports = mongoose => {
     return data
   }
 
+  schema.methods.toUserObject = function toUserObject () {
+    const { __v, _id, ...object } = this.toObject();
+
+    let user = {
+      
+    };
+
+    const isUser = object.role === 'user';
+    user.id = _id;
+    user.role = object.role;
+    user.name = isUser ? object.google.name : object.custom.name;
+    user.email = isUser ? object.google.email : object.custom.email;
+    user.coordinates = object.coordinates;
+    user.isLoggedIn = object.isLoggedIn;
+    user.favoriteRestaurants = object.favoriteRestaurants;
+    user.ownedRestaurants = object.ownedRestaurants;
+
+    if (object.profilePicture.data)
+      user.profilePicture = object.profilePicture.data.toString('base64');
+    else
+      user.profilePicture = object.profilePicture;
+    
+    return user;
+  }
+ 
+  schema.method('toJSON', function () {
+    const { __v, _id, ...object } = this.toObject()
+
+    object.id = _id;
+
+    if (object.profilePicture.data)
+      object.profilePicture = object.profilePicture.data.toString('base64');
+
+    return object;
+  })
+
+
   const User = mongoose.model('user', schema)
   return User
 }
