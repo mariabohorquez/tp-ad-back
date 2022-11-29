@@ -1,4 +1,12 @@
+const ImageSchema = require('./image.schema');
+
 module.exports = mongoose => {
+  const ImageSchema = mongoose.Schema({
+    data: Buffer,
+    name: String,
+    type: String
+  })
+
   const schema = mongoose.Schema({
     name: {
       type: String,
@@ -19,10 +27,6 @@ module.exports = mongoose => {
       required: true,
       unique: false
     },
-    pictures: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'image'
-    }],
     ingredients: {
       type: String, // fresa, leche, azucar
       required: true,
@@ -39,7 +43,8 @@ module.exports = mongoose => {
       required: false,
       unique: false,
       default: false
-    }
+    },
+    pictures : [ImageSchema],
   }, {
     timestamp: true
   })
@@ -49,6 +54,10 @@ module.exports = mongoose => {
     object.id = _id
     object.price = Number(object.price)
     object.discounts = Number(object.discounts)
+    object.pictures = object.pictures.map(item => {
+      return item.data.toString('base64');
+    })
+
     return object
   })
 

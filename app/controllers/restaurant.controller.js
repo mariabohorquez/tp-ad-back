@@ -628,20 +628,39 @@ exports.createDish = (req, res) => {
 
   if (!req.body) {
     return res.status(400).send({
-      message: 'Data to update cannot be empty!'
+      message: 'Data of Dish cannot be empty!'
     })
   }
 
+  if (!req.file) {
+    return res.status(400).send({
+      message: 'Image of Dish cannot be empty!'
+    })
+  }
 
+  let images = [];
+
+  const image = {
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    data: new Buffer.from(req.file.buffer, 'base64')
+  }
+
+  if (!allowedImageFormats.includes(image.type)) {
+    return res.status(400).send({ message: `Please upload a valid image format: ${allowedImageFormats}` })
+  }
+
+  images.push(image);
+  
   const newDish = new Dish({
     name: req.body.name,
     category: req.body.category,
     price: req.body.price,
-    picture: req.body.picture,
-    ingredients: req.body.ingredients.toString(),
+    ingredients: req.body.ingredients,
     isVegan: req.body.isVegan,
     isGlutenFree: req.body.isGlutenFree,
-    discounts: req.body.discounts || 0
+    discounts: req.body.discounts || 0,
+    pictures : images,
   })
 
   Restaurant.findById(restaurantId).populate('menu').then(restaurant => {

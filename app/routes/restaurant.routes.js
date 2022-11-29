@@ -29,7 +29,7 @@ module.exports = app => {
   router.post('/restaurants/:restaurantId/image', multerUploader.single('file'), restaurants.uploadRestaurantImage)
 
   // Dishes CRUD
-  router.post('/restaurants/:restaurantId/dishes', restaurants.createDish)
+  router.post('/restaurants/:restaurantId/dishes', multerUploader.single('file'), restaurants.createDish)
   router.get('/restaurants/:restaurantId/dishes', restaurants.findAllDishes)
   router.get('/restaurants/:restaurantId/dishes/:dishId', restaurants.findOneDish)
   router.patch('/restaurants/:restaurantId/dishes/:dishId', restaurants.updateDish)
