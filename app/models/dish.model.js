@@ -1,10 +1,9 @@
-const ImageSchema = require('./image.schema');
 
 module.exports = mongoose => {
   const ImageSchema = mongoose.Schema({
-    data: Buffer,
-    name: String,
-    type: String
+    fileName: String,
+    type: String,
+    uri: Buffer,
   })
 
   const schema = mongoose.Schema({
@@ -54,8 +53,15 @@ module.exports = mongoose => {
     object.id = _id
     object.price = Number(object.price)
     object.discounts = Number(object.discounts)
+
     object.pictures = object.pictures.map(item => {
-      return item.data.toString('base64');
+      const newItem = {
+        fileName : item.fileName,
+        type : item.type,
+        id : item._id,
+        uri : item.uri.toString('base64')
+      }
+      return newItem;
     })
 
     return object

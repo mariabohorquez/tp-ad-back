@@ -632,26 +632,15 @@ exports.createDish = (req, res) => {
     })
   }
 
-  if (!req.file) {
-    return res.status(400).send({
-      message: 'Image of Dish cannot be empty!'
-    })
-  }
+  let images = req.body.pictures.map(item => {
+    const image = {
+      fileName : item.fileName,
+      type : item.type,
+      uri : new Buffer(item.base64, 'base64'),
+    }
+    return image;
+  });
 
-  let images = [];
-
-  const image = {
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    data: new Buffer.from(req.file.buffer, 'base64')
-  }
-
-  if (!allowedImageFormats.includes(image.type)) {
-    return res.status(400).send({ message: `Please upload a valid image format: ${allowedImageFormats}` })
-  }
-
-  images.push(image);
-  
   const newDish = new Dish({
     name: req.body.name,
     category: req.body.category,
@@ -809,11 +798,34 @@ exports.updateDish = (req, res) => {
   const id = req.params.restaurantId
   const dishId = req.params.dishId
 
+  console.log('Edit Dish Req: ', req);
+
   if (!req.body) {
     return res.status(400).send({
       message: 'Data to update cannot be empty!'
     })
   }
+
+  const images = [];
+
+  req.body.pictures.forEach((item, idx) => {
+    const image = {
+      fileName : item.fileName,
+      type : item.type,
+      uri : '',
+    };
+
+    if (item.id){
+      image.uri = new Buffer(item.uri, 'base64');
+    }
+    else{
+      image.uri = new Buffer(item.base64, 'base64')
+    }
+
+    images.push(image);
+  });
+  
+  req.body.pictures = images;
 
   Dish.findOneAndUpdate({ _id: dishId },
     { $set: req.body },

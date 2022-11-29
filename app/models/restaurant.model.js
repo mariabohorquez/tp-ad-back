@@ -97,7 +97,7 @@ module.exports = mongoose => {
   schema.method('toJSON', function () {
     const { __v, _id, ...object } = this.toObject()
     object.id = _id;
-    object.averageRating = Number(object.averageRating);
+    object.averageRating = Number(object.averageRating).toFixed(2);
 
     if (object.pictures.length > 0 && object.pictures[0].data)
       object.pictures = object.pictures.map(item => item.data.toString('base64'))
