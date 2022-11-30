@@ -47,6 +47,15 @@ exports.create = (req, res) => {
     return
   }
 
+  let images = req.body.pictures.map(item => {
+    const image = {
+      fileName : item.fileName,
+      type : item.type,
+      uri : new Buffer(item.base64, 'base64'),
+    }
+    return image;
+  });
+
   // Create a Restaurant
   const restaurant = new Restaurant({
     name: req.body.name,
@@ -56,10 +65,10 @@ exports.create = (req, res) => {
     coordinates: req.body.coordinates || {},
     openingTimes : req.body.openingTimes.map(item => {return Date(item)}),
     closingTimes : req.body.closingTimes.map(item => {return Date(item)}),
-    isClosedOverwrite : req.body.isClosedOverwrite
+    isClosedOverwrite : req.body.isClosedOverwrite,
+    pictures : images
   })
-
-
+  
   Restaurant.findOne({ name: req.body.name })
     .then(data => {
       if (data) {

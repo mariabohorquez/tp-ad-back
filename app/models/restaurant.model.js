@@ -1,4 +1,10 @@
 module.exports = mongoose => {
+  const ImageSchema = mongoose.Schema({
+    fileName: String,
+    type: String,
+    uri: Buffer,
+  });
+
   const schema = mongoose.Schema(
     {
       name: {
@@ -68,10 +74,7 @@ module.exports = mongoose => {
         required: false,
         default: 0
       },
-      pictures: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'image'
-      }]
+      pictures : [ImageSchema]
     },
     { timestamps: true }
   )
@@ -88,7 +91,15 @@ module.exports = mongoose => {
       score: Number(object.averageRating).toFixed(2),
       restaurantId: _id,
       isFavorite: user ? user.favoriteRestaurants.includes(_id) : false,
-      pictures : object.pictures.map(item => item.data.toString('base64'))
+      pictures : object.pictures = object.pictures.map(item => {
+        const newItem = {
+          fileName : item.fileName,
+          type : item.type,
+          id : item._id,
+          uri : item.uri.toString('base64')
+        }
+        return newItem;
+      })
     }
 
     return restCard
@@ -99,10 +110,15 @@ module.exports = mongoose => {
     object.id = _id;
     object.averageRating = Number(object.averageRating).toFixed(2);
 
-    if (object.pictures.length > 0 && object.pictures[0].data)
-      object.pictures = object.pictures.map(item => item.data.toString('base64'))
-    else
-      object.pictures = [];
+    object.pictures = object.pictures.map(item => {
+      const newItem = {
+        fileName : item.fileName,
+        type : item.type,
+        id : item._id,
+        uri : item.uri.toString('base64')
+      }
+      return newItem;
+    })
 
     return object
   })
