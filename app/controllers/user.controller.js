@@ -102,7 +102,6 @@ exports.register = (req, res) => {
           }
           data.isLoggedIn = true
           await data.save();
-          await data.populate('profilePicture')
           return res.status(200).send(data.toUserObject());
         } else {
           // Save User in the database
