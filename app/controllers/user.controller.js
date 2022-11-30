@@ -1,12 +1,13 @@
 const db = require('../models')
-const authConfig = require('../config/auth.config.js')
 const sendEmail = require('./sendEmail.controller.js')
-const crypto = require('crypto')
 const allowedImageFormats = require('./imageSupport.js')
 const User = db.users
 const Image = db.images
 const Token = db.tokens
-const Restaurant = db.restaurants
+
+// jwt
+const jwt = require('jsonwebtoken')
+const authConfig = require('../config/auth.config.js')
 
 exports.register = (req, res) => {
   // #swagger.tags = ['Auth']
@@ -74,7 +75,16 @@ exports.register = (req, res) => {
   }
 
   if (req.body.role === 'user') {
-    console.log('Registering user')
+    console.log('Trying to register/login google user')
+
+    // Generate jwt token
+    const token = jwt.sign(
+      { id: req.body.google.id, email: req.body.google.email },
+      authConfig.secret,
+      {
+        expiresIn: '2h'
+      }
+    )
 
     // Create a User
     const user = new User({
@@ -89,7 +99,8 @@ exports.register = (req, res) => {
         latitude: req.body.coordinates?.latitude || -34.603722,
         longitude: req.body.coordinates?.longitude || -58.381592
       },
-      isLoggedIn : true
+      isLoggedIn: true,
+      token
     })
 
     // If the user already exists, don't create it again
@@ -101,8 +112,10 @@ exports.register = (req, res) => {
             longitude: req.body.coordinates?.longitude || -58.381592
           }
           data.isLoggedIn = true
-          await data.save();
-          return res.status(200).send(data.toUserObject());
+          data.token = token
+          await data.save()
+
+          return res.status(200).send(data.toUserObject())
         } else {
           // Save User in the database
           user
@@ -176,15 +189,24 @@ exports.login = (req, res) => {
           })
         }
 
-        // Update logged in status
+        const token = jwt.sign(
+          { id: data._id, email: data.email },
+          authConfig.secret,
+          {
+            expiresIn: '2h'
+          }
+        )
+
+        // Update logged in status and token
         data.isLoggedIn = true
+        data.token = token
         data.save()
 
         return res.status(200).send({
           id: data._id,
           email: data.custom.email,
           name: data.custom.name,
-          accessToken: 'this is a token'
+          accessToken: token
         })
       }
     })
@@ -388,44 +410,42 @@ exports.update = async (req, res) => {
     })
   }
 
-  const name = req.body.name;
-  const pictures = [];
+  const name = req.body.name
+  const pictures = []
 
   req.body.pictures.forEach((item, idx) => {
     const image = {
-      fileName : item.fileName,
-      type : item.type,
-      uri : '',
-    };
-
-    if (item.id){
-      image.uri = new Buffer(item.uri, 'base64');
+      fileName: item.fileName,
+      type: item.type,
+      uri: ''
     }
-    else{
+
+    if (item.id) {
+      image.uri = new Buffer(item.uri, 'base64')
+    } else {
       image.uri = new Buffer(item.base64, 'base64')
     }
 
-    pictures.push(image);
-  });
-
+    pictures.push(image)
+  })
 
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id)
 
-    if (!user){
+    if (!user) {
       res.status(404).send({
         message: `Cannot update User with id=${id}. Maybe User was not found!`
       })
-    }else{
+    } else {
       if (user.role === 'user') {
         user.google.name = name
       } else if (user.role === 'owner') {
         user.custom.name = name
       }
 
-      user.pictures = pictures;
+      user.pictures = pictures
 
-      const savedUser = await user.save();
+      const savedUser = await user.save()
       if (savedUser) {
         res.status(200).send(savedUser.toUserObject())
       } else {
@@ -434,7 +454,6 @@ exports.update = async (req, res) => {
         })
       }
     }
-
   } catch (error) {
     res.status(500).send({
       message: 'Error updating User with id=' + id + ' with error: ' + error
@@ -476,14 +495,7 @@ exports.delete = async (req, res) => {
     })
   }
 
-  try {
-    let user = await User.findById(userId)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).send({
-      message: 'Could not delete user with id=' + userId + ' with error: ' + error
-    })
-  }
+  const user = await User.findById(userId)
 
   if (!user) {
     return res.status(404).send({
@@ -576,8 +588,8 @@ exports.uploadUserImage = (req, res) => {
       image.save().then(savedImage => {
         user.profilePicture = savedImage.id
         user.save().then(async updatedUser => {
-          await updatedUser.populate('profilePicture');
-          res.status(200).send(updatedUser.toUserObject());
+          await updatedUser.populate('profilePicture')
+          res.status(200).send(updatedUser.toUserObject())
         }).catch(err => {
           res.status(500).send({
             message: `Error updating the user: ${err}`
@@ -590,7 +602,7 @@ exports.uploadUserImage = (req, res) => {
       })
     }).catch(err => {
       res.status(500).send({
-        message: `Cannot find user with id ${id}.`
+        message: `Cannot find user with id ${id}. Error: ${err}`
       })
     })
 }
@@ -609,34 +621,32 @@ exports.findAllFavoriteRestaurants = async (req, res) => {
   const id = req.params.id
 
   try {
-    var user = await User.findById(id);
+    const user = await User.findById(id)
 
-    if (!user){
+    if (!user) {
       res.status(404).send({
         message: `Cannot find user with id ${id}.`
       })
-    }else{
-      
+    } else {
       await user.populate({
         path: 'favoriteRestaurants',
         populate: {
           path: 'pictures',
           model: 'image'
         }
-      });
+      })
 
       const restaurants = user.favoriteRestaurants.map(item => {
-        const ret = item.toRestaurantCardObject();
-        ret.isFavorite = true;
-        return ret;
+        const ret = item.toRestaurantCardObject()
+        ret.isFavorite = true
+        return ret
       })
 
       res.status(200).send(restaurants)
     }
-
   } catch (error) {
     res.status(500).send({
-            message:
+      message:
             error.message || 'Some error occurred while retrieving restaurants.'
     })
   }
@@ -714,11 +724,9 @@ exports.findAllRestaurants = (req, res) => {
         message: `User Id ${id} can not be found`
       })
     } else {
-
       const restaurants = data.ownedRestaurants.map(item => {
-        return item.toRestaurantCardObject();
-      });
-
+        return item.toRestaurantCardObject()
+      })
 
       res.status(200).send(restaurants)
     }

@@ -10,6 +10,14 @@
     }
   },
   "basePath": "/api/v1",
+  "securityDefinitions": {
+    "Bearer": {
+      "name": "x-access-token",
+      "type": "apiKey",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme."
+    }
+  },
   "consumes": [
     "application/json"
   ],
@@ -130,6 +138,12 @@
           "400": {
             "description": "Content cannot be empty"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -229,6 +243,12 @@
           "400": {
             "description": "Needs to specify userId"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "User not found"
           },
@@ -270,6 +290,12 @@
           "400": {
             "description": "Content cannot be empty"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "User not found"
           },
@@ -302,6 +328,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "User not found"
@@ -342,6 +371,12 @@
           "400": {
             "description": "Error with given parameters."
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Object the id belongs to not found."
           },
@@ -373,6 +408,12 @@
             "schema": {
               "$ref": "#/definitions/Restaurants"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "User not found"
@@ -414,6 +455,12 @@
           "400": {
             "description": "Restaurant id needs to be filled"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Restaurant not found"
           },
@@ -448,6 +495,12 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "User not found"
@@ -485,6 +538,12 @@
           },
           "400": {
             "description": "Error with given parameters."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Error creating restaurant"
@@ -548,6 +607,12 @@
               "$ref": "#/definitions/Restaurants"
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Some error occurred while retrieving restaurants."
           }
@@ -576,6 +641,12 @@
             "schema": {
               "$ref": "#/definitions/Restaurant"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -619,6 +690,12 @@
           "400": {
             "description": "Error with given parameters."
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Restaurant not found"
           },
@@ -645,6 +722,12 @@
         "responses": {
           "200": {
             "description": "Restaurant deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -681,6 +764,12 @@
         "responses": {
           "200": {
             "description": "Restaurant set to {status} successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -730,6 +819,12 @@
           "400": {
             "description": "Error with given parameters."
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "User or restaurant not found"
           },
@@ -761,6 +856,12 @@
             "schema": {
               "$ref": "#/definitions/Reviews"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -800,6 +901,12 @@
           },
           "400": {
             "description": "Error with given parameters."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Object the id belongs to not found."
@@ -842,6 +949,12 @@
           "400": {
             "description": "Error with given parameters"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Restaurant not found."
           },
@@ -871,6 +984,12 @@
             "schema": {
               "$ref": "#/definitions/Menu"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -910,6 +1029,12 @@
             "schema": {
               "$ref": "#/definitions/Dish"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant or dish not found"
@@ -957,6 +1082,12 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Restaurant or dish not found"
           },
@@ -990,6 +1121,12 @@
         "responses": {
           "200": {
             "description": "Dish deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant or dish not found"
@@ -1035,6 +1172,12 @@
           "400": {
             "description": "Error with given parameters."
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Object the id belongs to not found."
           },
@@ -1075,6 +1218,12 @@
           "400": {
             "description": "Body for category cannot be empty!"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Restaurant not found"
           },
@@ -1102,6 +1251,12 @@
           "200": {
             "description": "Categories retrieved successfully",
             "type": "array"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -1137,6 +1292,12 @@
         "responses": {
           "200": {
             "description": "Category deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Restaurant not found"
@@ -1814,5 +1975,10 @@
         }
       }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
 }

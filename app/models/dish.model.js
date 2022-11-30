@@ -3,7 +3,7 @@ module.exports = mongoose => {
   const ImageSchema = mongoose.Schema({
     fileName: String,
     type: String,
-    uri: Buffer,
+    uri: Buffer
   })
 
   const schema = mongoose.Schema({
@@ -43,7 +43,7 @@ module.exports = mongoose => {
       unique: false,
       default: false
     },
-    pictures : [ImageSchema],
+    pictures: [ImageSchema]
   }, {
     timestamp: true
   })
@@ -56,12 +56,12 @@ module.exports = mongoose => {
 
     object.pictures = object.pictures.map(item => {
       const newItem = {
-        fileName : item.fileName,
-        type : item.type,
-        id : item._id,
-        uri : item.uri.toString('base64')
+        fileName: item.fileName,
+        type: item.type,
+        id: item._id,
+        uri: item.uri.toString('base64')
       }
-      return newItem;
+      return newItem
     })
 
     return object

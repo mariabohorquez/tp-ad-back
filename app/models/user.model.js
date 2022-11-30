@@ -4,8 +4,8 @@ module.exports = mongoose => {
   const ImageSchema = mongoose.Schema({
     fileName: String,
     type: String,
-    uri: Buffer,
-  });
+    uri: Buffer
+  })
 
   const schema = mongoose.Schema({
     role: {
@@ -72,6 +72,14 @@ module.exports = mongoose => {
     },
     isLoggedIn: {
       type: Boolean
+    },
+    token: {
+      type: String,
+      createdAt: {
+        type: Date,
+        expires: 7200,
+        default: Date.now
+      }
     }
   }, {
     timestamp: true
@@ -93,7 +101,6 @@ module.exports = mongoose => {
     }
 
     // generate the hash
-    console.log('hashing password: ' + this.custom.password)
     bcrypt.hash(this.custom.password, 10, (err, hash) => {
       if (err) {
         next(err)
@@ -108,53 +115,46 @@ module.exports = mongoose => {
 
   // method to compare a given password with the database hash
   schema.methods.comparePassword = function comparePassword (password) {
-    console.log('password ' + password)
-    console.log('this.password ' + this.custom.password)
     const data = bcrypt.compareSync(password, this.custom.password)
     return data
   }
 
   schema.methods.toUserObject = function toUserObject () {
-    const { __v, _id, ...object } = this.toObject();
+    const { __v, _id, ...object } = this.toObject()
 
-    let user = {
-      
-    };
-
-    const isUser = object.role === 'user';
-    user.id = _id;
-    user.role = object.role;
-    user.name = isUser ? object.google.name : object.custom.name;
-    user.email = isUser ? object.google.email : object.custom.email;
-    user.coordinates = object.coordinates;
-    user.isLoggedIn = object.isLoggedIn;
-    user.favoriteRestaurants = object.favoriteRestaurants;
-    user.ownedRestaurants = object.ownedRestaurants;
+    const user = {}
+    const isUser = object.role === 'user'
+    user.id = _id
+    user.role = object.role
+    user.name = isUser ? object.google.name : object.custom.name
+    user.email = isUser ? object.google.email : object.custom.email
+    user.coordinates = object.coordinates
+    user.isLoggedIn = object.isLoggedIn
+    user.favoriteRestaurants = object.favoriteRestaurants
+    user.ownedRestaurants = object.ownedRestaurants
+    user.token = object.token ? object.token : null
 
     user.pictures = object.pictures.map(item => {
       const newItem = {
-        fileName : item.fileName,
-        type : item.type,
-        id : item._id,
-        uri : item.uri.toString('base64')
+        fileName: item.fileName,
+        type: item.type,
+        id: item._id,
+        uri: item.uri.toString('base64')
       }
-      return newItem;
+      return newItem
     })
-    
-    return user;
+
+    return user
   }
- 
+
   schema.method('toJSON', function () {
     const { __v, _id, ...object } = this.toObject()
 
-    object.id = _id;
+    object.id = _id
+    if (object.profilePicture?.data) { object.profilePicture = object.profilePicture.data.toString('base64') }
 
-    if (object.profilePicture.data)
-      object.profilePicture = object.profilePicture.data.toString('base64');
-
-    return object;
+    return object
   })
-
 
   const User = mongoose.model('user', schema)
   return User
