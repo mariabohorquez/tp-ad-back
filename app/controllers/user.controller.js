@@ -172,15 +172,14 @@ exports.login = (req, res) => {
 
   // Find user by email
   User.findOne({ 'custom.email': req.body.email })
-    .then(data => {
-      if (!data) {
+    .then(user => {
+      if (!user) {
         return res.status(404).send({
           message: 'User not found'
         })
       } else {
         // Check if password is correct
-        console.log('data is ' + data)
-        const passwordIsValid = data.comparePassword(req.body.password)
+        const passwordIsValid = user.comparePassword(req.body.password)
 
         if (!passwordIsValid) {
           return res.status(401).send({
@@ -198,16 +197,11 @@ exports.login = (req, res) => {
         )
 
         // Update logged in status and token
-        data.isLoggedIn = true
-        data.token = token
-        data.save()
+        user.token = token
+		user.isLoggedIn = true
+        user.save()
 
-        return res.status(200).send({
-          id: data._id,
-          email: data.custom.email,
-          name: data.custom.name,
-          accessToken: token
-        })
+        return res.status(200).send(user.toUserObject());
       }
     })
 }
