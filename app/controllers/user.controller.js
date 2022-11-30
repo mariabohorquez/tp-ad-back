@@ -389,7 +389,24 @@ exports.update = async (req, res) => {
   }
 
   const name = req.body.name;
+  const pictures = [];
 
+  req.body.pictures.forEach((item, idx) => {
+    const image = {
+      fileName : item.fileName,
+      type : item.type,
+      uri : '',
+    };
+
+    if (item.id){
+      image.uri = new Buffer(item.uri, 'base64');
+    }
+    else{
+      image.uri = new Buffer(item.base64, 'base64')
+    }
+
+    pictures.push(image);
+  });
 
 
   try {
@@ -405,6 +422,8 @@ exports.update = async (req, res) => {
       } else if (user.role === 'owner') {
         user.custom.name = name
       }
+
+      user.pictures = pictures;
 
       const savedUser = await user.save();
       if (savedUser) {
