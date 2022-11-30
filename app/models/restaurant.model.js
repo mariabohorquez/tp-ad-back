@@ -2,8 +2,8 @@ module.exports = mongoose => {
   const ImageSchema = mongoose.Schema({
     fileName: String,
     type: String,
-    uri: Buffer,
-  });
+    uri: Buffer
+  })
 
   const schema = mongoose.Schema(
     {
@@ -12,11 +12,11 @@ module.exports = mongoose => {
         required: true,
         unique: true
       },
-      openingTimes : {
-        type : [Date],
+      openingTimes: {
+        type: [Date]
       },
-      closingTimes : {
-        type : [Date],
+      closingTimes: {
+        type: [Date]
       },
       // https://stackoverflow.com/questions/17460235/mongodb-opening-hours-schema-and-query-for-open-closed
       isClosedOverwrite: {
@@ -74,15 +74,14 @@ module.exports = mongoose => {
         required: false,
         default: 0
       },
-      pictures : [ImageSchema]
+      pictures: [ImageSchema]
     },
     { timestamps: true }
   )
 
   schema.index({ coordinates: '2dsphere' })
 
-  schema.methods.toRestaurantCardObject = function toRestaurantCardObject(user = undefined){
-    
+  schema.methods.toRestaurantCardObject = function toRestaurantCardObject (user = undefined) {
     const { __v, _id, ...object } = this.toObject()
 
     const restCard = {
@@ -91,14 +90,14 @@ module.exports = mongoose => {
       score: Number(object.averageRating).toFixed(2),
       restaurantId: _id,
       isFavorite: user ? user.favoriteRestaurants.includes(_id) : false,
-      pictures : object.pictures = object.pictures.map(item => {
+      pictures: object.pictures = object.pictures.map(item => {
         const newItem = {
-          fileName : item.fileName,
-          type : item.type,
-          id : item._id,
-          uri : item.uri.toString('base64')
+          fileName: item.fileName,
+          type: item.type,
+          id: item._id,
+          uri: item.uri.toString('base64')
         }
-        return newItem;
+        return newItem
       })
     }
 
@@ -107,17 +106,17 @@ module.exports = mongoose => {
 
   schema.method('toJSON', function () {
     const { __v, _id, ...object } = this.toObject()
-    object.id = _id;
-    object.averageRating = Number(object.averageRating).toFixed(2);
+    object.id = _id
+    object.averageRating = Number(object.averageRating).toFixed(2)
 
     object.pictures = object.pictures.map(item => {
       const newItem = {
-        fileName : item.fileName,
-        type : item.type,
-        id : item._id,
-        uri : item.uri.toString('base64')
+        fileName: item.fileName,
+        type: item.type,
+        id: item._id,
+        uri: item.uri.toString('base64')
       }
-      return newItem;
+      return newItem
     })
 
     return object

@@ -47,14 +47,14 @@ exports.create = (req, res) => {
     return
   }
 
-  let images = req.body.pictures.map(item => {
+  const images = req.body.pictures.map(item => {
     const image = {
-      fileName : item.fileName,
-      type : item.type,
-      uri : new Buffer(item.base64, 'base64'),
+      fileName: item.fileName,
+      type: item.type,
+      uri: new Buffer(item.base64, 'base64')
     }
-    return image;
-  });
+    return image
+  })
 
   // Create a Restaurant
   const restaurant = new Restaurant({
@@ -63,12 +63,12 @@ exports.create = (req, res) => {
     address: req.body.address || {},
     restaurantTypes: req.body.restaurantTypes,
     coordinates: req.body.coordinates || {},
-    openingTimes : req.body.openingTimes.map(item => {return Date(item)}),
-    closingTimes : req.body.closingTimes.map(item => {return Date(item)}),
-    isClosedOverwrite : req.body.isClosedOverwrite,
-    pictures : images
+    openingTimes: req.body.openingTimes.map(item => { return Date(item) }),
+    closingTimes: req.body.closingTimes.map(item => { return Date(item) }),
+    isClosedOverwrite: req.body.isClosedOverwrite,
+    pictures: images
   })
-  
+
   Restaurant.findOne({ name: req.body.name })
     .then(data => {
       if (data) {
@@ -95,7 +95,7 @@ exports.create = (req, res) => {
             })
           }).catch(err => {
             res.status(500).send({
-              message: `Cannot find user with id ${ownerId}.`
+              message: `Cannot find user with id ${ownerId}. Error ${err}`
             })
           })
       }
@@ -153,7 +153,7 @@ exports.findAll = async (req, res) => {
      description: 'Some error occurred while retrieving restaurants.',
     }
   */
-  
+
   const name = req.query.name || ''
   console.log('name ' + name)
   const priceRange = req.query.priceRange ? req.query.priceRange.split(/[ ,]+/) : [new RegExp('.*')]
@@ -163,22 +163,18 @@ exports.findAll = async (req, res) => {
   const minRating = req.query.minRating ? Number(req.query.minRating) : 0
   console.log('minRating: ' + minRating)
   const maxDistance = req.query.maxDistance && Number(req.query.maxDistance) > 0 ? Number(req.query.maxDistance) : 10 // distance in km
-  console.log('maxDistance: ' + maxDistance);
-
+  console.log('maxDistance: ' + maxDistance)
 
   try {
-    var user = await User.findById(req.query.userId);
+    const user = await User.findById(req.query.userId)
 
-    if (!user){
-      res.status(500).send({
-        message:
-        err.message || 'User not send.'
-      })
-    }else{
+    if (!user) {
+      res.status(500).send('User not found.')
+    } else {
       console.log('User at coordinates: ' + user.coordinates)
     }
 
-    var restaurants = await Restaurant.aggregate(
+    const restaurants = await Restaurant.aggregate(
       [
         {
           $geoNear: {
@@ -208,23 +204,22 @@ exports.findAll = async (req, res) => {
             },
             restaurantTypes: {
               $in: restaurantTypes
-            },
+            }
           }
         }
       ]
-    );
+    )
 
     await Restaurant.populate(restaurants, {
       path: 'pictures'
-    });
+    })
 
     const returnData = restaurants.map(item => {
-      const resto = new Restaurant(item);
-      return resto.toRestaurantCardObject(user);
-    });
+      const resto = new Restaurant(item)
+      return resto.toRestaurantCardObject(user)
+    })
 
-    res.status(200).send(returnData);
-
+    res.status(200).send(returnData)
   } catch (error) {
     res.status(500).send({
       message:
@@ -255,19 +250,18 @@ exports.findOne = (req, res) => {
 
   Restaurant.findById(id)
     .then(async data => {
-      if (!data){
+      if (!data) {
         res.status(404).send({
-          message : 'Not found Restaurant with id ' + id
-        });
-      }
-      else{
+          message: 'Not found Restaurant with id ' + id
+        })
+      } else {
         try {
-          await data.populate('pictures');
-          res.status(200).send(data.toJSON());
+          await data.populate('pictures')
+          res.status(200).send(data.toJSON())
         } catch (error) {
           res
-          .status(500)
-          .send({ message: 'Error retrieving Restaurant with id=' + id + ' with error: ' + error })
+            .status(500)
+            .send({ message: 'Error retrieving Restaurant with id=' + id + ' with error: ' + error })
         }
       }
     })
@@ -313,7 +307,6 @@ exports.update = (req, res) => {
   }
 
   const id = req.params.id
-  
 
   Restaurant.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
     .then(data => {
@@ -321,9 +314,9 @@ exports.update = (req, res) => {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else{
+      } else {
         res.status(200).send(data.toJSON())
-      } 
+      }
     })
     .catch(err => {
       res.status(500).send({
@@ -391,11 +384,11 @@ exports.createReview = (req, res) => {
           for (const aReview of restaurant.reviews) {
             if (aReview.name === user.google.name) {
               return res.status(400).send({
-                message: `You can't create more than one of review from same user account`
+                message: 'You can\'t create more than one of review from same user account'
               })
             }
           }
-          
+
           // Add review to array
           review.save().then(newReview => {
             restaurant.reviews.push(newReview)
@@ -407,7 +400,7 @@ exports.createReview = (req, res) => {
             const averageRating = sum / reviews.length
             restaurant.averageRating = averageRating
             restaurant.save().then(updatedRestaurant => {
-              return res.status(200).send(updatedRestaurant);
+              return res.status(200).send(updatedRestaurant)
             })
               .catch(err => {
                 return res.status(500).send({
@@ -641,14 +634,14 @@ exports.createDish = (req, res) => {
     })
   }
 
-  let images = req.body.pictures.map(item => {
+  const images = req.body.pictures.map(item => {
     const image = {
-      fileName : item.fileName,
-      type : item.type,
-      uri : new Buffer(item.base64, 'base64'),
+      fileName: item.fileName,
+      type: item.type,
+      uri: new Buffer(item.base64, 'base64')
     }
-    return image;
-  });
+    return image
+  })
 
   const newDish = new Dish({
     name: req.body.name,
@@ -658,7 +651,7 @@ exports.createDish = (req, res) => {
     isVegan: req.body.isVegan,
     isGlutenFree: req.body.isGlutenFree,
     discounts: req.body.discounts || 0,
-    pictures : images,
+    pictures: images
   })
 
   Restaurant.findById(restaurantId).populate('menu').then(restaurant => {
@@ -723,9 +716,8 @@ exports.findAllDishes = (req, res) => {
 
   Restaurant.findById(restaurantId).populate('menu')
     .then(data => {
-
       const dishes = data.menu.map(item => {
-        return item.toJSON();
+        return item.toJSON()
       })
 
       res.status(200).send(dishes)
@@ -761,13 +753,12 @@ exports.findOneDish = (req, res) => {
 
   Dish.findById(dishId)
     .then(data => {
-
-      if (!data){
+      if (!data) {
         res.status(404).send({
-          message : `Dish not founded`
-        });
-      }else{
-        const dish = data.toJSON();
+          message: 'Dish not founded'
+        })
+      } else {
+        const dish = data.toJSON()
         res.status(200).send(dish)
       }
     })
@@ -807,7 +798,7 @@ exports.updateDish = (req, res) => {
   const id = req.params.restaurantId
   const dishId = req.params.dishId
 
-  console.log('Edit Dish Req: ', req);
+  console.log('Edit Dish Req: ', req)
 
   if (!req.body) {
     return res.status(400).send({
@@ -815,26 +806,25 @@ exports.updateDish = (req, res) => {
     })
   }
 
-  const images = [];
+  const images = []
 
   req.body.pictures.forEach((item, idx) => {
     const image = {
-      fileName : item.fileName,
-      type : item.type,
-      uri : '',
-    };
-
-    if (item.id){
-      image.uri = new Buffer(item.uri, 'base64');
+      fileName: item.fileName,
+      type: item.type,
+      uri: ''
     }
-    else{
+
+    if (item.id) {
+      image.uri = new Buffer(item.uri, 'base64')
+    } else {
       image.uri = new Buffer(item.base64, 'base64')
     }
 
-    images.push(image);
-  });
-  
-  req.body.pictures = images;
+    images.push(image)
+  })
+
+  req.body.pictures = images
 
   Dish.findOneAndUpdate({ _id: dishId },
     { $set: req.body },

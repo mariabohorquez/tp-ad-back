@@ -28,6 +28,15 @@ const doc = {
   "produces": [
     "application/json"
   ],
+  "securityDefinitions": {
+    "Bearer": {
+      "name": "x-access-token",
+      "type": "apiKey",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme.",
+    },
+  },
+  "security": [{"Bearer": []}],
   "definitions": { 
     Restaurant: {
       name: 'La Pizzeria',
