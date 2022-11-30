@@ -109,7 +109,6 @@ exports.register = (req, res) => {
           user
             .save()
             .then(data => {
-
               return res.status(201).send(data.toUserObject())
             })
             .catch(err => {

@@ -1,6 +1,12 @@
 const bcrypt = require('bcrypt')
 
 module.exports = mongoose => {
+  const ImageSchema = mongoose.Schema({
+    fileName: String,
+    type: String,
+    uri: Buffer,
+  });
+
   const schema = mongoose.Schema({
     role: {
       type: String,
@@ -38,10 +44,8 @@ module.exports = mongoose => {
         unique: false
       }
     },
-    profilePicture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'image'
-    },
+    pictures: [ImageSchema],
+
     favoriteRestaurants: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -127,10 +131,15 @@ module.exports = mongoose => {
     user.favoriteRestaurants = object.favoriteRestaurants;
     user.ownedRestaurants = object.ownedRestaurants;
 
-    if (object.profilePicture.data)
-      user.profilePicture = object.profilePicture.data.toString('base64');
-    else
-      user.profilePicture = object.profilePicture;
+    user.pictures = object.pictures.map(item => {
+      const newItem = {
+        fileName : item.fileName,
+        type : item.type,
+        id : item._id,
+        uri : item.uri.toString('base64')
+      }
+      return newItem;
+    })
     
     return user;
   }
