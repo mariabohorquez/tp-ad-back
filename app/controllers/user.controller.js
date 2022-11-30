@@ -198,7 +198,7 @@ exports.login = (req, res) => {
 
         // Update logged in status and token
         user.token = token
-		user.isLoggedIn = true
+		    user.isLoggedIn = true
         user.save()
 
         return res.status(200).send(user.toUserObject());

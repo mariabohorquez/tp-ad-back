@@ -36,7 +36,8 @@ module.exports = mongoose => {
         neighborhood: String,
         city: String,
         state: String,
-        country: String
+        country: String,
+        zipCode : String,
       },
       coordinates: {
         type: {
@@ -118,6 +119,8 @@ module.exports = mongoose => {
       }
       return newItem
     })
+
+    console.log('Restaurant Data: ', object);
 
     return object
   })

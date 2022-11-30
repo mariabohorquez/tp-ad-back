@@ -308,6 +308,28 @@ exports.update = (req, res) => {
 
   const id = req.params.id
 
+  const images = [];
+
+  req.body.pictures.forEach((item, idx) => {
+    const image = {
+      fileName : item.fileName,
+      type : item.type,
+      uri : '',
+    };
+
+    if (item.id){
+      image.uri = new Buffer(item.uri, 'base64');
+    }
+    else{
+      image.uri = new Buffer(item.base64, 'base64')
+    }
+
+    images.push(image);
+  });
+  
+  req.body.pictures = images;
+  
+
   Restaurant.findByIdAndUpdate(id, req.body, { useFindAndModify: false, returnDocument: 'after' })
     .then(data => {
       if (!data) {
