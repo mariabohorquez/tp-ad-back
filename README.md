@@ -58,43 +58,60 @@ classDiagram
     -ingredients:String,
     -isVegan:Boolean,
     -isGlutenFree:Boolean
+    -discounts :Number,
+    -pictures : Array
   }
-  class Owner {
-    -email: String,
-    -password: String,
-    -name: String,
-    -profilePicture: Buffer,
-    -restaurants: Object
+  class User {
+    -role: String,
+    -custom: Object,
+    -favoriteRestaurants: Array,
+    -ownedRestaurants: Object,
+    -coordinates: Object,
+    -isLoggedIn : Boolean,
+    -pictures: Array,
+    -token: String
+   
     }
     class Restaurant {
     -name: String,
-    -openingTime: Number,
-    -closingTime: Number,
+    -openingTime: Array,
+    -closingTime: Array,
     -isClosedOverwrite: Boolean,
     -priceRange: String,
     -address: Object,
-    -restaurantTypes: String,
-    -menuCategories: String,
-    -menu: Object,
-    -reviews: Object
+    -coordinates : Object,
+    -restaurantTypes: Array,
+    -menuCategories: Array,
+    -menu: Array,
+    -reviews: Array,
+    -averageRaiting: Number,
+    -pictures: Array,
+    
     }
     
     class Review {
-    -user: Object,
     -rating: Number,
     -comment: String
     }
-    
-    class User {
-    -google: Object,
-    -profilePicture: Buffer,
-    -favoriteRestaurants: Object
+     class Image {
+    -data: Object,
+    -name: String,
+    -type: String,
+    }
+      class Token {
+    -userId: Object,
+    -token: String,
+    -createdAt: Date,
     }
     
+    
+    
  Restaurant "1" *-- "0..n" Dish : menu
- Owner "1" *-- "0..n" Restaurant : idMongo
- Restaurant "1" *-- "0..n" Review : idMongo
+ Restaurant "1" *-- "0..n" Review : reviews
+ Restaurant "1" *-- "0..n" Image : pictures
+ Dish "1" *-- "0..n" Image : pictures
+ User "1" *-- "1" Token : idMongo
+ User "1" *-- "0..n" Restaurant : idMongo
  User "1" *-- "0..n" Review : idMongo
- User "1" --"0..n" Restaurant : favorite
 ```
 
