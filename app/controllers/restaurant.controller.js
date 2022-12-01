@@ -1052,7 +1052,7 @@ exports.createCategory = (req, res) => {
       }
   */
   const restaurantId = req.params.restaurantId
-  const category = req.body.name
+  const category = req.body.category
 
   if (!category) {
     return res.status(400).send({
@@ -1154,20 +1154,38 @@ exports.deleteCategory = (req, res) => {
       }
   */
   const id = req.params.restaurantId
-  const category = req.body.category
+
+  if (!id) {
+    return res.status(400).send({
+      message: 'Restaurant Id can not be empty'
+    })
+  }
+
+  const category = req.body.category;
+
+  if (!category) {
+    return res.status(400).send({
+      message: 'Category cannot be empty!'
+    })
+  }
 
   Restaurant.findOneAndUpdate(
     { _id: id },
     { $pull: { menuCategories: category } },
     { upsert: false, new: true })
-    .then(data => {
+    .then(async data => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`
         })
-      } else res.status(200).send({ message: 'Restaurant was updated successfully. Category deleted' })
+      } else {
+
+        await Dish.deleteMany({category : category})
+        res.status(200).send({ message: 'Restaurant was updated successfully. Category deleted' })
+      }
     })
     .catch(err => {
+      console.log(err);
       res.status(500).send({
         message: 'Error updating Restaurant with id=' + id + ' with error: ' + err
       })
