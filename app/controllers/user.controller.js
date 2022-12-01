@@ -189,7 +189,7 @@ exports.login = (req, res) => {
         }
 
         const token = jwt.sign(
-          { id: data._id, email: data.email },
+          { id: user._id, email: user.email },
           authConfig.secret,
           {
             expiresIn: '2h'
