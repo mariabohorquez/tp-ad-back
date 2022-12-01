@@ -55,7 +55,7 @@ exports.register = (req, res) => {
     User.findOne({ 'custom.email': req.body.custom.email })
       .then(data => {
         if (data) {
-          return res.status(400).send({
+          return res.status(406).send({
             message: 'Email already exists'
           })
         } else {
